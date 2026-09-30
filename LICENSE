@@ -19,3 +19,50 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+===============================================================================
+子目录版权（Subdirectory copyright）
+===============================================================================
+
+本仓库是**单仓（monorepo）**。上面的 MIT 许可与版权署名 `someone628` 覆盖的是
+**根目录**下的构建脚本与文档；各子目录里的插件**版权归各自作者**，
+以该子目录内的 `LICENSE` 文件为准：
+
+| 子目录 | 插件 | 版权署名 |
+| --- | --- | --- |
+| `dsh-onco-lexicon/` | 离线肿瘤学术语词典（DSH 插件） | `Copyright (c) 2026 evilfies` |
+| `dsh-lit-translate/` | 文献翻译（DSH 插件） | `Copyright (c) 2026 director` |
+
+两点需要注意：
+
+1. **数据不是 MIT 作品。** `dsh-onco-lexicon/data/onco.ncit.jsonl` 派生自
+   NCI Thesaurus OBO Edition（**CC BY 4.0**）：再分发时必须保留 NCIt 署名、
+   标明本插件对其所做的修改，并注意 `NCI Thesaurus` 是商标。
+   完整说明见 `dsh-onco-lexicon/THIRD-PARTY-NOTICES.md`，
+   该子目录的 README「许可」一节也复述了要点。
+2. **子包不携带本文件。** 打包成 tgz 时，每个子包只会带上自己目录内的 `LICENSE`
+   ——所以子包内的 `LICENSE` 各自完整写明了版权人，可脱离本仓库独立分发；
+   本文件的"子目录版权"一节只是让**在仓库里阅读的人**看得明白。
+
+===============================================================================
+Subdirectory copyright (EN)
+===============================================================================
+
+This repository is a monorepo. The MIT license and the copyright notice above
+(`Copyright (c) 2026 someone628`) cover the root-level build scripts and docs.
+Each plugin in a subdirectory is copyrighted by its own author, as stated in
+that subdirectory's own LICENSE file:
+
+* `dsh-onco-lexicon/` — offline oncology terminology lexicon — `Copyright (c) 2026 evilfies`
+* `dsh-lit-translate/` — literature translation — `Copyright (c) 2026 director`
+
+Notes:
+
+1. Data is not MIT-licensed. `dsh-onco-lexicon/data/onco.ncit.jsonl` is derived
+   from the NCI Thesaurus OBO Edition, which is licensed under **CC BY 4.0**;
+   redistribution must keep the NCIt attribution and indicate the modifications
+   made here. `NCI Thesaurus` is a trademark. See
+   `dsh-onco-lexicon/THIRD-PARTY-NOTICES.md` for the full notice.
+2. The packaged tarballs do not include this file — each package ships only its
+   own subdirectory LICENSE, which names its own copyright holder, so the
+   packages can be redistributed standalone.
