@@ -1,0 +1,28 @@
+# ---- 依赖 ----
+# 测试用的 node_modules（junction，指向外部的 @deepseek-ai/* 包，绝不入库）
+node_modules/
+
+# ---- 打包产物 ----
+*.tgz
+.pack/
+.pack-lit-translate/
+
+# ---- Python ----
+__pycache__/
+*.pyc
+
+# ---- 体积大的数据与中间产物 ----
+# 主词典 81.6 MB：随 tgz / npm 包发布，不进 git 历史（见 dsh-onco-lexicon/data/README.md）
+dsh-onco-lexicon/data/onco.ncit.jsonl
+# NCIt 解析中间产物（84.9 MiB）与各类索引输出
+onco-ncit-dsh.jsonl
+kb_out/
+kb_out_ncit/
+tfidf_out/
+data.zip
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

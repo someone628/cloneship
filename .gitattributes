@@ -1,0 +1,8 @@
+# 统一行尾，避免 Windows 提交时把 LF 换行搞成 CRLF 引入无意义 diff
+* text=auto eol=lf
+
+# 二进制 / 大文件：不做换行转换
+*.png binary
+*.tgz binary
+*.jsonl -text
+*.obo -text

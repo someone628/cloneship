@@ -1,0 +1,57 @@
+{
+  "name": "dsh-onco-lexicon",
+  "version": "0.6.1",
+  "description": "DSH 离线肿瘤学术语词典插件：术语、缩写、生物标志物、抗肿瘤药物与临床试验终点查询，支持中英术语对照与长文本术语标注，含可浏览的侧边栏栏目，全程不联网。",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "oncology",
+    "lexicon",
+    "offline"
+  ],
+  "type": "module",
+  "license": "MIT",
+  "author": "evilfies",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/someone628/cloneship.git",
+    "directory": "dsh-onco-lexicon"
+  },
+  "homepage": "https://github.com/someone628/cloneship/tree/main/dsh-onco-lexicon#readme",
+  "bugs": {
+    "url": "https://github.com/someone628/cloneship/issues"
+  },
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "assets/icon.png",
+    "data/onco.ncit.jsonl",
+    "data/onco.seed.jsonl",
+    "cordis.patch.yml",
+    "skill.md",
+    "README.md",
+    "LICENSE",
+    "THIRD-PARTY-NOTICES.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    }
+  }
+}

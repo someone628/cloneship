@@ -1,0 +1,53 @@
+{
+  "name": "dsh-lit-translate",
+  "version": "0.1.1",
+  "description": "DSH 文献翻译插件：从文献阅读里把「学术英译中」单独抠出来做成配套插件。粘贴或导入 txt/md 即可逐段翻译，术语首次出现附英文原文，支持上文参考、进度续翻与导出，并给模型提供 lit_translate 工具。",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "translation",
+    "literature",
+    "medical"
+  ],
+  "type": "module",
+  "license": "MIT",
+  "author": "director",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/someone628/cloneship.git",
+    "directory": "dsh-lit-translate"
+  },
+  "homepage": "https://github.com/someone628/cloneship/tree/main/dsh-lit-translate#readme",
+  "bugs": {
+    "url": "https://github.com/someone628/cloneship/issues"
+  },
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "skill.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+# ============================================================================
+# dsh-lit-translate —— DSH bundle patch
+# ============================================================================
+# 把「文献翻译」面板挂进 Web profile 的配置树。
+#
+# 安装：
+#   dsh plugin --profile <你的 web profile> add link:<本目录的绝对路径>
+#   或先打包再装：dsh plugin --profile web add file:<tgz 路径>
+#
+# 依赖说明：翻译走 harness 当前的默认模型（ctx.get('llm') + agentDefaultModel），
+# 不额外配置 API Key；没有可用默认模型时面板仍能打开，只是翻译会报错。
+#
+# 本机 DSH 运行时未附带 TypeScript 编译器，插件以纯 ESM JavaScript 交付，
+# 入口是 lib/index.js，无需构建步骤。
+# ============================================================================
+
+- insert:
+    - id: dsh-lit-translate
+      name: dsh-lit-translate
+      config:
+        # 单次翻译的原文上限（字符）。超过就让用户/模型先切段，避免一次塞爆上下文。
+        maxChars: 120000
+        # lit_translate 在调用方没写 annotate 时的默认值。
+        # true = 术语首次出现写成「中文（English）」；false = 纯中文译文。
+        annotate: true
+        # 工作稿（原文 + 各段译文）的落盘目录。
+        # 留空/null 则用 $DSH_HOME/lit-translate。
+        dataDir: null

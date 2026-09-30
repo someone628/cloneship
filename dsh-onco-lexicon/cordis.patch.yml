@@ -1,0 +1,21 @@
+# ============================================================================
+# dsh-onco-lexicon —— DSH bundle patch
+# ============================================================================
+# 把离线肿瘤学术语词典挂进 Web profile 的配置树。
+#
+# 安装：
+#   dsh plugin --profile <你的 web profile> add link:<本目录的绝对路径>
+#
+# 注意：本机 DSH 运行时未附带 TypeScript 编译器，插件以纯 ESM JavaScript 交付，
+# 入口是 lib/index.js，无需构建步骤。
+# ============================================================================
+
+- insert:
+    - id: dsh-onco-lexicon
+      name: dsh-onco-lexicon
+      config:
+        # dictPath 留空则自动探测：优先 data/onco.ncit.jsonl（若存在），
+        # 缺失时回退到内置的 data/onco.seed.jsonl
+        dictPath: null
+        topK: 5
+        fuzzy: true
