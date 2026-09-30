@@ -86,7 +86,32 @@ dsh plugin --profile web add file:<dsh-lit-translate-0.1.1.tgz 的绝对路径>
 
 ---
 
-## 4. 许可与版权
+## 4. 主词典怎么分发
+
+`dsh-onco-lexicon/data/onco.ncit.jsonl` 有 **81.6 MB（77.9 MiB）**，**不进 git 历史**。给它三条出口：
+
+1. **GitHub Release 附件（推荐）** —— 直接挂打包好的 tgz，主词典已经在里面：
+
+   ```powershell
+   powershell -File build-package.ps1     # 产出 dsh-onco-lexicon-0.6.1.tgz（约 12.9 MB，主词典在内）
+   gh release create v0.6.1 dsh-onco-lexicon-0.6.1.tgz --title "dsh-onco-lexicon 0.6.1"
+   ```
+
+   （没装 `gh` 就在仓库的 Releases 页面手动上传同一个 tgz。）使用者下载后
+   `dsh plugin --profile web add file:<下载路径>` 即可，**不需要自己生成词典**。
+
+2. **npm 发布** —— `npm publish dsh-onco-lexicon-0.6.1.tgz`：包内 `files` 已包含数据文件，
+   整包约 12.9 MB，其中绝大部分是词典。
+
+3. **使用者自行生成** —— 见 [`dsh-onco-lexicon/data/README.md`](dsh-onco-lexicon/data/README.md)：
+   取 `ncit.obo`（CC BY 4.0）后跑 `prep_ncit_obo.py` + `build-plugin-dict.py`。
+
+> 一个都不做也能用：仓库里带着 106 条的种子词典，插件会自动回退到它
+> （中文查询仍可用，英文覆盖面大幅缩小）。
+
+---
+
+## 5. 许可与版权
 
 本仓库是**单仓**，版权分属不同作者：
 
@@ -103,8 +128,9 @@ dsh plugin --profile web add file:<dsh-lit-translate-0.1.1.tgz 的绝对路径>
 
 ---
 
-## 5. 状态
+## 6. 状态
 
+* 代码已推送到 GitHub：<https://github.com/someone628/cloneship>（`main` 分支）；
 * 两个插件均已在本机 DSH Web profile 上安装并实测可用；
 * **尚未提交到 dsh.so 插件注册表**（截至 2026-09-30，`https://www.dsh.so/plugin/dsh-onco-lexicon.json`
   与 `.../dsh-lit-translate.json` 均为 404）。

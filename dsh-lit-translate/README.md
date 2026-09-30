@@ -37,14 +37,14 @@
 ### 方式一：从源码目录 link（开发时用）
 
 ```powershell
-dsh plugin --profile web add link:C:\Users\Abc89\Documents\ds-harness-desktop\WorkSpace\dsh-lit-translate
+dsh plugin --profile web add link:C:\path\to\cloneship\dsh-lit-translate
 ```
 
 ### 方式二：打包后安装（推荐发给别人时用）
 
 ```powershell
 powershell -File build-package-lit-translate.ps1
-dsh plugin --profile web add file:C:\Users\Abc89\Documents\ds-harness-desktop\WorkSpace\dsh-lit-translate-0.1.1.tgz
+dsh plugin --profile web add file:C:\path\to\cloneship\dsh-lit-translate-0.1.1.tgz
 ```
 
 安装后需要**重载或重启 DSH**，侧边栏才会出现「文献翻译」入口。
