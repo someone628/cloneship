@@ -83,7 +83,12 @@ def build_text(rec: dict) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Parse ncit.obo into JSONL with a `text` field")
-    ap.add_argument("--data", default=r"C:\Users\Abc89\Desktop\data\ncit.obo")
+    ap.add_argument(
+        "--data",
+        default=os.environ.get("NCIT_OBO")
+        or os.path.join(os.path.dirname(os.path.abspath(__file__)), "ncit.obo"),
+        help="ncit.obo 路径（也可用环境变量 NCIT_OBO 指定；默认取脚本同目录的 ncit.obo）",
+    )
     ap.add_argument("--out", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "onco-ncit-dsh.jsonl"))
     ap.add_argument("--limit", type=int, default=0, help="仅处理前 N 个 Term（调试用）")
     ap.add_argument("--include-def", action="store_true", help="把真实释义也并入 text")

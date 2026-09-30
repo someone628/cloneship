@@ -301,7 +301,7 @@ globalThis.fetch = async (url, init) => {
   else if (payload.op === 'perf') body = PERF
   else if (payload.op === 'related') body = RELATED
   else if (payload.op === 'translate') body = TRANSLATE
-  else if (payload.op === 'export') body = { ok: true, path: 'C:\\Users\\Abc89\\Downloads\\onco-lexicon-2026-01-01-00-00-00.txt', bytes: Buffer.byteLength(payload.args.text, 'utf8') }
+  else if (payload.op === 'export') body = { ok: true, path: 'C:\\Users\\example\\Downloads\\onco-lexicon-2026-01-01-00-00-00.txt', bytes: Buffer.byteLength(payload.args.text, 'utf8') }
   else body = { ok: true, entries: [flatEntry] }
   return { json: async () => body }
 }

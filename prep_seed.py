@@ -66,7 +66,12 @@ def build_text(rec: dict) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Prepare onco-seed-dsh.jsonl")
-    ap.add_argument("--data", default=r"C:\Users\Abc89\Desktop\data\dataonco.seed.jsonl.txt")
+    ap.add_argument(
+        "--data",
+        default=os.environ.get("ONCO_SEED_SRC")
+        or os.path.join(os.path.dirname(os.path.abspath(__file__)), "dataonco.seed.jsonl.txt"),
+        help="种子词典源文件（也可用环境变量 ONCO_SEED_SRC 指定；默认取脚本同目录）",
+    )
     ap.add_argument("--out", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "onco-seed-dsh.jsonl"))
     args = ap.parse_args()
 

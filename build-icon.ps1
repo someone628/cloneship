@@ -8,14 +8,22 @@
 # 用标记而不是占位符，是为了脚本可重复运行（不会第二次就找不到替换目标）。
 #
 # 用法：pwsh -File build-icon.ps1 [-Source <jpg>] [-Size 64] [-Gamma 2.2]
+#
+# 源图路径按序回退，脚本里不写死任何个人路径：
+#   1) -Source 参数
+#   2) 环境变量 ONCO_ICON_SRC
+#   3) 脚本同目录的 assets\icon-source.jpg
+# 例：setx ONCO_ICON_SRC "C:\path\to\source.jpg"
 
 param(
-  [string]$Source = "C:\Users\Abc89\Desktop\9fde96db4c4e5dc0343bae6ae96affa9.jpg",
+  [string]$Source = $env:ONCO_ICON_SRC,
   [int]$Size = 64,
   [double]$Gamma = 2.2
 )
 
 $ErrorActionPreference = "Stop"
+
+if (-not $Source) { $Source = Join-Path $PSScriptRoot "assets\icon-source.jpg" }
 Add-Type -AssemblyName System.Drawing
 
 $pluginDir = Join-Path $PSScriptRoot "dsh-onco-lexicon"

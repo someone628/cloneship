@@ -3,8 +3,18 @@
  *
  * 这是最接近"别人电脑上"的场景：从 profile 的 node_modules 里加载插件，
  * 确认 index.js 能通过 import.meta.url 找到同包的 assets/icon.png 并供出 PNG。
+ *
+ * 路径不写死：优先用环境变量 DSH_HOME，其次回退到 ~/.ds-harness-desktop/dsh-home。
  */
-const INSTALLED = 'file:///C:/Users/Abc89/.ds-harness-desktop/dsh-home/profiles/web/node_modules/dsh-onco-lexicon/lib/index.js'
+import os from 'node:os'
+import path from 'node:path'
+import { readFile } from 'node:fs/promises'
+import { pathToFileURL } from 'node:url'
+
+const DSH_HOME = process.env.DSH_HOME || path.join(os.homedir(), '.ds-harness-desktop', 'dsh-home')
+const PROFILE = process.env.DSH_PROFILE || 'web'
+const INSTALLED_DIR = path.join(DSH_HOME, 'profiles', PROFILE, 'node_modules', 'dsh-onco-lexicon')
+const INSTALLED = pathToFileURL(path.join(INSTALLED_DIR, 'lib', 'index.js')).href
 
 let checks = 0
 const failures = []
@@ -57,8 +67,7 @@ if (iconRoute) {
 }
 
 console.log('[3] 客户端内嵌数据也应在')
-const clientSrc = await (await import('node:fs/promises')).readFile(
-  'C:/Users/Abc89/.ds-harness-desktop/dsh-home/profiles/web/node_modules/dsh-onco-lexicon/lib/client.js', 'utf8')
+const clientSrc = await readFile(path.join(INSTALLED_DIR, 'lib', 'client.js'), 'utf8')
 const m = /const ICON_DATA_URI = '([^']*)'/.exec(clientSrc)
 check(!!m && m[1].length > 1000, `内嵌 data URI 异常（长度 ${m ? m[1].length : 0}）`)
 check(/const ICON_SOURCES = \[ICON_DATA_URI, ICON_URL\]/.test(clientSrc), '来源列表构造不对')
