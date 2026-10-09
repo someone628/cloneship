@@ -42,19 +42,25 @@ if (Test-Path $stageRoot) { Remove-Item $stageRoot -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $stage | Out-Null
 Copy-Item (Join-Path $src "package.json"), (Join-Path $src "cordis.patch.yml"), `
           (Join-Path $src "skill.md"), (Join-Path $src "README.md"), `
-          (Join-Path $src "LICENSE") $stage -Force
+          (Join-Path $src "LICENSE"), (Join-Path $src "THIRD-PARTY-NOTICES.md") $stage -Force
 Copy-Item (Join-Path $src "lib") (Join-Path $stage "lib") -Recurse -Force
+# MeSH 2026 派生索引：74 MiB 的二进制，只随 tgz / npm 包分发，不进 git
+# （与 dsh-onco-lexicon/data/onco.ncit.jsonl 同一套办法，见 .gitignore 与 data/README.md）
+Copy-Item (Join-Path $src "data") (Join-Path $stage "data") -Recurse -Force
 
 # ---- 不变量检查（都是曾经踩过的坑）----
 if (-not $SkipChecks) {
   # 1) 随包文本文件不得带 BOM
-  foreach ($rel in @("package.json", "cordis.patch.yml", "skill.md", "README.md", "lib\index.js", "lib\client.js", "LICENSE")) {
+  foreach ($rel in @("package.json", "cordis.patch.yml", "skill.md", "README.md", "LICENSE",
+                     "THIRD-PARTY-NOTICES.md", "lib\index.js", "lib\client.js", "lib\mesh.js",
+                     "data\README.md", "data\mesh_index.json", "data\mesh_build_report.txt",
+                     "data\mesh_fixtures.json")) {
     $p = Join-Path $stage $rel
     if (-not (Test-Path $p)) { Fail "staging 缺少 $rel" }
     $b = [IO.File]::ReadAllBytes($p)
     if ($b.Length -ge 3 -and $b[0] -eq 0xEF -and $b[1] -eq 0xBB -and $b[2] -eq 0xBF) { Fail "$rel 带 BOM" }
   }
-  Ok "7 个文本文件均无 BOM"
+  Ok "13 个文本文件均无 BOM"
 
   # 2) client 半必须声明在 package.json 里，否则面板不会加载
   if (-not $pkg.exports.'./client') { Fail "package.json 未声明 ./client 导出" }
@@ -78,6 +84,32 @@ if (-not $SkipChecks) {
   $junk = Get-ChildItem $stage -Recurse -Force -Directory -Filter "node_modules" -ErrorAction SilentlyContinue
   if ($junk) { Fail "staging 里混进了 node_modules（测试用的 junction）" }
   Ok "无 node_modules 混入"
+
+  # 6) MeSH 索引必须随包，magic 正确，且与清单里的 sha256 对得上
+  #    （索引缺失时插件会静默降级成纯翻译——用户会以为"术语功能没做"，所以宁可在打包时就拦下来）
+  $meshBin = Join-Path $stage "data\mesh_index.bin"
+  if (-not (Test-Path $meshBin)) { Fail "staging 缺少 data\mesh_index.bin（先跑 python mesh_build.py build，再把索引复制到 dsh-lit-translate\data）" }
+  $meshBytes = (Get-Item $meshBin).Length
+  if ($meshBytes -lt 50MB -or $meshBytes -gt 200MB) { Fail ("data\mesh_index.bin 大小异常：{0:N1} MiB" -f ($meshBytes / 1MB)) }
+  $fs = [IO.File]::OpenRead($meshBin)
+  $head = New-Object byte[] 8
+  $null = $fs.Read($head, 0, 8)
+  $fs.Close()
+  $meshMagic = [Text.Encoding]::ASCII.GetString($head)
+  if ($meshMagic -ne "MESHIDX1") { Fail "data\mesh_index.bin 的 magic 不是 MESHIDX1（读到 '$meshMagic'）" }
+  $manifestText = [IO.File]::ReadAllText((Join-Path $stage "data\mesh_index.json"), [Text.UTF8Encoding]::new($false))
+  $manifest = $manifestText | ConvertFrom-Json
+  $entry = $manifest.files.PSObject.Properties['mesh_index.bin'].Value
+  if (-not $entry) { Fail "data\mesh_index.json 里没有 mesh_index.bin 的条目" }
+  if ([int64]$entry.bytes -ne $meshBytes) { Fail ("data\mesh_index.bin 与清单字节数不一致：清单 {0} / 实际 {1}" -f $entry.bytes, $meshBytes) }
+  $gotHash = (Get-FileHash $meshBin -Algorithm SHA256).Hash.ToLower()
+  if ($entry.sha256 -ne $gotHash) { Fail "data\mesh_index.bin 与 data\mesh_index.json 的 sha256 不一致（清单 $($entry.sha256) / 实际 $gotHash）" }
+  Ok ("MeSH 索引 {0:N1} MiB，sha256 与清单一致（{1}…）" -f ($meshBytes / 1MB), $gotHash.Substring(0, 12))
+
+  # 7) host 半必须真的用上术语层（免得改坏了看不出来）
+  if ($hostText -notmatch "from './mesh.js'") { Fail "lib/index.js 没有引入 ./mesh.js" }
+  if (-not (Test-Path (Join-Path $stage "lib\mesh.js"))) { Fail "staging 缺少 lib\mesh.js" }
+  Ok "host 半已接入 MeSH 术语层"
 }
 
 # ---- 打包 ----
@@ -87,7 +119,8 @@ if (Test-Path $tgz) { Remove-Item $tgz -Force }
 if ($LASTEXITCODE -ne 0) { Fail "tar 失败" }
 
 $tgzBytes = (Get-Item $tgz).Length
-Ok ("tgz: {0}  ({1:N1} KB)" -f (Split-Path $tgz -Leaf), ($tgzBytes / 1KB))
+$meshMiB = (Get-Item (Join-Path $src "data\mesh_index.bin")).Length / 1MB
+Ok ("tgz: {0}  ({1:N1} MiB，其中 MeSH 索引解包后 {2:N1} MiB)" -f (Split-Path $tgz -Leaf), ($tgzBytes / 1MB), $meshMiB)
 
 # ---- 清理 staging ----
 Remove-Item $stageRoot -Recurse -Force

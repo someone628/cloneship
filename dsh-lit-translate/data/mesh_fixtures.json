@@ -1,0 +1,205 @@
+{
+  "format": "MESHIDX1",
+  "queries": [
+    {
+      "q": "neoplasms",
+      "norm": "neoplasms",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:D009369",
+        "name": "Neoplasms",
+        "def": "New abnormal growth of tissue. Malignant neoplasms show a greater degree of anaplasia and have the properties of invasion and metastasis, compared to benign neoplasms.",
+        "cat": "disease",
+        "tree": "C04",
+        "map": ""
+      }
+    },
+    {
+      "q": "neoplasm",
+      "norm": "neoplasm",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:D009369",
+        "name": "Neoplasms",
+        "def": "New abnormal growth of tissue. Malignant neoplasms show a greater degree of anaplasia and have the properties of invasion and metastasis, compared to benign neoplasms.",
+        "cat": "disease",
+        "tree": "C04",
+        "map": ""
+      }
+    },
+    {
+      "q": "progression-free survival",
+      "norm": "progression free survival",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:D000077982",
+        "name": "Progression-Free Survival",
+        "def": "Length of time during and after the treatment of a disease, such as cancer, that a patient lives with the disease but the disease does not get worse.",
+        "cat": "method",
+        "tree": "E01.789.800.285,E05.318.740.998.738,N04.761.559.590.800.474,N05.715.360.575.575.800.474",
+        "map": ""
+      }
+    },
+    {
+      "q": "Progression-Free Survival",
+      "norm": "progression free survival",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:D000077982",
+        "name": "Progression-Free Survival",
+        "def": "Length of time during and after the treatment of a disease, such as cancer, that a patient lives with the disease but the disease does not get worse.",
+        "cat": "method",
+        "tree": "E01.789.800.285,E05.318.740.998.738,N04.761.559.590.800.474,N05.715.360.575.575.800.474",
+        "map": ""
+      }
+    },
+    {
+      "q": "bevonium",
+      "norm": "bevonium",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:C000002",
+        "name": "bevonium",
+        "def": "",
+        "cat": "drug",
+        "tree": "",
+        "map": "Benzilates"
+      }
+    },
+    {
+      "q": "abnormalities",
+      "norm": "abnormalities",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:Q000002",
+        "name": "abnormalities",
+        "def": "",
+        "cat": "concept",
+        "tree": "Y02.030.010",
+        "map": ""
+      }
+    },
+    {
+      "q": "non-small cell lung carcinoma",
+      "norm": "non small cell lung carcinoma",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:D002289",
+        "name": "Carcinoma, Non-Small-Cell Lung",
+        "def": "A heterogeneous aggregate of at least three distinct histological types of lung cancer, including SQUAMOUS CELL CARCINOMA; ADENOCARCINOMA; and LARGE CELL CARCINOMA. They are dealt with collectively because of their shared treatment strategy.",
+        "cat": "disease",
+        "tree": "C04.588.894.797.520.109.220.249,C08.381.540.140.500,C08.785.520.100.220.500",
+        "map": ""
+      }
+    },
+    {
+      "q": "NSCLC",
+      "norm": "nsclc",
+      "n_refs": 0,
+      "first": null
+    },
+    {
+      "q": "Crohn's disease",
+      "norm": "crohns disease",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:D003424",
+        "name": "Crohn Disease",
+        "def": "A chronic transmural inflammation that may involve any part of the DIGESTIVE TRACT from MOUTH to ANUS, mostly found in the ILEUM, the CECUM, and the COLON. In Crohn disease, the inflammation, extending through the intestinal wall from the MUCOSA to the serosa, is characteristically asymmetric and s…",
+        "cat": "disease",
+        "tree": "C06.405.205.731.500,C06.405.469.432.500",
+        "map": ""
+      }
+    },
+    {
+      "q": "Crohn disease",
+      "norm": "crohn disease",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:D003424",
+        "name": "Crohn Disease",
+        "def": "A chronic transmural inflammation that may involve any part of the DIGESTIVE TRACT from MOUTH to ANUS, mostly found in the ILEUM, the CECUM, and the COLON. In Crohn disease, the inflammation, extending through the intestinal wall from the MUCOSA to the serosa, is characteristically asymmetric and s…",
+        "cat": "disease",
+        "tree": "C06.405.205.731.500,C06.405.469.432.500",
+        "map": ""
+      }
+    },
+    {
+      "q": "hazard ratio",
+      "norm": "hazard ratio",
+      "n_refs": 0,
+      "first": null
+    },
+    {
+      "q": "PD-L1",
+      "norm": "pd l1",
+      "n_refs": 0,
+      "first": null
+    },
+    {
+      "q": "trastuzumab",
+      "norm": "trastuzumab",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:D000068878",
+        "name": "Trastuzumab",
+        "def": "A humanized monoclonal antibody against the ERBB-2 RECEPTOR (HER2). As an ANTINEOPLASTIC AGENT, it is used to treat BREAST CANCER where HER2 is overexpressed.",
+        "cat": "drug",
+        "tree": "D12.776.124.486.485.114.224.060.875,D12.776.124.790.651.114.224.060.875,D12.776.377.715.548.114.224.200.875",
+        "map": ""
+      }
+    },
+    {
+      "q": "myocardial infarction",
+      "norm": "myocardial infarction",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:D009203",
+        "name": "Myocardial Infarction",
+        "def": "NECROSIS of the MYOCARDIUM caused by an obstruction of the blood supply to the heart (CORONARY CIRCULATION).",
+        "cat": "disease",
+        "tree": "C14.280.647.500,C14.907.585.500,C23.550.513.355.750,C23.550.717.489.750",
+        "map": ""
+      }
+    },
+    {
+      "q": "aspirin",
+      "norm": "aspirin",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:D001241",
+        "name": "Aspirin",
+        "def": "The prototypical analgesic used in the treatment of mild to moderate pain. It has anti-inflammatory and antipyretic properties and acts as an inhibitor of cyclooxygenase which results in the inhibition of the biosynthesis of prostaglandins. Aspirin also inhibits platelet aggregation and is used in…",
+        "cat": "drug",
+        "tree": "D02.455.426.559.389.657.410.595.176",
+        "map": ""
+      }
+    },
+    {
+      "q": "gene expression",
+      "norm": "gene expression",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:D015870",
+        "name": "Gene Expression",
+        "def": "The phenotypic manifestation of a gene or genes by the processes of GENETIC TRANSCRIPTION and GENETIC TRANSLATION.",
+        "cat": "concept",
+        "tree": "G05.297",
+        "map": ""
+      }
+    },
+    {
+      "q": "immunotherapy",
+      "norm": "immunotherapy",
+      "n_refs": 1,
+      "first": {
+        "id": "mesh:D007167",
+        "name": "Immunotherapy",
+        "def": "Manipulation of the host's immune system in treatment of disease. It includes both active and passive immunization as well as immunosuppressive therapy to prevent graft rejection.",
+        "cat": "method",
+        "tree": "E02.095.465.425",
+        "map": ""
+      }
+    }
+  ]
+}

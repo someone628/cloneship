@@ -1,0 +1,48 @@
+{
+  "format": "MESHIDX1",
+  "version": 1,
+  "mesh_release": "MeSH 2026",
+  "built_utc": "2026-10-09T10:24:26Z",
+  "sources": {
+    "desc2026.xml": {
+      "bytes": 312952703,
+      "sha256": "449792ed59ba4d60035e44724352f7361ec0dc945b67dcd821a50ff32f81bcdb"
+    },
+    "supp2026.xml": {
+      "bytes": 786405116,
+      "sha256": "8ec0efa76e050813ffefad4f6cff280cd85e2a26110119949e987aba564824ca"
+    },
+    "mesh-parse.py": {
+      "bytes": 258703,
+      "sha256": "f36717238b07f0fae9c52cf57e43a659d6f0f8d0ef6bea3f834fd5de6b8dd3ca"
+    }
+  },
+  "counts": {
+    "descriptors": 31110,
+    "supplemental": 324046,
+    "qualifiers": 76,
+    "records": 355232,
+    "terms": 840392,
+    "refs": 840708
+  },
+  "normalization": "NFKD,strip-marks,drop-apostrophes,lower,non-word->space,collapse",
+  "record_fields": [
+    "id",
+    "name",
+    "def",
+    "cat",
+    "tree",
+    "map"
+  ],
+  "note": "MeSH 为美国国家医学图书馆（NLM）公开数据；本文件是其派生索引。",
+  "files": {
+    "mesh_index.bin": {
+      "bytes": 77593601,
+      "sha256": "4f536e3fd992c21b6ec918c04c2790fbe8a28fae641654f5a8f8bc73ae8e4656"
+    },
+    "mesh-records.jsonl.gz": {
+      "bytes": 21014573,
+      "sha256": "9caff359f576e8418e8c8a280318b206a5555de367471558d46acc83029d28b3"
+    }
+  }
+}

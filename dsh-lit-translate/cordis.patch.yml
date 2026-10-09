@@ -26,3 +26,18 @@
         # 工作稿（原文 + 各段译文）的落盘目录。
         # 留空/null 则用 $DSH_HOME/lit-translate。
         dataDir: null
+
+        # ---- MeSH 2026 术语约束（随包分发的离线索引，data/mesh_index.bin）----
+        # true = 翻译前把原文命中的 MeSH 术语（规范英文名 + 释义 + MeSH 编号）
+        # 作为术语约束注入系统提示词，减少同一术语前后译法不一致。
+        # 注意：MeSH 只有英文、没有中文名；这一层不产出任何中文译名。
+        # 索引缺失/损坏时自动降级为纯翻译，只在工具输出与面板上给出警告。
+        mesh: true
+        # 索引文件路径。留空/null = 插件自带的 data/mesh_index.bin（74 MiB，355,232 条记录）。
+        meshIndexFile: null
+        # 单次最多注入多少个术语（命中更多时按词长与特异性优先）
+        meshMaxTerms: 40
+        # 每个术语的释义截断到多少字符
+        meshDefChars: 120
+        # 术语块总长度上限（字符），防止提示词被术语表吃掉
+        meshMaxBlockChars: 3600

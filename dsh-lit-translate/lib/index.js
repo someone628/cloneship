@@ -7,6 +7,10 @@
  *   2. 把工作稿（原文 + 各段译文）落盘到 $DSH_HOME/lit-translate/doc.json
  *   3. 给模型提供 lit_translate 工具，和 onco_translate 的「术语级对照」互补：
  *      词典工具管术语，这个工具管整段学术翻译
+ *   4. 翻译前用本地 MeSH 2026 离线索引（lib/mesh.js + data/mesh_index.bin）
+ *      把原文命中的术语收敛到 MeSH 规范名，作为术语约束注入系统提示词。
+ *      注意：MeSH 只有英文，没有中文名——这一层只统一英文口径与消歧，
+ *      绝不产出「MeSH 官方中文名」这种东西。
  *
  * 刻意**不做**的事：不导入 PDF、不做版式渲染、不做思维导图、不存文献卡片。
  * 那些都属于文献阅读插件；这个插件只服务翻译这一段链路，因此不碰它的数据目录，
@@ -22,6 +26,13 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { defineTool } from '@deepseek-ai/dsh-tools'
+import {
+  createMeshSource,
+  findMeshTerms,
+  renderMeshBlock,
+  renderMeshSummary,
+  meshBrief,
+} from './mesh.js'
 
 export const name = 'lit-translate'
 export const inject = ['tools', 'systemPrompt', 'webServer', 'connection']
@@ -143,9 +154,14 @@ export function splitSegments(text) {
   return merged
 }
 
-/** 组装系统提示词：是否附英文原文 + 是否给了上文参考 */
-export function buildPrompt(annotate, hasContext) {
-  return (annotate ? SYSTEM_ANNOTATE : SYSTEM_PLAIN) + (hasContext ? CONTEXT_RULE : '')
+/** 组装系统提示词：是否附英文原文 + 是否给了上文参考 + 本次命中的 MeSH 术语约束 */
+export function buildPrompt(annotate, hasContext, meshBlock) {
+  const block = typeof meshBlock === 'string' ? meshBlock.trim() : ''
+  return (
+    (annotate ? SYSTEM_ANNOTATE : SYSTEM_PLAIN) +
+    (hasContext ? CONTEXT_RULE : '') +
+    (block.length > 0 ? '\n\n' + block : '')
+  )
 }
 
 /** 组装用户消息：有上文参考时两段分开写，并明确「不要翻译上文」 */
@@ -171,6 +187,7 @@ export function renderTranslationResult(result, meta) {
     `术语附英文原文：${opts.annotate === false ? '关' : '开'}`,
     `本次原文 ${src.length} 字`,
     opts.hasContext === true ? '已带上一段作上文参考（只用于术语与指代一致，未参与翻译）' : '',
+    typeof opts.meshLine === 'string' ? opts.meshLine : '',
   ].filter((line) => line.length > 0)
   const parts = [head.join(' · ')]
   parts.push(String(result.text === null || result.text === undefined ? '' : result.text))
@@ -239,6 +256,49 @@ export function apply(ctx, config = {}) {
     typeof config.dataDir === 'string' && config.dataDir.trim().length > 0 ? config.dataDir.trim() : DEFAULT_DATA_DIR
   const dataFile = path.join(dataDir, 'doc.json')
   ensureDir(dataDir)
+
+  // ---- MeSH 2026 术语约束（离线索引，随包分发）----
+  // 只做英文术语口径收敛与消歧：MeSH 没有中文名，插件绝不产出中文译名。
+  const meshEnabled = config.mesh !== false
+  const meshIndexFile =
+    typeof config.meshIndexFile === 'string' && config.meshIndexFile.trim().length > 0
+      ? config.meshIndexFile.trim()
+      : null
+  const meshMaxTerms = Number.isFinite(config.meshMaxTerms) && config.meshMaxTerms > 0 ? Math.floor(config.meshMaxTerms) : 40
+  const meshDefChars = Number.isFinite(config.meshDefChars) && config.meshDefChars > 0 ? Math.floor(config.meshDefChars) : 120
+  const meshMaxBlockChars =
+    Number.isFinite(config.meshMaxBlockChars) && config.meshMaxBlockChars > 0 ? Math.floor(config.meshMaxBlockChars) : 3600
+  // 索引整份 74 MiB，第一次真要翻译时才读进内存；面板探活只读 68 字节的头
+  const meshSource = createMeshSource(meshIndexFile)
+
+  function meshStatusPayload() {
+    if (!meshEnabled) return { enabled: false, ok: false, file: meshSource.file, records: 0, terms: 0, loaded: false, error: null }
+    const st = meshSource.status()
+    return {
+      enabled: true,
+      ok: st.ok === true,
+      file: st.file,
+      bytes: st.bytes || 0,
+      records: st.recordCount || 0,
+      terms: st.termCount || 0,
+      loaded: st.loaded === true,
+      error: st.ok === true ? null : st.error || 'unknown',
+    }
+  }
+
+  /**
+   * 给一段原文找出 MeSH 术语并组装成提示词块。
+   * 返回 { block, brief, matchCount, truncated } 或 { error }；**任何失败都不阻断翻译**。
+   */
+  function meshFor(text, disabled) {
+    if (!meshEnabled || disabled === true) return null
+    const got = meshSource.get()
+    if (got.ok !== true) return { error: got.error }
+    const found = findMeshTerms(got.index, text, { maxTerms: meshMaxTerms })
+    if (found.matches.length === 0) return { block: '', brief: meshBrief(found.matches), matchCount: 0, truncated: false }
+    const block = renderMeshBlock(found, { defChars: meshDefChars, maxChars: meshMaxBlockChars })
+    return { block, brief: meshBrief(found.matches), matchCount: found.matches.length, truncated: found.truncated === true }
+  }
 
   /**
    * 读当前默认模型。只做读取，不发起调用，所以可以放心地在 ping / 面板状态条里用。
@@ -329,11 +389,38 @@ export function apply(ctx, config = {}) {
     }
     const annotate = args && args.annotate === false ? false : args && args.annotate === true ? true : defaultAnnotate
     const hasContext = context.trim().length > 0
-    const system = buildPrompt(annotate, hasContext)
+    const mesh = meshFor(text, args && args.mesh === false)
+    const system = buildPrompt(annotate, hasContext, mesh && typeof mesh.block === 'string' ? mesh.block : '')
     const userText = buildUserText(text, context)
     const res = await llmRun(system, userText, 'littr')
-    if (res.ok === true) res.annotate = annotate
+    if (res.ok === true) {
+      res.annotate = annotate
+      if (mesh !== null) {
+        res.mesh = mesh
+        if (typeof mesh.error === 'string') res.meshWarning = mesh.error
+      } else {
+        // 配置关掉、或调用方本次传了 mesh=false：说清楚是「没启用」而不是「没命中」
+        res.mesh = { block: '', brief: meshBrief([]), matchCount: 0, truncated: false, disabled: true }
+      }
+    }
     return res
+  }
+
+  /**
+   * 工具输出里那行 MeSH 说明。
+   * 三种状态都要说清楚：生效了命中几个 / 索引不可用没生效 / 调用方主动关掉了。
+   */
+  function meshSummaryLine(res) {
+    if (!meshEnabled) return 'MeSH 术语约束：插件配置里已关闭'
+    if (res && typeof res.meshWarning === 'string') return `MeSH 术语约束：本次未生效（${res.meshWarning}）`
+    const m = res && res.mesh ? res.mesh : null
+    if (m === null) return ''
+    if (m.disabled === true) return 'MeSH 术语约束：本次已按调用方要求关闭'
+    const terms = m.brief && Array.isArray(m.brief.terms) ? m.brief.terms : []
+    if (m.matchCount === 0) return renderMeshSummary(terms)
+    let line = renderMeshSummary(terms)
+    if (m.truncated === true) line += '（命中更多，已按词长与特异性优先注入前若干个）'
+    return line
   }
 
   // ---------- 工具层：lit_translate ----------
@@ -343,6 +430,8 @@ export function apply(ctx, config = {}) {
         name: 'lit_translate',
         description:
           '把英文医学/流行病学文献内容翻译成流畅、准确的学术中文（默认术语首次出现时附英文原文）。' +
+          '默认会用本地 MeSH 2026 离线术语库约束英文术语口径（规范名 + 释义消歧 + MeSH 编号），' +
+          '但 MeSH 只有英文、没有中文名，所以中文译名仍由模型按医学翻译规范给出。' +
           '与 onco_translate 的区别：onco_translate 只做「术语级对照」，不做语序调整；' +
           '本工具做的是整段学术翻译，可直接供中文阅读。' +
           '长文献请按段落多次调用，并把上一段原文（可含其译文）放进 context，以保持术语与指代一致。',
@@ -364,6 +453,12 @@ export function apply(ctx, config = {}) {
               '可选：术语首次出现时是否写成「中文（English）」形式，默认 true（便于核对原文用词）。' +
               '想直接拿到纯中文译文时传 false。',
           },
+          mesh: {
+            type: 'boolean',
+            description:
+              '可选：本次是否启用 MeSH 2026 术语约束（默认 true，取插件配置）。' +
+              '关掉后只做纯翻译，不注入术语提示词；术语一致性则完全依赖 context。',
+          },
         },
         output: {
           schema: { type: 'string' },
@@ -381,6 +476,7 @@ export function apply(ctx, config = {}) {
             text,
             annotate: res.annotate !== false,
             hasContext: context.trim().length > 0,
+            meshLine: meshSummaryLine(res),
           })
         },
       }),
@@ -400,8 +496,9 @@ export function apply(ctx, config = {}) {
         '1. 需要把英文文献段落译成中文时用 lit_translate；只查术语中英名时用 onco_translate，两者不要混用。',
         '2. 默认 annotate=true：术语首次出现写成「中文（English）」，便于核对原文用词；用户明确要纯中文时传 annotate=false。',
         '3. 长文献按段落分次调用；把上一段原文（可含其译文）放进 context，可显著减少同一术语前后译法不一致。',
-        '4. 它是翻译工具，不是文献解读工具：需要总结、评价、提取数据或回答研究问题时不要用它，直接用你自己的分析能力。',
-        '5. 转述它的结果时要说明这是机器译文；数字、单位、P 值、样本量、基因位点必须与原文一致，不得据译文推断原文没有的结论。',
+        '4. 它默认带本地 MeSH 2026 术语约束（把原文命中的术语收敛到 MeSH 规范名，附释义与 MeSH 编号）。MeSH 只有英文、没有中文名——不要把 MeSH 编号说成「官方中文名」的依据，中文译名由模型按医学翻译规范给出。',
+        '5. 它是翻译工具，不是文献解读工具：需要总结、评价、提取数据或回答研究问题时不要用它，直接用你自己的分析能力。',
+        '6. 转述它的结果时要说明这是机器译文；数字、单位、P 值、样本量、基因位点必须与原文一致，不得据译文推断原文没有的结论。',
       ].join('\n'),
     })
   } catch (error) {
@@ -480,6 +577,7 @@ export function apply(ctx, config = {}) {
             dataFile,
             maxChars,
             annotate: defaultAnnotate,
+            mesh: meshStatusPayload(),
             model: picked.ok === true ? { provider: picked.provider, model: picked.model } : null,
             modelError: picked.ok === true ? null : picked.error,
           }
@@ -495,6 +593,10 @@ export function apply(ctx, config = {}) {
             annotate: res.annotate !== false,
             provider: res.provider,
             model: res.model,
+            mesh: res.mesh && res.mesh.matchCount > 0 ? res.mesh.brief : null,
+            meshCount: res.mesh ? res.mesh.matchCount : 0,
+            meshDisabled: res.mesh ? res.mesh.disabled === true : false,
+            meshWarning: typeof res.meshWarning === 'string' ? res.meshWarning : null,
           }
         }
 
@@ -536,6 +638,7 @@ export function apply(ctx, config = {}) {
                 dataDir,
                 dataFile,
                 maxChars,
+                mesh: meshStatusPayload(),
                 model: picked.ok === true ? { provider: picked.provider, model: picked.model } : null,
                 modelError: picked.ok === true ? null : picked.error,
               })

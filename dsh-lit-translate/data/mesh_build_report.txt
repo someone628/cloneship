@@ -1,0 +1,30 @@
+MeSH 2026 -> 文献翻译术语索引  构建报告
+========================================================================
+构建时间      : 2026-10-09 18:24:29
+耗时          : 34.4s
+记录          : 355,232  descriptor=31,110  qualifier=76  supplemental=324,046
+术语/引用     : 840,392 / 840,708
+索引大小      : 74.0 MiB
+全量语料      : 20.0 MiB (gzip)
+
+歧义分布（一个字面形式指向多少条记录）
+------------------------------------------------------------------------
+      2-3 : 315
+     4-10 : 0
+   11-100 : 0
+     101+ : 0
+
+样例（前 12 条记录）
+------------------------------------------------------------------------
+  mesh:D000001   descriptor   Calcimycin                                     drug       An ionophorous, polyether antibiotic fro
+  mesh:D000002   descriptor   Temefos                                        drug       An organothiophosphate insecticide.
+  mesh:D000003   descriptor   Abattoirs                                      concept    Places where animals are slaughtered and
+  mesh:D000004   descriptor   Abbreviations as Topic                         concept    Works about shortened forms of written w
+  mesh:D000005   descriptor   Abdomen                                        concept    That portion of the body that lies betwe
+  mesh:D000006   descriptor   Abdomen, Acute                                 disease    A clinical syndrome with acute abdominal
+  mesh:D000007   descriptor   Abdominal Injuries                             disease    General or unspecified injuries involvin
+  mesh:D000008   descriptor   Abdominal Neoplasms                            disease    New abnormal growth of tissue in the ABD
+  mesh:D000009   descriptor   Abdominal Muscles                              concept    Muscles forming the ABDOMINAL WALL inclu
+  mesh:D000010   descriptor   Abducens Nerve                                 concept    The 6th cranial nerve which originates i
+  mesh:D000011   descriptor   Abelson murine leukemia virus                  concept    A replication-defective strain of Murine
+  mesh:D000012   descriptor   Abetalipoproteinemia                           disease    An autosomal recessive disorder of lipid

@@ -107,12 +107,20 @@ window.__ModuleLoader__.load({
       const oldList = Array.isArray(old) ? old : []
       for (const seg of oldList) {
         if (seg && typeof seg.en === 'string' && typeof seg.zh === 'string' && seg.zh.length > 0) {
-          keep.set(seg.en.trim(), seg.zh)
+          keep.set(seg.en.trim(), seg)
         }
       }
       return splitSegments(text).map((en) => {
-        const zh = keep.get(en)
-        return zh ? { id: uid(), en, zh } : { id: uid(), en, zh: '' }
+        const prev = keep.get(en)
+        if (!prev) return { id: uid(), en, zh: '' }
+        // 沿用旧译文时连 MeSH 命中一起带走：否则重新切段后「MeSH 12」这种标记会莫名消失
+        return {
+          id: uid(),
+          en,
+          zh: prev.zh,
+          meshCount: prev.meshCount || 0,
+          meshNames: Array.isArray(prev.meshNames) ? prev.meshNames : [],
+        }
       })
     }
 
@@ -152,6 +160,9 @@ window.__ModuleLoader__.load({
       lines.push(
         '> 由 DSH 默认模型翻译，' +
           (doc && doc.annotate === false ? '未附英文术语原文。' : '术语首次出现时附英文原文。') +
+          (doc && doc.mesh === false
+            ? ''
+            : '英文术语口径参考本地 MeSH 2026 术语库（MeSH 只有英文名称，中文译名由模型给出）。') +
           '仅供文献阅读参考，正式引用或做判断前请核对英文原文。',
       )
       lines.push('')
@@ -279,6 +290,7 @@ window.__ModuleLoader__.load({
 .lt-chip{font-size:10.5px;padding:1px 7px;border-radius:99px;border:1px solid var(--lt-line);color:var(--lt-ink-3)}
 .lt-chip.is-done{color:var(--lt-ink);background:rgba(14,116,144,.14);border-color:rgba(14,116,144,.34)}
 .lt-chip.is-warn{color:#b45309;border-color:rgba(180,83,9,.45);background:rgba(180,83,9,.10)}
+.lt-chip.is-mesh{color:var(--lt-accent);border-color:rgba(14,116,144,.42);background:rgba(14,116,144,.10)}
 .lt-spacer{flex:1}
 .lt-en{font-size:12px;line-height:1.7;color:var(--lt-ink-3);white-space:pre-wrap;word-break:break-word;
   cursor:pointer;border-left:2px solid rgba(14,116,144,.28);padding-left:8px}
@@ -355,6 +367,7 @@ window.__ModuleLoader__.load({
       const bits = [String((seg.en || '').length) + ' 字']
       if (zh.length > 0) bits.push('译文 ' + zh.length + ' 字')
       if (seg.model) bits.push(seg.model)
+      const meshNames = Array.isArray(seg.meshNames) ? seg.meshNames : []
       return h(
         'div',
         { className: segClass },
@@ -364,6 +377,18 @@ window.__ModuleLoader__.load({
           h('span', { className: 'lt-idx' }, '第 ' + (index + 1) + ' 段'),
           h('span', { className: chipClass }, status),
           seg.warn === true ? h('span', { className: 'lt-chip is-warn', title: '译文在模型输出上限处被截断' }, '可能被截断') : null,
+          seg.meshCount > 0
+            ? h(
+                'span',
+                {
+                  className: 'lt-chip is-mesh',
+                  title:
+                    '本次翻译注入了 ' + seg.meshCount + ' 个 MeSH 2026 术语约束（只统一英文规范名与消歧，MeSH 没有中文名）：\n' +
+                    meshNames.join('\n'),
+                },
+                'MeSH ' + seg.meshCount,
+              )
+            : null,
           h('span', { className: 'lt-small' }, bits.join(' · ')),
           h('span', { className: 'lt-spacer' }),
           zh.length > 0
@@ -418,6 +443,10 @@ window.__ModuleLoader__.load({
       const [segs, setSegs] = React.useState([])
       const [annotate, setAnnotate] = React.useState(true)
       const [useContext, setUseContext] = React.useState(true)
+      /** MeSH 2026 术语约束开关：默认开；关掉后只做纯翻译（术语一致性全靠上文参考） */
+      const [useMesh, setUseMesh] = React.useState(true)
+      /** 索引不可用时的提示（每次 translate 都可能带回一条），与「翻译失败」分开显示 */
+      const [meshWarn, setMeshWarn] = React.useState('')
       const [view, setView] = React.useState('pair') // pair | zh
       const [busy, setBusy] = React.useState(false)
       const [prog, setProg] = React.useState(null)
@@ -478,6 +507,7 @@ window.__ModuleLoader__.load({
             setSegs(Array.isArray(doc.segments) ? doc.segments : [])
             setAnnotate(doc.annotate !== false)
             setUseContext(doc.useContext !== false)
+            setUseMesh(doc.mesh !== false)
             setMsg('已恢复上次的工作稿（' + from + '）')
           }
           setLoaded(true)
@@ -496,6 +526,7 @@ window.__ModuleLoader__.load({
           snapshot,
           annotate,
           useContext,
+          mesh: useMesh,
           updatedAt: Date.now(),
           segments: segs.map((s) => ({
             id: s.id,
@@ -503,6 +534,8 @@ window.__ModuleLoader__.load({
             zh: s.zh || '',
             open: s.open === true,
             warn: s.warn === true,
+            meshCount: s.meshCount || 0,
+            meshNames: Array.isArray(s.meshNames) ? s.meshNames : [],
           })),
         }
         const timer = setTimeout(async () => {
@@ -521,7 +554,7 @@ window.__ModuleLoader__.load({
           }
         }, 900)
         return () => clearTimeout(timer)
-      }, [src, snapshot, segs, annotate, useContext, loaded])
+      }, [src, snapshot, segs, annotate, useContext, useMesh, loaded])
 
       function patchSegs(next, note) {
         setSegs(next)
@@ -556,7 +589,7 @@ window.__ModuleLoader__.load({
         const context = useContext ? buildContext(working, index) : ''
         let res = null
         try {
-          res = await rpc('translate', { text: seg.en, annotate, context })
+          res = await rpc('translate', { text: seg.en, annotate, context, mesh: useMesh })
         } catch (error) {
           res = { ok: false, error: errText(error) }
         }
@@ -568,6 +601,7 @@ window.__ModuleLoader__.load({
           setErr('翻译失败（第 ' + (index + 1) + ' 段）：' + message)
           return
         }
+        if (typeof res.meshWarning === 'string' && res.meshWarning.length > 0) setMeshWarn(res.meshWarning)
         setSegs(
           working.map((s, i) =>
             i === index
@@ -577,11 +611,17 @@ window.__ModuleLoader__.load({
                   zh: res.text,
                   warn: res.truncated === true,
                   model: (res.provider || '?') + '/' + (res.model || '?'),
+                  meshCount: typeof res.meshCount === 'number' ? res.meshCount : 0,
+                  meshNames: res.mesh && Array.isArray(res.mesh.names) ? res.mesh.names : [],
                 })
               : s,
           ),
         )
-        setMsg('第 ' + (index + 1) + ' 段翻译完成' + (res.truncated === true ? '（译文可能被截断，建议切小一段重译）' : ''))
+        setMsg(
+          '第 ' + (index + 1) + ' 段翻译完成' +
+            (res.meshCount > 0 ? '（MeSH 术语约束 ' + res.meshCount + ' 个）' : '') +
+            (res.truncated === true ? '（译文可能被截断，建议切小一段重译）' : ''),
+        )
       }
 
       /** 批量翻译：mode='pending' 只翻未译的段，mode='all' 全部重译 */
@@ -624,7 +664,7 @@ window.__ModuleLoader__.load({
           const context = useContext ? buildContext(working, index) : ''
           let res = null
           try {
-            res = await rpc('translate', { text: seg.en, annotate, context })
+            res = await rpc('translate', { text: seg.en, annotate, context, mesh: useMesh })
           } catch (error) {
             res = { ok: false, error: errText(error) }
           }
@@ -637,6 +677,7 @@ window.__ModuleLoader__.load({
             setErr('翻译失败（第 ' + (index + 1) + ' 段，已翻 ' + done + ' 段）：' + message)
             return
           }
+          if (typeof res.meshWarning === 'string' && res.meshWarning.length > 0) setMeshWarn(res.meshWarning)
           done++
           working = working.map((s, i) =>
             i === index
@@ -646,6 +687,8 @@ window.__ModuleLoader__.load({
                   zh: res.text,
                   warn: res.truncated === true,
                   model: (res.provider || '?') + '/' + (res.model || '?'),
+                  meshCount: typeof res.meshCount === 'number' ? res.meshCount : 0,
+                  meshNames: res.mesh && Array.isArray(res.mesh.names) ? res.mesh.names : [],
                 })
               : s,
           )
@@ -685,7 +728,7 @@ window.__ModuleLoader__.load({
           setErr('还没有任何译文可导出')
           return
         }
-        const text = toMarkdown({ segments: segs, annotate }, mode)
+        const text = toMarkdown({ segments: segs, annotate, mesh: useMesh }, mode)
         const ok = downloadText(exportName(mode === 'zh' ? '译文' : '对照', 'md'), text)
         setMsg(ok ? '已开始下载导出文件' : '导出失败：浏览器拦下了下载')
       }
@@ -722,6 +765,22 @@ window.__ModuleLoader__.load({
       const st = segStats(segs)
       const pct = st.total > 0 ? Math.round((st.done / st.total) * 100) : 0
       const modelLine = info && info.model ? info.model.provider + ' / ' + info.model.model : '（未知模型）'
+      const meshInfo = info && info.mesh && typeof info.mesh === 'object' ? info.mesh : null
+      const meshBad = meshInfo !== null && meshInfo.enabled === true && meshInfo.ok !== true
+      const meshLine =
+        meshInfo === null || meshInfo.enabled !== true
+          ? ''
+          : meshInfo.ok === true
+            ? 'MeSH 2026 ' + Number(meshInfo.records || 0).toLocaleString('en-US') + ' 条'
+            : 'MeSH 索引不可用'
+      const meshTitle =
+        meshInfo === null
+          ? ''
+          : 'MeSH 2026 离线术语库：' +
+            (meshInfo.ok === true
+              ? Number(meshInfo.records || 0).toLocaleString('en-US') + ' 条记录 / ' +
+                Number(meshInfo.terms || 0).toLocaleString('en-US') + ' 个检索名；' + (meshInfo.file || '')
+              : (meshInfo.error || 'unknown') + '（' + (meshInfo.file || '') + '）')
 
       return h(
         'div',
@@ -732,7 +791,14 @@ window.__ModuleLoader__.load({
           h('span', { className: 'lt-h1' }, '文献翻译'),
           h('span', { className: 'lt-small' }, '英译中 · 学术文献口径 · 由默认模型翻译'),
           h('span', { className: 'lt-spacer' }),
-          h('span', { className: 'lt-small', title: info && info.dataFile ? '工作稿保存位置：' + info.dataFile : '' }, modelLine),
+          h(
+            'span',
+            { className: 'lt-small', title: (info && info.dataFile ? '工作稿保存位置：' + info.dataFile : '') },
+            modelLine,
+          ),
+          meshLine.length > 0
+            ? h('span', { className: 'lt-small', title: meshTitle }, '· ' + meshLine)
+            : null,
         ),
 
         h(
@@ -805,6 +871,22 @@ window.__ModuleLoader__.load({
             }),
             '带上一段作参考',
           ),
+          h(
+            'label',
+            {
+              className: 'lt-check',
+              title:
+                '用本地 MeSH 2026 术语库把原文里的术语收敛到 MeSH 规范英文名（附释义与 MeSH 编号），' +
+                '减少同一术语前后译法不一致。注意 MeSH 只有英文，没有中文名——中文译名仍由模型给出。',
+            },
+            h('input', {
+              type: 'checkbox',
+              checked: useMesh,
+              disabled: busy || meshBad,
+              onChange: (ev) => setUseMesh(!!(ev.target && ev.target.checked)),
+            }),
+            'MeSH 术语约束',
+          ),
           h('span', { className: 'lt-spacer' }),
           h(
             'button',
@@ -828,6 +910,16 @@ window.__ModuleLoader__.load({
 
         stale
           ? h('div', { className: 'lt-notice' }, '原文改过了：点「切段」重新切分才会生效（原文完全一致的段会保留已有译文）。')
+          : null,
+        meshBad && useMesh
+          ? h(
+              'div',
+              { className: 'lt-notice' },
+              'MeSH 术语索引不可用（' + (meshInfo.error || 'unknown') + '）：翻译照常可用，只是这次不会注入术语约束。',
+            )
+          : null,
+        meshWarn.length > 0
+          ? h('div', { className: 'lt-notice' }, 'MeSH 术语约束本次未生效：' + meshWarn + '（翻译本身已正常返回）')
           : null,
         prog !== null
           ? h('div', { className: 'lt-notice' }, '翻译中 ' + prog.done + ' / ' + prog.total + ' 段…')
