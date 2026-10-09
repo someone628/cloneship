@@ -1,0 +1,470 @@
+[
+  {
+    "id": "bronchiectasis",
+    "kind": "finding",
+    "mesh": "Bronchiectasis",
+    "region": "chest",
+    "zh": [
+      "支气管扩张",
+      "支气管扩张症",
+      "柱状支气管扩张",
+      "囊状支气管扩张",
+      "静脉曲张型支气管扩张",
+      "支气管扩张改变"
+    ],
+    "approx": false
+  },
+  {
+    "id": "chylothorax",
+    "kind": "finding",
+    "mesh": "Chylothorax",
+    "region": "chest",
+    "zh": [
+      "乳糜胸",
+      "乳糜性胸腔积液",
+      "乳糜胸水",
+      "乳糜样胸腔积液",
+      "胸膜腔乳糜",
+      "乳糜性胸水"
+    ],
+    "approx": false
+  },
+  {
+    "id": "emphysema",
+    "kind": "finding",
+    "mesh": "Emphysema",
+    "region": "chest",
+    "zh": [
+      "肺气肿",
+      "阻塞性肺气肿",
+      "肺气肿改变",
+      "肺气肿征象",
+      "小叶中央型肺气肿",
+      "全小叶型肺气肿"
+    ],
+    "approx": false,
+    "note": "未收「肺过度充气」「肺充气过度」：那是影像征象（过度充气），不是 MeSH 主题词粒度。"
+  },
+  {
+    "id": "empyema",
+    "kind": "finding",
+    "mesh": "Empyema",
+    "region": "chest",
+    "zh": [
+      "脓胸",
+      "胸腔积脓",
+      "胸膜腔积脓",
+      "化脓性胸膜炎",
+      "脓性胸腔积液"
+    ],
+    "approx": false
+  },
+  {
+    "id": "hemothorax",
+    "kind": "finding",
+    "mesh": "Hemothorax",
+    "region": "chest",
+    "zh": [
+      "血胸",
+      "胸腔积血",
+      "胸膜腔积血",
+      "胸腔内积血"
+    ],
+    "approx": false,
+    "note": "未收「血性胸腔积液」：那是胸腔积液的性状描述，与血胸不等价。"
+  },
+  {
+    "id": "hydrothorax",
+    "kind": "finding",
+    "mesh": "Hydrothorax",
+    "region": "chest",
+    "zh": [
+      "水胸",
+      "漏出性胸腔积液",
+      "漏出性胸水",
+      "非炎性胸腔积液",
+      "胸膜腔漏出液"
+    ],
+    "note": "MeSH 的 Hydrothorax 指非炎性（漏出性）胸膜腔积液；中文报告极少写「水胸」，实际多用「漏出性胸腔积液」一类描述，故为近似映射。"
+  },
+  {
+    "id": "lung-diseases-interstitial",
+    "kind": "finding",
+    "mesh": "Lung Diseases, Interstitial",
+    "region": "chest",
+    "zh": [
+      "间质性肺病",
+      "间质性肺疾病",
+      "肺间质病变",
+      "肺间质性改变",
+      "肺间质疾病",
+      "间质性肺病变"
+    ],
+    "approx": false
+  },
+  {
+    "id": "lung-neoplasms",
+    "kind": "finding",
+    "mesh": "Lung Neoplasms",
+    "region": "chest",
+    "zh": [
+      "肺癌",
+      "肺恶性肿瘤",
+      "肺部肿瘤",
+      "肺部恶性肿瘤",
+      "肺内肿瘤",
+      "支气管肺癌",
+      "肺门肿块",
+      "肺门区肿块"
+    ],
+    "approx": [
+      "肺门肿块",
+      "肺门区肿块"
+    ],
+    "note": "「肺门肿块」「肺门区肿块」只是近似归到肺肿瘤：肺门团块也可以是肿大淋巴结或血管影，输出会带「近似」标记。"
+  },
+  {
+    "id": "lymphadenopathy",
+    "kind": "finding",
+    "mesh": "Lymphadenopathy",
+    "region": "chest",
+    "zh": [
+      "淋巴结肿大",
+      "淋巴结增大",
+      "淋巴结病",
+      "肿大淋巴结",
+      "淋巴结体积增大",
+      "淋巴结肿胀"
+    ],
+    "approx": false,
+    "note": "「淋巴结」本身是解剖概念，归解剖文件，不在本条目内。"
+  },
+  {
+    "id": "lymphatic-diseases",
+    "kind": "finding",
+    "mesh": "Lymphatic Diseases",
+    "region": "chest",
+    "zh": [
+      "淋巴系统疾病",
+      "淋巴管疾病",
+      "淋巴系统病变",
+      "淋巴疾病",
+      "淋巴管病变",
+      "淋巴系统异常"
+    ],
+    "approx": [
+      "淋巴管疾病",
+      "淋巴疾病",
+      "淋巴管病变"
+    ],
+    "note": "Lymphatic Diseases 是宽泛类目；「淋巴管疾病」「淋巴疾病」是它的下位或口语化写法，只作近似归一。"
+  },
+  {
+    "id": "mediastinal-diseases",
+    "kind": "finding",
+    "mesh": "Mediastinal Diseases",
+    "region": "chest",
+    "zh": [
+      "纵隔病变",
+      "纵隔疾病",
+      "纵隔内病变",
+      "纵隔异常",
+      "纵隔疾患"
+    ],
+    "approx": false
+  },
+  {
+    "id": "mediastinal-emphysema",
+    "kind": "finding",
+    "mesh": "Mediastinal Emphysema",
+    "region": "chest",
+    "zh": [
+      "纵隔气肿",
+      "纵隔积气",
+      "纵隔内积气",
+      "纵隔内气肿",
+      "纵隔气体积聚"
+    ],
+    "approx": false
+  },
+  {
+    "id": "mediastinal-neoplasms",
+    "kind": "finding",
+    "mesh": "Mediastinal Neoplasms",
+    "region": "chest",
+    "zh": [
+      "纵隔肿瘤",
+      "纵隔恶性肿瘤",
+      "纵隔肿物",
+      "纵隔肿块",
+      "纵隔恶性病变",
+      "纵隔肿瘤性病变"
+    ],
+    "approx": false
+  },
+  {
+    "id": "multiple-pulmonary-nodules",
+    "kind": "finding",
+    "mesh": "Multiple Pulmonary Nodules",
+    "region": "chest",
+    "zh": [
+      "肺内多结节",
+      "多结节性肺病变",
+      "多结节状肺病变",
+      "肺内多结节灶",
+      "多结节性肺内病变",
+      "肺内多结节影"
+    ],
+    "note": "数量词（多发/单发）由抽取层单独提取并在匹配前屏蔽，故这里只收不含「多发」字样的写法；单发与多发由 ct.rules.json 结合数量词决定，故本条目写法对「多个结节」为近似表达。"
+  },
+  {
+    "id": "pleural-diseases",
+    "kind": "finding",
+    "mesh": "Pleural Diseases",
+    "region": "chest",
+    "zh": [
+      "胸膜病变",
+      "胸膜疾病",
+      "胸膜腔病变",
+      "胸膜异常",
+      "胸膜疾患"
+    ],
+    "approx": false,
+    "note": "「胸膜增厚」属影像描述性征象，不收。"
+  },
+  {
+    "id": "pleural-effusion",
+    "kind": "finding",
+    "mesh": "Pleural Effusion",
+    "region": "chest",
+    "zh": [
+      "胸腔积液",
+      "胸膜腔积液",
+      "胸水",
+      "胸腔内积液",
+      "胸膜积液"
+    ],
+    "approx": false
+  },
+  {
+    "id": "pleural-neoplasms",
+    "kind": "finding",
+    "mesh": "Pleural Neoplasms",
+    "region": "chest",
+    "zh": [
+      "胸膜肿瘤",
+      "胸膜恶性肿瘤",
+      "胸膜恶性病变",
+      "胸膜肿物",
+      "胸膜癌",
+      "胸膜肿瘤性病变"
+    ],
+    "approx": false
+  },
+  {
+    "id": "pneumonia",
+    "kind": "finding",
+    "mesh": "Pneumonia",
+    "region": "chest",
+    "zh": [
+      "肺炎",
+      "肺部感染",
+      "支气管肺炎",
+      "大叶性肺炎",
+      "小叶性肺炎",
+      "感染性肺炎",
+      "肺内感染",
+      "肺实质炎症"
+    ],
+    "approx": false
+  },
+  {
+    "id": "pneumothorax",
+    "kind": "finding",
+    "mesh": "Pneumothorax",
+    "region": "chest",
+    "zh": [
+      "气胸",
+      "胸腔积气",
+      "胸膜腔积气",
+      "张力性气胸",
+      "开放性气胸",
+      "闭合性气胸",
+      "自发性气胸"
+    ],
+    "approx": false
+  },
+  {
+    "id": "pulmonary-atelectasis",
+    "kind": "finding",
+    "mesh": "Pulmonary Atelectasis",
+    "region": "chest",
+    "zh": [
+      "肺不张",
+      "肺膨胀不全",
+      "肺叶不张",
+      "肺段不张",
+      "阻塞性肺不张",
+      "压迫性肺不张",
+      "肺组织不张",
+      "肺萎陷"
+    ],
+    "approx": false
+  },
+  {
+    "id": "pulmonary-edema",
+    "kind": "finding",
+    "mesh": "Pulmonary Edema",
+    "region": "chest",
+    "zh": [
+      "肺水肿",
+      "肺间质水肿",
+      "肺泡性肺水肿",
+      "肺泡水肿",
+      "肺内水肿",
+      "肺水肿改变"
+    ],
+    "approx": false
+  },
+  {
+    "id": "pulmonary-embolism",
+    "kind": "finding",
+    "mesh": "Pulmonary Embolism",
+    "region": "chest",
+    "zh": [
+      "肺栓塞",
+      "肺动脉栓塞",
+      "肺动脉血栓栓塞",
+      "肺血栓栓塞",
+      "肺栓塞症",
+      "肺动脉栓塞症"
+    ],
+    "approx": false,
+    "note": "「肺梗死」是栓塞后的肺组织坏死，与肺栓塞不等价，未收。"
+  },
+  {
+    "id": "pulmonary-fibrosis",
+    "kind": "finding",
+    "mesh": "Pulmonary Fibrosis",
+    "region": "chest",
+    "zh": [
+      "肺纤维化",
+      "肺间质纤维化",
+      "肺纤维化改变",
+      "肺纤维化灶",
+      "肺组织纤维化",
+      "纤维化性间质性肺病"
+    ],
+    "approx": false
+  },
+  {
+    "id": "respiratory-distress-syndrome",
+    "kind": "finding",
+    "mesh": "Respiratory Distress Syndrome",
+    "region": "chest",
+    "zh": [
+      "呼吸窘迫综合征",
+      "呼吸窘迫",
+      "成人呼吸窘迫综合征",
+      "急性呼吸窘迫综合征",
+      "呼吸窘迫症"
+    ],
+    "approx": [
+      "呼吸窘迫"
+    ],
+    "note": "「呼吸窘迫」比 MeSH 的 Respiratory Distress Syndrome 更宽（未限定综合征），只作近似归一。"
+  },
+  {
+    "id": "respiratory-insufficiency",
+    "kind": "finding",
+    "mesh": "Respiratory Insufficiency",
+    "region": "chest",
+    "zh": [
+      "呼吸功能不全",
+      "呼吸衰竭",
+      "呼吸机能不全",
+      "肺功能不全",
+      "通气功能衰竭",
+      "换气功能衰竭"
+    ],
+    "approx": false
+  },
+  {
+    "id": "respiratory-tract-infections",
+    "kind": "finding",
+    "mesh": "Respiratory Tract Infections",
+    "region": "chest",
+    "zh": [
+      "呼吸道感染",
+      "上呼吸道感染",
+      "下呼吸道感染",
+      "气道感染",
+      "支气管感染",
+      "呼吸系统感染",
+      "支气管炎症"
+    ],
+    "approx": false,
+    "note": "「肺部感染」归 Pneumonia（更特异），不在本条目内，避免重复。"
+  },
+  {
+    "id": "sarcoidosis",
+    "kind": "finding",
+    "mesh": "Sarcoidosis",
+    "region": "chest",
+    "zh": [
+      "结节病",
+      "肺结节病",
+      "胸部结节病",
+      "系统性结节病",
+      "结节病累及肺",
+      "肺内结节病"
+    ],
+    "approx": false
+  },
+  {
+    "id": "solitary-pulmonary-nodule",
+    "kind": "finding",
+    "mesh": "Solitary Pulmonary Nodule",
+    "region": "chest",
+    "zh": [
+      "孤立性肺结节",
+      "肺孤立性结节",
+      "肺部孤立结节",
+      "孤立性肺内结节",
+      "孤立性肺结节影",
+      "肺内孤立结节"
+    ],
+    "approx": false,
+    "note": "未收「单发肺结节」：数量词由抽取层处理并在匹配前屏蔽。"
+  },
+  {
+    "id": "subcutaneous-emphysema",
+    "kind": "finding",
+    "mesh": "Subcutaneous Emphysema",
+    "region": "chest",
+    "zh": [
+      "皮下气肿",
+      "皮下积气",
+      "皮下软组织积气",
+      "皮下气体积聚",
+      "皮下气肿形成"
+    ],
+    "approx": false
+  },
+  {
+    "id": "tuberculosis-pulmonary",
+    "kind": "finding",
+    "mesh": "Tuberculosis, Pulmonary",
+    "region": "chest",
+    "zh": [
+      "肺结核",
+      "肺结核病",
+      "浸润型肺结核",
+      "结核球",
+      "干酪性肺炎",
+      "结核性肺炎",
+      "粟粒性肺结核"
+    ],
+    "approx": false
+  }
+]

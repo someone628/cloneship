@@ -1,0 +1,898 @@
+[
+  {
+    "id": "abscess",
+    "kind": "finding",
+    "mesh": "Abscess",
+    "zh": [
+      "脓肿",
+      "脓肿形成",
+      "脓腔",
+      "脓腔形成",
+      "化脓性病变"
+    ],
+    "en": [
+      "abscess",
+      "abscess formation"
+    ],
+    "approx": [
+      "化脓性病变"
+    ],
+    "region": "systemic",
+    "note": "脏器特异性脓肿（肝脓肿等）归各部位文件；「化脓性病变」比 MeSH 脓肿宽（可含蜂窝织炎），故本条整体标 approx。"
+  },
+  {
+    "id": "aneurysm",
+    "kind": "finding",
+    "mesh": "Aneurysm",
+    "zh": [
+      "动脉瘤",
+      "动脉瘤样扩张",
+      "血管瘤样扩张",
+      "动脉瘤样改变",
+      "动脉瘤形成"
+    ],
+    "en": [
+      "aneurysm",
+      "aneurysmal dilatation"
+    ],
+    "approx": [
+      "动脉瘤样扩张",
+      "血管瘤样扩张",
+      "动脉瘤样改变",
+      "aneurysmal dilatation"
+    ],
+    "region": "vascular",
+    "note": "泛称条目，只收不含部位的写法；主动脉瘤等带部位写法归更特异条目。「血管瘤」（Hemangioma）与动脉瘤不同，不入本条。"
+  },
+  {
+    "id": "aortic-aneurysm",
+    "kind": "finding",
+    "mesh": "Aortic Aneurysm",
+    "zh": [
+      "主动脉瘤",
+      "主动脉扩张",
+      "主动脉瘤样扩张",
+      "升主动脉瘤",
+      "降主动脉瘤",
+      "胸主动脉瘤",
+      "主动脉增宽"
+    ],
+    "en": [
+      "aortic aneurysm",
+      "aortic dilatation"
+    ],
+    "approx": [
+      "主动脉扩张",
+      "主动脉瘤样扩张",
+      "主动脉增宽",
+      "aortic dilatation"
+    ],
+    "region": "vascular",
+    "note": "「主动脉扩张/增宽」是形态描述，未达动脉瘤阈值时也这么写，故标 approx；腹主动脉瘤归更特异的 Aortic Aneurysm, Abdominal。"
+  },
+  {
+    "id": "aortic-aneurysm-abdominal",
+    "kind": "finding",
+    "mesh": "Aortic Aneurysm, Abdominal",
+    "zh": [
+      "腹主动脉瘤",
+      "腹主动脉扩张",
+      "腹主动脉瘤样扩张",
+      "腹主动脉增宽",
+      "肾下腹主动脉瘤"
+    ],
+    "en": [
+      "abdominal aortic aneurysm",
+      "aaa"
+    ],
+    "approx": [
+      "腹主动脉扩张",
+      "腹主动脉瘤样扩张",
+      "腹主动脉增宽"
+    ],
+    "region": "vascular",
+    "note": "「腹主动脉扩张/增宽」为形态描述，故标 approx；条目是 Aortic Aneurysm 的子概念，匹配按最长优先。"
+  },
+  {
+    "id": "aortic-dissection",
+    "kind": "finding",
+    "mesh": "Aortic Dissection",
+    "zh": [
+      "主动脉夹层",
+      "主动脉夹层动脉瘤",
+      "主动脉夹层形成",
+      "主动脉真腔",
+      "主动脉内膜片",
+      "主动脉内膜撕裂"
+    ],
+    "en": [
+      "aortic dissection",
+      "dissecting aortic aneurysm"
+    ],
+    "approx": false,
+    "region": "vascular",
+    "note": "「内膜片」「内膜撕裂」是夹层的直接影像征象，与其为同一病变。原写法「主动脉双腔」含侧别/数量修饰词「双」，按规范不得写入别名——「主动脉双腔」经修饰词屏蔽后仍会落到「主动脉」+「双腔」上，由抽取层处理，不需要也无法作为别名收录。"
+  },
+  {
+    "id": "arterial-occlusive-diseases",
+    "kind": "finding",
+    "mesh": "Arterial Occlusive Diseases",
+    "zh": [
+      "动脉闭塞",
+      "动脉闭塞症",
+      "动脉狭窄",
+      "动脉闭塞性病变",
+      "动脉阻塞",
+      "动脉管腔狭窄"
+    ],
+    "en": [
+      "arterial occlusion",
+      "arterial stenosis",
+      "arterial occlusive disease"
+    ],
+    "approx": false,
+    "region": "vascular",
+    "note": "MeSH 定义含部分性梗阻，故「动脉狭窄」「管腔狭窄」视为等价。"
+  },
+  {
+    "id": "bone-cysts",
+    "kind": "finding",
+    "mesh": "Bone Cysts",
+    "zh": [
+      "骨囊肿",
+      "骨囊性病变",
+      "骨囊性改变",
+      "孤立性骨囊肿",
+      "单纯性骨囊肿",
+      "骨内囊性灶"
+    ],
+    "en": [
+      "bone cyst",
+      "bone cysts"
+    ],
+    "approx": [
+      "骨囊性病变",
+      "骨囊性改变",
+      "骨内囊性灶"
+    ],
+    "region": "msk",
+    "note": "「孤立性/单纯性骨囊肿」是子类型，「骨囊性病变/骨内囊性灶」为描述性写法，故标 approx。"
+  },
+  {
+    "id": "brain-edema",
+    "kind": "finding",
+    "mesh": "Brain Edema",
+    "zh": [
+      "脑水肿",
+      "脑组织水肿",
+      "脑实质水肿",
+      "脑肿胀",
+      "脑组织肿胀"
+    ],
+    "en": [
+      "brain edema",
+      "cerebral edema"
+    ],
+    "approx": false,
+    "region": "neuro",
+    "note": "「脑肿胀」在报告中即指脑水肿，按同义处理。"
+  },
+  {
+    "id": "brain-ischemia",
+    "kind": "finding",
+    "mesh": "Brain Ischemia",
+    "zh": [
+      "脑缺血",
+      "脑组织缺血",
+      "脑缺血性改变",
+      "脑供血不足",
+      "脑灌注不足"
+    ],
+    "en": [
+      "brain ischemia",
+      "cerebral ischemia",
+      "cerebral hypoperfusion"
+    ],
+    "approx": [
+      "脑供血不足",
+      "脑灌注不足",
+      "cerebral hypoperfusion"
+    ],
+    "region": "neuro",
+    "note": "「脑供血不足/脑灌注不足」说的是低灌注，未必已成缺血，故标 approx；已梗死者归 Ischemic Stroke。"
+  },
+  {
+    "id": "budd-chiari-syndrome",
+    "kind": "finding",
+    "mesh": "Budd-Chiari Syndrome",
+    "zh": [
+      "布加综合征",
+      "布加氏综合征",
+      "肝静脉阻塞",
+      "肝静脉闭塞",
+      "肝静脉回流受阻",
+      "肝静脉血栓形成"
+    ],
+    "en": [
+      "budd-chiari syndrome",
+      "hepatic vein obstruction"
+    ],
+    "approx": [
+      "肝静脉阻塞",
+      "肝静脉闭塞",
+      "肝静脉回流受阻",
+      "hepatic vein obstruction"
+    ],
+    "region": "vascular",
+    "note": "「肝静脉阻塞/回流受阻」是本病定义性描述但不必然等同完整综合征，故标 approx；泛称「静脉血栓」归 Venous Thrombosis。"
+  },
+  {
+    "id": "cardiomegaly",
+    "kind": "finding",
+    "mesh": "Cardiomegaly",
+    "zh": [
+      "心脏增大",
+      "心影增大",
+      "心脏扩大",
+      "心影扩大",
+      "心脏体积增大"
+    ],
+    "en": [
+      "cardiomegaly",
+      "enlarged heart",
+      "cardiac enlargement"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "X 线/CT 报告里的「心影增大」即心脏增大的常用写法。"
+  },
+  {
+    "id": "cerebral-hemorrhage",
+    "kind": "finding",
+    "mesh": "Cerebral Hemorrhage",
+    "zh": [
+      "脑出血",
+      "脑内出血",
+      "脑实质出血",
+      "脑实质内出血",
+      "大脑出血",
+      "脑血肿"
+    ],
+    "en": [
+      "cerebral hemorrhage",
+      "intracerebral hemorrhage",
+      "intracerebral hematoma"
+    ],
+    "approx": false,
+    "region": "neuro",
+    "note": "限于脑实质内出血；「颅内出血」等泛称归 Intracranial Hemorrhages，蛛网膜下腔出血单列。"
+  },
+  {
+    "id": "fractures-bone",
+    "kind": "finding",
+    "mesh": "Fractures, Bone",
+    "zh": [
+      "骨折",
+      "骨质断裂",
+      "骨皮质中断",
+      "骨皮质不连续",
+      "骨质不连续",
+      "骨折线",
+      "骨小梁中断"
+    ],
+    "en": [
+      "bone fracture",
+      "fracture",
+      "cortical disruption"
+    ],
+    "approx": false,
+    "region": "msk",
+    "note": "泛称骨折条目；椎体骨折归 Spinal Fractures，自发性/病理性骨折归 Fractures, Spontaneous。"
+  },
+  {
+    "id": "fractures-spontaneous",
+    "kind": "finding",
+    "mesh": "Fractures, Spontaneous",
+    "zh": [
+      "自发性骨折",
+      "病理性骨折",
+      "病理骨折",
+      "非外伤性骨折",
+      "脆性骨折"
+    ],
+    "en": [
+      "pathological fracture",
+      "spontaneous fracture",
+      "fragility fracture"
+    ],
+    "approx": [
+      "脆性骨折",
+      "fragility fracture"
+    ],
+    "region": "msk",
+    "note": "MeSH 定义为非外伤性/疾病所致骨折，故「病理性骨折」为等价；「脆性骨折」偏骨质疏松性骨折，只部分重叠，故标 approx。"
+  },
+  {
+    "id": "hematoma",
+    "kind": "finding",
+    "mesh": "Hematoma",
+    "zh": [
+      "血肿",
+      "血肿形成",
+      "软组织血肿",
+      "肌间血肿",
+      "皮下血肿",
+      "肌层血肿"
+    ],
+    "en": [
+      "hematoma",
+      "hematoma formation"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "泛称条目；颅内各腔血肿（硬膜下、硬膜外等）归 Intracranial Hemorrhages，脑内血肿归 Cerebral Hemorrhage。"
+  },
+  {
+    "id": "hydrocephalus",
+    "kind": "finding",
+    "mesh": "Hydrocephalus",
+    "zh": [
+      "脑积水",
+      "脑室积水",
+      "脑室扩张",
+      "脑室扩大",
+      "梗阻性脑积水",
+      "交通性脑积水"
+    ],
+    "en": [
+      "hydrocephalus",
+      "ventriculomegaly"
+    ],
+    "approx": [
+      "脑室扩张",
+      "脑室扩大",
+      "ventriculomegaly"
+    ],
+    "region": "neuro",
+    "note": "「脑室扩张/扩大」只是影像表现，未必是脑积水；「梗阻性/交通性」为本病分型，故标 approx。"
+  },
+  {
+    "id": "intervertebral-disc-displacement",
+    "kind": "finding",
+    "mesh": "Intervertebral Disc Displacement",
+    "zh": [
+      "椎间盘突出",
+      "椎间盘脱出",
+      "椎间盘突出症",
+      "髓核脱出",
+      "髓核突出",
+      "椎间盘移位",
+      "椎间盘后突"
+    ],
+    "en": [
+      "disc herniation",
+      "intervertebral disc displacement",
+      "nucleus pulposus herniation"
+    ],
+    "approx": false,
+    "region": "msk",
+    "note": "有意不收「椎间盘膨出」这类程度分级写法，它们由 ct.rules.json 作为未归一化项报出。"
+  },
+  {
+    "id": "intracranial-hemorrhages",
+    "kind": "finding",
+    "mesh": "Intracranial Hemorrhages",
+    "zh": [
+      "颅内出血",
+      "颅内血肿",
+      "颅内积血",
+      "硬膜下血肿",
+      "硬膜外血肿",
+      "脑室内出血",
+      "颅内出血灶"
+    ],
+    "en": [
+      "intracranial hemorrhage",
+      "intracranial hematoma",
+      "subdural hematoma",
+      "epidural hematoma"
+    ],
+    "approx": [
+      "硬膜下血肿",
+      "硬膜外血肿",
+      "脑室内出血",
+      "subdural hematoma",
+      "epidural hematoma"
+    ],
+    "region": "neuro",
+    "note": "本条是泛称（MeSH 定义为颅腔内出血，含脑实质与三层脑膜出血）；硬膜下血肿、硬膜外血肿在 MeSH 中是本概念的下位描述符，脑室内出血无独立描述符，映射到本泛称均属近似，故标 approx。"
+  },
+  {
+    "id": "ischemic-stroke",
+    "kind": "finding",
+    "mesh": "Ischemic Stroke",
+    "zh": [
+      "脑梗死",
+      "脑梗塞",
+      "脑缺血性梗死",
+      "缺血性脑梗死",
+      "缺血性脑卒中",
+      "缺血性卒中"
+    ],
+    "en": [
+      "ischemic stroke",
+      "cerebral infarction",
+      "ischaemic stroke"
+    ],
+    "approx": false,
+    "region": "neuro",
+    "note": "「脑梗塞」是报告里对脑梗死的常见写法；不带「缺血性」的泛称「脑卒中/卒中」归 Stroke。"
+  },
+  {
+    "id": "kyphosis",
+    "kind": "finding",
+    "mesh": "Kyphosis",
+    "zh": [
+      "脊柱后凸",
+      "脊柱后凸畸形",
+      "脊椎后凸",
+      "后凸畸形",
+      "脊柱后突",
+      "胸椎后凸"
+    ],
+    "en": [
+      "kyphosis",
+      "kyphotic deformity"
+    ],
+    "approx": false,
+    "region": "msk",
+    "note": "与 Scoliosis（侧弯）分列，避免「畸形」类泛称互相串门。"
+  },
+  {
+    "id": "lymphedema",
+    "kind": "finding",
+    "mesh": "Lymphedema",
+    "zh": [
+      "淋巴水肿",
+      "淋巴性水肿",
+      "肢体淋巴水肿",
+      "淋巴回流障碍",
+      "淋巴淤滞"
+    ],
+    "en": [
+      "lymphedema",
+      "lymphatic edema"
+    ],
+    "approx": [
+      "淋巴回流障碍",
+      "淋巴淤滞"
+    ],
+    "region": "systemic",
+    "note": "「淋巴回流障碍/淋巴淤滞」为机制性描述，与已成水肿不完全等价，故标 approx；勿与 Lymphocele（淋巴囊肿）混。"
+  },
+  {
+    "id": "lymphocele",
+    "kind": "finding",
+    "mesh": "Lymphocele",
+    "zh": [
+      "淋巴囊肿",
+      "淋巴液囊肿",
+      "淋巴囊肿形成",
+      "淋巴囊性积液"
+    ],
+    "en": [
+      "lymphocele",
+      "lymphocyst"
+    ],
+    "approx": [
+      "淋巴囊性积液"
+    ],
+    "region": "systemic",
+    "note": "「淋巴囊性积液」为描述性写法，与淋巴囊肿为近似，故标 approx；与 Lymphedema 分列。"
+  },
+  {
+    "id": "meningeal-carcinomatosis",
+    "kind": "finding",
+    "mesh": "Meningeal Carcinomatosis",
+    "zh": [
+      "脑膜癌病",
+      "脑膜癌",
+      "脑膜癌转移",
+      "脑膜转移癌",
+      "软脑膜转移",
+      "脑膜转移瘤"
+    ],
+    "en": [
+      "meningeal carcinomatosis",
+      "leptomeningeal metastasis",
+      "meningeal metastasis"
+    ],
+    "approx": [
+      "脑膜转移瘤",
+      "meningeal metastasis"
+    ],
+    "region": "neuro",
+    "note": "MeSH 特指癌的脑膜播散；「脑膜转移瘤」可含硬膜受累、范围略宽，故标 approx。"
+  },
+  {
+    "id": "necrosis",
+    "kind": "finding",
+    "mesh": "Necrosis",
+    "zh": [
+      "坏死",
+      "坏死灶",
+      "组织坏死",
+      "坏死性改变",
+      "液化性坏死",
+      "凝固性坏死",
+      "坏死区"
+    ],
+    "en": [
+      "necrosis",
+      "necrotic change",
+      "liquefactive necrosis"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "泛称坏死；坏死性胰腺炎等带部位/疾病的写法归各自条目，不在本条。"
+  },
+  {
+    "id": "osteolysis",
+    "kind": "finding",
+    "mesh": "Osteolysis",
+    "zh": [
+      "骨质破坏",
+      "溶骨性破坏",
+      "骨破坏",
+      "骨皮质破坏",
+      "溶骨性改变",
+      "骨质溶解",
+      "溶骨性病变"
+    ],
+    "en": [
+      "osteolysis",
+      "bone destruction",
+      "lytic bone lesion"
+    ],
+    "approx": false,
+    "region": "msk",
+    "note": "报告里「骨质破坏」即溶骨性骨破坏；「骨转移」是部位+转移组合，不入本条。"
+  },
+  {
+    "id": "osteoporosis",
+    "kind": "finding",
+    "mesh": "Osteoporosis",
+    "zh": [
+      "骨质疏松",
+      "骨质疏松症",
+      "骨质稀疏",
+      "骨质疏松改变",
+      "骨密度减低",
+      "骨量减少"
+    ],
+    "en": [
+      "osteoporosis",
+      "decreased bone mineral density",
+      "bone rarefaction"
+    ],
+    "approx": [
+      "骨质稀疏",
+      "骨密度减低",
+      "骨量减少",
+      "decreased bone mineral density",
+      "bone rarefaction"
+    ],
+    "region": "msk",
+    "note": "「骨密度减低/骨量减少」是影像与定量提示，未必已达骨质疏松诊断阈值，故标 approx；「骨质增生」无对应 MeSH，不收。"
+  },
+  {
+    "id": "osteosclerosis",
+    "kind": "finding",
+    "mesh": "Osteosclerosis",
+    "zh": [
+      "骨质硬化",
+      "骨硬化",
+      "骨质密度增高",
+      "骨密度增高",
+      "硬化性骨改变",
+      "骨质致密"
+    ],
+    "en": [
+      "osteosclerosis",
+      "increased bone density",
+      "bone sclerosis"
+    ],
+    "approx": false,
+    "region": "msk",
+    "note": "影像上骨密度增高即骨硬化；有意不收「骨质增生硬化」以免把无 MeSH 对应的「骨质增生」拉进来。"
+  },
+  {
+    "id": "pericardial-effusion",
+    "kind": "finding",
+    "mesh": "Pericardial Effusion",
+    "zh": [
+      "心包积液",
+      "心包腔积液",
+      "心包内积液",
+      "心包渗液"
+    ],
+    "en": [
+      "pericardial effusion",
+      "fluid in pericardial cavity"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "程度词（少量/大量）由抽取层处理，不入别名。"
+  },
+  {
+    "id": "scoliosis",
+    "kind": "finding",
+    "mesh": "Scoliosis",
+    "zh": [
+      "脊柱侧弯",
+      "脊柱侧凸",
+      "脊椎侧弯",
+      "脊柱侧弯畸形",
+      "脊柱侧凸畸形",
+      "侧弯畸形"
+    ],
+    "en": [
+      "scoliosis",
+      "scoliotic deformity"
+    ],
+    "approx": false,
+    "region": "msk",
+    "note": "侧别与度数由抽取层处理，不入别名。"
+  },
+  {
+    "id": "seroma",
+    "kind": "finding",
+    "mesh": "Seroma",
+    "zh": [
+      "血清肿",
+      "血清性积液",
+      "血清样积液",
+      "血清肿形成"
+    ],
+    "en": [
+      "seroma",
+      "serous collection"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "术后/引流后浆液性积聚的常用写法；「浆液性积液」泛用于胸腹水，故不收以免过度命中。"
+  },
+  {
+    "id": "spinal-cord-compression",
+    "kind": "finding",
+    "mesh": "Spinal Cord Compression",
+    "zh": [
+      "脊髓受压",
+      "脊髓压迫",
+      "脊髓压迫症",
+      "脊髓受压变形",
+      "脊髓受压变扁",
+      "硬膜囊受压"
+    ],
+    "en": [
+      "spinal cord compression",
+      "cord compression",
+      "thecal sac compression"
+    ],
+    "approx": [
+      "硬膜囊受压",
+      "thecal sac compression"
+    ],
+    "region": "msk",
+    "note": "「硬膜囊受压」不等于脊髓本身受压，故标 approx；与 Spinal Stenosis（椎管狭窄）分列。"
+  },
+  {
+    "id": "spinal-fractures",
+    "kind": "finding",
+    "mesh": "Spinal Fractures",
+    "zh": [
+      "椎体骨折",
+      "椎体压缩骨折",
+      "椎体压缩性骨折",
+      "椎体楔形变",
+      "椎体塌陷",
+      "脊柱骨折",
+      "附件骨折",
+      "椎体爆裂骨折"
+    ],
+    "en": [
+      "spinal fracture",
+      "vertebral fracture",
+      "vertebral compression fracture",
+      "burst fracture"
+    ],
+    "approx": [
+      "椎体楔形变",
+      "椎体塌陷"
+    ],
+    "region": "msk",
+    "note": "「椎体楔形变」可为发育性或退变所致，不必然等于骨折，故标 approx；压缩程度分级不入别名。"
+  },
+  {
+    "id": "spinal-stenosis",
+    "kind": "finding",
+    "mesh": "Spinal Stenosis",
+    "zh": [
+      "椎管狭窄",
+      "椎管狭窄症",
+      "骨性椎管狭窄",
+      "椎管骨性狭窄",
+      "中央椎管狭窄",
+      "侧隐窝狭窄",
+      "神经根管狭窄"
+    ],
+    "en": [
+      "spinal stenosis",
+      "central canal stenosis",
+      "foraminal stenosis"
+    ],
+    "approx": false,
+    "region": "msk",
+    "note": "中央椎管/侧隐窝/神经根管狭窄是椎管狭窄的解剖分型，属同一概念的分区写法。"
+  },
+  {
+    "id": "spondylitis",
+    "kind": "finding",
+    "mesh": "Spondylitis",
+    "zh": [
+      "脊柱炎",
+      "脊椎炎",
+      "椎体炎",
+      "椎间盘炎",
+      "强直性脊柱炎",
+      "感染性脊柱炎"
+    ],
+    "en": [
+      "spondylitis",
+      "spondylodiscitis",
+      "ankylosing spondylitis"
+    ],
+    "approx": [
+      "椎间盘炎",
+      "强直性脊柱炎",
+      "感染性脊柱炎",
+      "spondylodiscitis",
+      "ankylosing spondylitis"
+    ],
+    "region": "msk",
+    "note": "「椎间盘炎」「强直性脊柱炎」是与椎体炎相邻/下属的概念（后者在 MeSH 中亦为 Spondylitis 子类），故标 approx。"
+  },
+  {
+    "id": "stroke",
+    "kind": "finding",
+    "mesh": "Stroke",
+    "zh": [
+      "卒中",
+      "脑卒中",
+      "脑血管意外",
+      "中风",
+      "脑中风"
+    ],
+    "en": [
+      "stroke",
+      "cerebrovascular accident",
+      "cva"
+    ],
+    "approx": false,
+    "region": "neuro",
+    "note": "泛称条目，含缺血与出血；「缺血性脑卒中」等带限定写法归 Ischemic Stroke，匹配按最长优先。"
+  },
+  {
+    "id": "subarachnoid-hemorrhage",
+    "kind": "finding",
+    "mesh": "Subarachnoid Hemorrhage",
+    "zh": [
+      "蛛网膜下腔出血",
+      "蛛网膜下出血",
+      "蛛网膜下腔积血",
+      "脑沟积血",
+      "脑池积血"
+    ],
+    "en": [
+      "subarachnoid hemorrhage",
+      "sah"
+    ],
+    "approx": false,
+    "region": "neuro",
+    "note": "「脑沟积血/脑池积血」是蛛网膜下腔出血的直接分布描述，按同一病变处理。"
+  },
+  {
+    "id": "superior-vena-cava-syndrome",
+    "kind": "finding",
+    "mesh": "Superior Vena Cava Syndrome",
+    "zh": [
+      "上腔静脉综合征",
+      "上腔静脉阻塞",
+      "上腔静脉受压",
+      "上腔静脉狭窄",
+      "上腔静脉梗阻",
+      "上腔静脉回流受阻"
+    ],
+    "en": [
+      "superior vena cava syndrome",
+      "svc obstruction"
+    ],
+    "approx": [
+      "上腔静脉阻塞",
+      "上腔静脉受压",
+      "上腔静脉狭窄",
+      "上腔静脉梗阻",
+      "上腔静脉回流受阻",
+      "svc obstruction"
+    ],
+    "region": "vascular",
+    "note": "除综合征本身外，其余写法描述的是其成因（阻塞/受压/狭窄），临床常等同使用，故标 approx。"
+  },
+  {
+    "id": "thrombosis",
+    "kind": "finding",
+    "mesh": "Thrombosis",
+    "zh": [
+      "血栓",
+      "血栓形成",
+      "血管内血栓",
+      "附壁血栓",
+      "血栓性病变",
+      "管腔内血栓"
+    ],
+    "en": [
+      "thrombosis",
+      "thrombus",
+      "mural thrombus"
+    ],
+    "approx": false,
+    "region": "vascular",
+    "note": "泛称条目，只收不带「静脉/深静脉」的写法；静脉血栓、深静脉血栓专归 Venous Thrombosis，同一串不重复出现。"
+  },
+  {
+    "id": "venous-thromboembolism",
+    "kind": "finding",
+    "mesh": "Venous Thromboembolism",
+    "zh": [
+      "静脉血栓栓塞",
+      "静脉血栓栓塞症",
+      "血栓栓塞",
+      "血栓栓塞症",
+      "静脉栓塞",
+      "静脉血栓栓塞性疾病"
+    ],
+    "en": [
+      "venous thromboembolism",
+      "vte",
+      "thromboembolism"
+    ],
+    "approx": [
+      "血栓栓塞",
+      "血栓栓塞症",
+      "thromboembolism"
+    ],
+    "region": "vascular",
+    "note": "「血栓栓塞」本身可涵盖动脉栓塞，比 MeSH 的静脉血栓栓塞宽，故标 approx；肺栓塞归胸部文件。"
+  },
+  {
+    "id": "venous-thrombosis",
+    "kind": "finding",
+    "mesh": "Venous Thrombosis",
+    "zh": [
+      "静脉血栓",
+      "深静脉血栓",
+      "静脉血栓形成",
+      "深静脉血栓形成",
+      "静脉内血栓",
+      "下肢静脉血栓"
+    ],
+    "en": [
+      "venous thrombosis",
+      "deep vein thrombosis",
+      "dvt"
+    ],
+    "approx": false,
+    "region": "vascular",
+    "note": "与 Thrombosis 严格分工：本条的别名一律带「静脉」，泛称「血栓」不在此。"
+  }
+]

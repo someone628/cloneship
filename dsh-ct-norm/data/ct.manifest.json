@@ -1,0 +1,76 @@
+{
+  "format": "CTNORM1",
+  "version": "0.1.0",
+  "built_utc": "2026-10-09T11:40:02Z",
+  "mesh_release": "MeSH 2026",
+  "mesh_index": {
+    "file": "mesh_index.bin",
+    "bytes": 77593601,
+    "sha256": "4f536e3fd992c21b6ec918c04c2790fbe8a28fae641654f5a8f8bc73ae8e4656",
+    "built_utc": "2026-10-09T10:24:26Z",
+    "records": 355232,
+    "terms": 840392
+  },
+  "counts": {
+    "entries": 327,
+    "byKind": {
+      "anatomy": 122,
+      "finding": 134,
+      "assessment": 27,
+      "morphology": 8,
+      "neoplasm": 36
+    },
+    "aliasesZh": 1539,
+    "aliasesEn": 518,
+    "meshConcepts": 370,
+    "unmappedGroups": 33
+  },
+  "sources": {
+    "10-anatomy.json": {
+      "sha256": "fd8e58ee58260601cdfa7dcf8d7b7c11932f5d7c8708993b67a49fba2e1998f6",
+      "bytes": 27711,
+      "entries": 122
+    },
+    "12-findings-head-neck.json": {
+      "sha256": "fe8a337f9e149dc0ed68d36ab0806d30d55a9ba93b33a98a3d87e962927e30ed",
+      "bytes": 945,
+      "entries": 2
+    },
+    "20-findings-thorax.json": {
+      "sha256": "f3842809a9e41147fd2aa63105a083dc59c496a43ed887c83a12c501431a67cf",
+      "bytes": 10989,
+      "entries": 30
+    },
+    "30-findings-abdomen.json": {
+      "sha256": "d361fe313ddfe37797c552fa85a813a2d07967312ee6f2ea5c5e7be94f1261b0",
+      "bytes": 18273,
+      "entries": 42
+    },
+    "40-findings-neuro-msk.json": {
+      "sha256": "ed5cc54502477d942ad8bd30e15b9ec878b7022e79ff2742dc93ddd9de2a1088",
+      "bytes": 22709,
+      "entries": 40
+    },
+    "45-urogenital-assessment.json": {
+      "sha256": "0ff651cb862d090d9ca8f3f98a645734dd965b35401ee1f4a2d6a1dcd1f19fa6",
+      "bytes": 20928,
+      "entries": 47
+    },
+    "50-morphology.json": {
+      "sha256": "f1f13bd053d050eacb7b14917ef5e7a07970455adf95cb5fb7d29a7184ae0b94",
+      "bytes": 4058,
+      "entries": 8
+    },
+    "55-neoplasms-histology.json": {
+      "sha256": "93d37637f25f1a74cfa4a209f96fef97bc64312209e9eedb4db9b371192d5f2d",
+      "bytes": 11707,
+      "entries": 36
+    }
+  },
+  "rules": {
+    "file": "ct.rules.json",
+    "sha256": "221b5fe9bb44ce64b20ec7850036084f25f9f5c09dc60aad44b328035fa135a6",
+    "bytes": 12686
+  },
+  "note": "本清单记录构建期输入与其指纹，用于复现与审计。mesh.subset.jsonl 只含词表引用到的 MeSH 概念，插件在物理上产不出该子集之外的 MeSH 编号。"
+}

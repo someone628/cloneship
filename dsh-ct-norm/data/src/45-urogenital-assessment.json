@@ -1,0 +1,896 @@
+[
+  {
+    "id": "biopsy",
+    "kind": "assessment",
+    "mesh": "Biopsy",
+    "zh": [
+      "活检",
+      "穿刺活检",
+      "组织活检",
+      "病理活检",
+      "穿刺病理",
+      "活检病理",
+      "切取活检"
+    ],
+    "en": [
+      "biopsy",
+      "needle biopsy"
+    ],
+    "approx": false,
+    "region": "imaging",
+    "note": "泛指取组织行病理检查的操作；具体术式（细针、粗针、切开）另有条目或未单列。"
+  },
+  {
+    "id": "chemotherapy-adjuvant",
+    "kind": "assessment",
+    "mesh": "Chemotherapy, Adjuvant",
+    "zh": [
+      "辅助化疗",
+      "辅助化学治疗",
+      "术后辅助化疗",
+      "辅助化疗方案"
+    ],
+    "en": [
+      "adjuvant chemotherapy",
+      "adjuvant treatment"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "指根治性治疗后的辅助化疗；不含新辅助化疗（见 neoadjuvant-therapy）。"
+  },
+  {
+    "id": "computed-tomography",
+    "kind": "assessment",
+    "mesh": "Tomography, X-Ray Computed",
+    "zh": [
+      "CT",
+      "CT扫描",
+      "CT检查",
+      "计算机断层扫描",
+      "螺旋CT",
+      "增强CT",
+      "增强扫描",
+      "增强检查",
+      "强化扫描"
+    ],
+    "en": [
+      "computed tomography",
+      "helical ct",
+      "contrast-enhanced ct"
+    ],
+    "approx": false,
+    "region": "imaging",
+    "note": "「增强扫描／增强检查／增强CT／强化扫描」说的是扫描方式（是否使用对比剂），不是疾病；增强后表现类描述仍属未归一化项。"
+  },
+  {
+    "id": "contrast-media",
+    "kind": "assessment",
+    "mesh": "Contrast Media",
+    "zh": [
+      "对比剂",
+      "造影剂",
+      "碘对比剂",
+      "含碘造影剂",
+      "碘造影剂"
+    ],
+    "en": [
+      "contrast media",
+      "contrast agent",
+      "contrast medium"
+    ],
+    "approx": [
+      "碘对比剂",
+      "含碘造影剂",
+      "碘造影剂"
+    ],
+    "region": "imaging",
+    "note": "「碘对比剂／含碘造影剂／碘造影剂」只是 CT 场景下最常用的碘剂亚类，范围窄于 MeSH 的 Contrast Media（后者还包括钆剂、钡剂等），故整条标记为近似。"
+  },
+  {
+    "id": "cystitis",
+    "kind": "finding",
+    "mesh": "Cystitis",
+    "zh": [
+      "膀胱炎",
+      "膀胱炎症",
+      "膀胱炎性改变",
+      "膀胱炎性病变"
+    ],
+    "en": [
+      "cystitis",
+      "bladder inflammation"
+    ],
+    "approx": false,
+    "region": "pelvis"
+  },
+  {
+    "id": "cysts",
+    "kind": "finding",
+    "mesh": "Cysts",
+    "zh": [
+      "囊肿",
+      "囊肿性病变",
+      "囊性病变",
+      "囊性病灶",
+      "囊性病变区"
+    ],
+    "en": [
+      "cyst",
+      "cysts",
+      "cystic lesion"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "全身性通用囊肿概念；器官特异的囊肿（如卵巢囊肿、骨囊肿）归各自条目，按最长优先匹配。"
+  },
+  {
+    "id": "diagnostic-imaging",
+    "kind": "assessment",
+    "mesh": "Diagnostic Imaging",
+    "zh": [
+      "影像学检查",
+      "影像检查",
+      "影像学",
+      "医学影像",
+      "影像诊断",
+      "影像学诊断"
+    ],
+    "en": [
+      "diagnostic imaging",
+      "medical imaging"
+    ],
+    "approx": false,
+    "region": "imaging"
+  },
+  {
+    "id": "disease-free-survival",
+    "kind": "assessment",
+    "mesh": "Disease-Free Survival",
+    "zh": [
+      "无病生存",
+      "无病生存期",
+      "无病生存率",
+      "DFS"
+    ],
+    "en": [
+      "disease-free survival"
+    ],
+    "approx": false,
+    "region": "systemic"
+  },
+  {
+    "id": "disease-progression",
+    "kind": "assessment",
+    "mesh": "Disease Progression",
+    "zh": [
+      "疾病进展",
+      "病情进展",
+      "病变进展",
+      "肿瘤进展"
+    ],
+    "en": [
+      "disease progression",
+      "progressive disease"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "只收「进展」这一事件性概念；RECIST 的 PD（进展）分级判定口径不属 MeSH 主题词粒度。"
+  },
+  {
+    "id": "endometriosis",
+    "kind": "finding",
+    "mesh": "Endometriosis",
+    "zh": [
+      "子宫内膜异位症",
+      "子宫内膜异位",
+      "子宫内膜异位病变",
+      "盆腔子宫内膜异位症",
+      "内异症"
+    ],
+    "en": [
+      "endometriosis"
+    ],
+    "approx": false,
+    "region": "pelvis"
+  },
+  {
+    "id": "fine-needle-biopsy",
+    "kind": "assessment",
+    "mesh": "Biopsy, Fine-Needle",
+    "zh": [
+      "细针穿刺",
+      "细针穿刺活检",
+      "细针抽吸活检",
+      "细针抽吸",
+      "针吸活检",
+      "细针穿刺细胞学"
+    ],
+    "en": [
+      "fine-needle biopsy",
+      "fine needle aspiration",
+      "fna"
+    ],
+    "approx": false,
+    "region": "imaging"
+  },
+  {
+    "id": "fluorodeoxyglucose-f18",
+    "kind": "assessment",
+    "mesh": "Fluorodeoxyglucose F18",
+    "zh": [
+      "FDG",
+      "氟代脱氧葡萄糖",
+      "氟脱氧葡萄糖",
+      "氟代脱氧葡萄糖显像剂"
+    ],
+    "en": [
+      "fluorodeoxyglucose"
+    ],
+    "approx": false,
+    "region": "imaging",
+    "note": "PET-CT 最常用的葡萄糖代谢显像剂；「18F-FDG」含数字，按规范不写入别名。"
+  },
+  {
+    "id": "hematuria",
+    "kind": "finding",
+    "mesh": "Hematuria",
+    "zh": [
+      "血尿",
+      "尿血",
+      "镜下血尿",
+      "肉眼血尿",
+      "血尿症"
+    ],
+    "en": [
+      "hematuria",
+      "blood in urine"
+    ],
+    "approx": false,
+    "region": "pelvis"
+  },
+  {
+    "id": "hydronephrosis",
+    "kind": "finding",
+    "mesh": "Hydronephrosis",
+    "zh": [
+      "肾积水",
+      "肾盂积水",
+      "肾盂扩张积水",
+      "输尿管扩张积水",
+      "肾盂肾盏扩张",
+      "肾盂扩张",
+      "肾盏扩张"
+    ],
+    "en": [
+      "hydronephrosis",
+      "hydronephrotic"
+    ],
+    "approx": false,
+    "region": "pelvis",
+    "note": "「输尿管扩张积水」是报告中与肾积水连写的常用说法；单侧输尿管扩张本身对应 Hydroureter，本词典未单列。"
+  },
+  {
+    "id": "kidney-calculi",
+    "kind": "finding",
+    "mesh": "Kidney Calculi",
+    "zh": [
+      "肾结石",
+      "肾结石症",
+      "肾盂结石",
+      "肾盏结石",
+      "肾脏结石",
+      "肾窦结石"
+    ],
+    "en": [
+      "kidney calculi",
+      "kidney stone",
+      "renal calculus",
+      "renal stone"
+    ],
+    "approx": false,
+    "region": "pelvis",
+    "note": "与 nephrolithiasis 同源，本表按中文报告用词拆成两条：本条取「结石」本体写法，Nephrolithiasis 取「肾石病」等疾病侧写法。"
+  },
+  {
+    "id": "magnetic-resonance-imaging",
+    "kind": "assessment",
+    "mesh": "Magnetic Resonance Imaging",
+    "zh": [
+      "MRI",
+      "磁共振成像",
+      "磁共振",
+      "核磁共振",
+      "核磁",
+      "磁共振检查",
+      "MRI检查"
+    ],
+    "en": [
+      "magnetic resonance imaging"
+    ],
+    "approx": false,
+    "region": "imaging"
+  },
+  {
+    "id": "mastitis",
+    "kind": "finding",
+    "mesh": "Mastitis",
+    "zh": [
+      "乳腺炎",
+      "乳腺炎症",
+      "乳腺炎性改变",
+      "乳腺炎性病变"
+    ],
+    "en": [
+      "mastitis"
+    ],
+    "approx": false,
+    "region": "pelvis"
+  },
+  {
+    "id": "neoadjuvant-therapy",
+    "kind": "assessment",
+    "mesh": "Neoadjuvant Therapy",
+    "zh": [
+      "新辅助治疗",
+      "新辅助",
+      "新辅助疗法",
+      "术前新辅助治疗"
+    ],
+    "en": [
+      "neoadjuvant therapy",
+      "neoadjuvant treatment"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "只收「新辅助治疗」这一笼统概念；新辅助化疗／新辅助放疗等具体方案是对应治疗条目与「新辅助」的组合写法。"
+  },
+  {
+    "id": "neoplasm-grading",
+    "kind": "assessment",
+    "mesh": "Neoplasm Grading",
+    "zh": [
+      "肿瘤分级",
+      "病理分级",
+      "组织学分级",
+      "肿瘤组织学分级",
+      "肿瘤病理分级"
+    ],
+    "en": [
+      "neoplasm grading",
+      "tumor grade",
+      "histologic grade"
+    ],
+    "approx": false,
+    "region": "systemic"
+  },
+  {
+    "id": "neoplasm-recurrence-local",
+    "kind": "finding",
+    "mesh": "Neoplasm Recurrence, Local",
+    "zh": [
+      "肿瘤复发",
+      "肿瘤局部复发",
+      "局部肿瘤复发",
+      "原位复发",
+      "复发性肿瘤",
+      "瘤床复发"
+    ],
+    "en": [
+      "local recurrence",
+      "local tumor recurrence"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "限定为「局部／原位」复发；裸词「复发」及其它泛化写法归 50-morphology.json 的 morph-recurrence（同为 Neoplasm Recurrence, Local），远处复发与转移见转移相关条目。"
+  },
+  {
+    "id": "neoplasm-staging",
+    "kind": "assessment",
+    "mesh": "Neoplasm Staging",
+    "zh": [
+      "肿瘤分期",
+      "TNM分期",
+      "临床分期",
+      "病理分期",
+      "肿瘤临床分期"
+    ],
+    "en": [
+      "neoplasm staging",
+      "tumor staging",
+      "tnm staging"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "TNM、临床、病理分期都是 Neoplasm Staging 的常规中文写法（MeSH 亦以 TNM 为其入口词）；具体期别（如 T3N1M0）属未归一化项。"
+  },
+  {
+    "id": "neoplastic-cells-circulating",
+    "kind": "assessment",
+    "mesh": "Neoplastic Cells, Circulating",
+    "zh": [
+      "循环肿瘤细胞",
+      "循环肿瘤细胞检测",
+      "外周血肿瘤细胞",
+      "血循环肿瘤细胞",
+      "CTC",
+      "CTCs"
+    ],
+    "en": [
+      "circulating neoplastic cells",
+      "circulating tumor cells"
+    ],
+    "approx": false,
+    "region": "imaging",
+    "note": "属实验室检测方法而非影像方法，本文件按「检查方法」统一置 region=imaging，便于与评估类条目区分。"
+  },
+  {
+    "id": "nephrolithiasis",
+    "kind": "finding",
+    "mesh": "Nephrolithiasis",
+    "zh": [
+      "肾石病",
+      "肾石症",
+      "肾结石病"
+    ],
+    "en": [
+      "nephrolithiasis",
+      "renal stone disease"
+    ],
+    "approx": false,
+    "region": "pelvis",
+    "note": "取疾病侧写法，与 kidney-calculi 分开；两概念在 MeSH 中同源，别名互不重复。"
+  },
+  {
+    "id": "ovarian-cysts",
+    "kind": "finding",
+    "mesh": "Ovarian Cysts",
+    "zh": [
+      "卵巢囊肿",
+      "卵巢囊性病变",
+      "卵巢单纯性囊肿",
+      "卵巢囊性灶",
+      "卵巢囊肿性病变"
+    ],
+    "en": [
+      "ovarian cyst",
+      "ovarian cysts"
+    ],
+    "approx": false,
+    "region": "pelvis"
+  },
+  {
+    "id": "pet-ct",
+    "kind": "assessment",
+    "mesh": "Positron Emission Tomography Computed Tomography",
+    "zh": [
+      "PET-CT",
+      "PETCT",
+      "PETCT检查",
+      "正电子发射计算机断层显像"
+    ],
+    "en": [
+      "positron emission tomography computed tomography"
+    ],
+    "approx": false,
+    "region": "imaging",
+    "note": "PET 与 CT 的同机融合检查；单独的 PET（正电子发射断层显像）不写入本条目，避免与混合检查混淆。"
+  },
+  {
+    "id": "polycystic-ovary-syndrome",
+    "kind": "finding",
+    "mesh": "Polycystic Ovary Syndrome",
+    "zh": [
+      "多囊卵巢综合征",
+      "多囊卵巢",
+      "多囊卵巢综合症",
+      "卵巢多囊样改变",
+      "多囊卵巢改变"
+    ],
+    "en": [
+      "polycystic ovary syndrome",
+      "pcos"
+    ],
+    "approx": [
+      "多囊卵巢",
+      "卵巢多囊样改变",
+      "多囊卵巢改变"
+    ],
+    "region": "pelvis",
+    "note": "「卵巢多囊样改变／多囊卵巢改变」描述的是卵巢多囊形态（PCO），只是 PCOS 的影像学近似说法，不等于综合征本身，故整条标记为近似。"
+  },
+  {
+    "id": "pregnancy-ectopic",
+    "kind": "finding",
+    "mesh": "Pregnancy, Ectopic",
+    "zh": [
+      "异位妊娠",
+      "宫外孕",
+      "子宫外妊娠",
+      "输卵管妊娠"
+    ],
+    "en": [
+      "ectopic pregnancy",
+      "extrauterine pregnancy"
+    ],
+    "approx": [
+      "输卵管妊娠"
+    ],
+    "region": "pelvis",
+    "note": "「输卵管妊娠」是异位妊娠中最常见的亚型（MeSH 另有 Pregnancy, Tubal），比本概念窄，故整条标记为近似。"
+  },
+  {
+    "id": "progression-free-survival",
+    "kind": "assessment",
+    "mesh": "Progression-Free Survival",
+    "zh": [
+      "无进展生存",
+      "无进展生存期",
+      "无进展生存率",
+      "PFS"
+    ],
+    "en": [
+      "progression-free survival"
+    ],
+    "approx": false,
+    "region": "systemic"
+  },
+  {
+    "id": "prostatic-hyperplasia",
+    "kind": "finding",
+    "mesh": "Prostatic Hyperplasia",
+    "zh": [
+      "前列腺增生",
+      "前列腺增生症",
+      "前列腺肥大",
+      "良性前列腺增生",
+      "前列腺增生性改变"
+    ],
+    "en": [
+      "prostatic hyperplasia",
+      "benign prostatic hyperplasia",
+      "bph"
+    ],
+    "approx": false,
+    "region": "pelvis"
+  },
+  {
+    "id": "prostatitis",
+    "kind": "finding",
+    "mesh": "Prostatitis",
+    "zh": [
+      "前列腺炎",
+      "前列腺炎症",
+      "前列腺炎性改变",
+      "前列腺炎性病变"
+    ],
+    "en": [
+      "prostatitis"
+    ],
+    "approx": false,
+    "region": "pelvis"
+  },
+  {
+    "id": "pyelonephritis",
+    "kind": "finding",
+    "mesh": "Pyelonephritis",
+    "zh": [
+      "肾盂肾炎",
+      "肾盂肾炎性改变",
+      "肾盂肾炎性病变",
+      "肾盂肾炎表现"
+    ],
+    "en": [
+      "pyelonephritis",
+      "renal pelvic inflammation"
+    ],
+    "approx": false,
+    "region": "pelvis",
+    "note": "不含「急性／慢性」等病程修饰写法，病程由抽取层单独处理。"
+  },
+  {
+    "id": "radiography",
+    "kind": "assessment",
+    "mesh": "Radiography",
+    "zh": [
+      "X线检查",
+      "X线摄影",
+      "X线平片",
+      "平片",
+      "摄片",
+      "普通X线检查",
+      "X线"
+    ],
+    "en": [
+      "radiography",
+      "plain radiograph",
+      "x-ray"
+    ],
+    "approx": false,
+    "region": "imaging"
+  },
+  {
+    "id": "radiopharmaceuticals",
+    "kind": "assessment",
+    "mesh": "Radiopharmaceuticals",
+    "zh": [
+      "放射性药物",
+      "放射性药品",
+      "放射性示踪剂",
+      "放射性显像剂"
+    ],
+    "en": [
+      "radiopharmaceuticals",
+      "radiopharmaceutical",
+      "radiotracer"
+    ],
+    "approx": [
+      "放射性示踪剂",
+      "放射性显像剂",
+      "radiotracer"
+    ],
+    "region": "imaging",
+    "note": "「放射性示踪剂／放射性显像剂」是报告中的常用说法，只覆盖显像用放射性药物，范围与 Radiopharmaceuticals（含治疗用）不完全等同，故整条标记为近似。"
+  },
+  {
+    "id": "radiotherapy",
+    "kind": "assessment",
+    "mesh": "Radiotherapy",
+    "zh": [
+      "放疗",
+      "放射治疗",
+      "放射疗法",
+      "放射线治疗"
+    ],
+    "en": [
+      "radiotherapy",
+      "radiation therapy"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "只收放疗这一治疗方式本身；调强、立体定向等具体技术属未归一化项。"
+  },
+  {
+    "id": "recist",
+    "kind": "assessment",
+    "mesh": "Response Evaluation Criteria in Solid Tumors",
+    "zh": [
+      "RECIST",
+      "RECIST标准",
+      "实体瘤疗效评价标准",
+      "实体瘤疗效评价",
+      "实体瘤评价标准"
+    ],
+    "en": [
+      "response evaluation criteria in solid tumors"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "仅指 RECIST 标准本身；版本号（1.1 等）与「完全缓解／部分缓解／疾病稳定」等反应分级不属 MeSH 主题词，见 ct.rules.json 未归一化项。"
+  },
+  {
+    "id": "remission-induction",
+    "kind": "assessment",
+    "mesh": "Remission Induction",
+    "zh": [
+      "诱导缓解",
+      "缓解诱导",
+      "诱导缓解治疗",
+      "缓解诱导治疗"
+    ],
+    "en": [
+      "remission induction",
+      "induction of remission"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "指为取得缓解而实施的治疗过程，不涉及缓解程度分级。"
+  },
+  {
+    "id": "remission-spontaneous",
+    "kind": "assessment",
+    "mesh": "Remission, Spontaneous",
+    "zh": [
+      "自行缓解",
+      "自发缓解",
+      "自然缓解",
+      "自发性缓解"
+    ],
+    "en": [
+      "spontaneous remission",
+      "spontaneous regression"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "范围严格限定为「未经治疗而自行消退／缓解」；不含治疗相关的完全缓解、部分缓解（MeSH 无对应主题词，见 ct.rules.json 未归一化项）。"
+  },
+  {
+    "id": "surgical-pathology",
+    "kind": "assessment",
+    "mesh": "Pathology, Surgical",
+    "zh": [
+      "外科病理",
+      "手术病理",
+      "外科病理学",
+      "手术病理检查",
+      "外科病理检查"
+    ],
+    "en": [
+      "surgical pathology",
+      "histopathology"
+    ],
+    "approx": false,
+    "region": "imaging"
+  },
+  {
+    "id": "treatment-outcome",
+    "kind": "assessment",
+    "mesh": "Treatment Outcome",
+    "zh": [
+      "治疗结果",
+      "治疗效果",
+      "治疗转归",
+      "治疗反应",
+      "疗效",
+      "治疗结局"
+    ],
+    "en": [
+      "treatment outcome",
+      "therapeutic outcome",
+      "treatment response"
+    ],
+    "approx": false,
+    "region": "systemic"
+  },
+  {
+    "id": "tumor-burden",
+    "kind": "assessment",
+    "mesh": "Tumor Burden",
+    "zh": [
+      "肿瘤负荷",
+      "瘤负荷",
+      "肿瘤负荷量",
+      "总肿瘤负荷",
+      "肿瘤总负荷"
+    ],
+    "en": [
+      "tumor burden",
+      "tumour burden",
+      "tumor load"
+    ],
+    "approx": false,
+    "region": "systemic"
+  },
+  {
+    "id": "ultrasonography",
+    "kind": "assessment",
+    "mesh": "Ultrasonography",
+    "zh": [
+      "超声",
+      "超声检查",
+      "B超",
+      "彩超",
+      "彩色多普勒超声",
+      "超声成像",
+      "多普勒超声"
+    ],
+    "en": [
+      "ultrasonography",
+      "ultrasound",
+      "sonography"
+    ],
+    "approx": false,
+    "region": "imaging"
+  },
+  {
+    "id": "ureteral-calculi",
+    "kind": "finding",
+    "mesh": "Ureteral Calculi",
+    "zh": [
+      "输尿管结石",
+      "输尿管结石症",
+      "输尿管石",
+      "输尿管腔内结石"
+    ],
+    "en": [
+      "ureteral calculi",
+      "ureteral stone",
+      "ureterolithiasis"
+    ],
+    "approx": false,
+    "region": "pelvis"
+  },
+  {
+    "id": "urinary-bladder-calculi",
+    "kind": "finding",
+    "mesh": "Urinary Bladder Calculi",
+    "zh": [
+      "膀胱结石",
+      "膀胱结石症",
+      "膀胱内结石",
+      "膀胱石",
+      "膀胱结石形成"
+    ],
+    "en": [
+      "urinary bladder calculi",
+      "bladder stone",
+      "vesical calculus"
+    ],
+    "approx": false,
+    "region": "pelvis"
+  },
+  {
+    "id": "urinary-bladder-neck-obstruction",
+    "kind": "finding",
+    "mesh": "Urinary Bladder Neck Obstruction",
+    "zh": [
+      "膀胱颈梗阻",
+      "膀胱颈部梗阻",
+      "膀胱出口梗阻",
+      "膀胱颈梗阻性病变"
+    ],
+    "en": [
+      "bladder neck obstruction",
+      "bladder outlet obstruction"
+    ],
+    "approx": false,
+    "region": "pelvis"
+  },
+  {
+    "id": "urinary-tract-infections",
+    "kind": "finding",
+    "mesh": "Urinary Tract Infections",
+    "zh": [
+      "泌尿系感染",
+      "尿路感染",
+      "泌尿系统感染",
+      "泌尿系感染性病变",
+      "尿路感染性病变"
+    ],
+    "en": [
+      "urinary tract infection",
+      "uti"
+    ],
+    "approx": false,
+    "region": "pelvis"
+  },
+  {
+    "id": "urolithiasis",
+    "kind": "finding",
+    "mesh": "Urolithiasis",
+    "zh": [
+      "尿路结石",
+      "尿石症",
+      "尿路结石症",
+      "泌尿系结石",
+      "泌尿系统结石",
+      "尿石病"
+    ],
+    "en": [
+      "urolithiasis",
+      "urinary calculi",
+      "urinary stones"
+    ],
+    "approx": false,
+    "region": "pelvis",
+    "note": "上位概念，指全尿路结石；肾、输尿管、膀胱的结石写法归各自条目，按最长优先匹配。"
+  },
+  {
+    "id": "watchful-waiting",
+    "kind": "assessment",
+    "mesh": "Watchful Waiting",
+    "zh": [
+      "观察等待",
+      "主动监测",
+      "观察随访",
+      "定期随访",
+      "保守观察"
+    ],
+    "en": [
+      "watchful waiting",
+      "active surveillance"
+    ],
+    "approx": false,
+    "region": "systemic",
+    "note": "指暂不干预、以随访观察为主的策略；程度与频次修饰词（密切、定期复查等）由抽取层处理，不写入别名。"
+  }
+]

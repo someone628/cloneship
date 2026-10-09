@@ -1,0 +1,79 @@
+[
+  {
+    "id": "morph-carcinoma",
+    "kind": "morphology",
+    "action": "neoplasm",
+    "mesh": "Carcinoma",
+    "zh": ["癌", "癌灶", "癌肿", "癌性病变", "癌组织", "癌变"],
+    "en": ["carcinoma", "cancer"],
+    "note": "泛化「癌」。单独出现时归一化到 Carcinoma；前面有部位时按 site@neoplasm 规则升级为该部位的肿瘤概念（如「肝癌」→ Liver Neoplasms），并保留 Carcinoma 作为附加概念。"
+  },
+  {
+    "id": "morph-malignancy",
+    "kind": "morphology",
+    "action": "neoplasm",
+    "mesh": "Neoplasms",
+    "zh": ["恶性肿瘤", "恶性病变", "恶性占位", "恶性病灶", "恶性肿物", "恶性结节"],
+    "en": ["malignancy", "malignant tumor", "malignant neoplasm"],
+    "note": "「恶性…」是定性表述而非具体瘤种。映射到 Neoplasms 这一最上位概念，不猜测具体瘤种。"
+  },
+  {
+    "id": "morph-mass",
+    "kind": "morphology",
+    "action": "mass",
+    "zh": ["占位", "占位性病变", "占位病变", "肿块", "团块", "肿物", "包块"],
+    "en": ["mass", "space-occupying lesion"],
+    "note": "影像描述词，MeSH 无对应概念。前面有部位时按 site@neoplasm 规则外推到该部位的肿瘤概念，输出会带 caveat 标明这是规则外推、需人工确认；无部位时不映射，进「未归一化」。"
+  },
+  {
+    "id": "morph-metastasis",
+    "kind": "morphology",
+    "action": "metastasis",
+    "mesh": "Neoplasm Metastasis",
+    "lymphaticMesh": "Lymphatic Metastasis",
+    "zh": ["转移瘤", "转移癌", "转移灶", "转移结节", "转移病变", "转移性病变", "转移性肿瘤", "转移"],
+    "en": ["metastasis", "metastases", "metastatic", "metastatic lesion"],
+    "note": "「转移」类词。前面有部位时同时给出 Neoplasm Metastasis 与该部位的肿瘤概念；部位是淋巴结时改用更精确的 Lymphatic Metastasis。"
+  },
+  {
+    "id": "morph-neoplasm",
+    "kind": "morphology",
+    "action": "neoplasm",
+    "mesh": "Neoplasms",
+    "zh": ["肿瘤", "新生物", "肿瘤性病变", "肿瘤灶", "瘤体"],
+    "en": ["tumor", "tumour", "neoplasm", "neoplasia"],
+    "note": "泛化「肿瘤」。单独出现时归一化到 Neoplasms；有部位时按 site@neoplasm 规则升级。"
+  },
+  {
+    "id": "morph-nodule",
+    "kind": "morphology",
+    "action": "nodule",
+    "candidates": {
+      "single": "Solitary Pulmonary Nodule",
+      "multiple": "Multiple Pulmonary Nodules"
+    },
+    "siteCandidates": {
+      "Thyroid Gland": "Thyroid Nodule"
+    },
+    "zh": ["结节", "结节影", "小结节", "结节灶", "类结节"],
+    "en": ["nodule", "nodular lesion"],
+    "note": "「结节」的 MeSH 归属取决于部位与数量：肺结节要按单发/多发在 Solitary Pulmonary Nodule 与 Multiple Pulmonary Nodules 之间二选一，数量缺失时**如实报为歧义**而不是默认取一个；甲状腺结节在 MeSH 里有独立描述符，由 siteCandidates 直接命中（覆盖「甲状腺右叶结节」这类写法——中间夹了修饰词，字面别名接不上）；其它部位 MeSH 无对应概念，进「未归一化」。"
+  },
+  {
+    "id": "morph-lesion",
+    "kind": "morphology",
+    "action": "lesion",
+    "zh": ["病灶", "病变", "异常密度灶", "异常密度影", "异常强化灶"],
+    "en": ["lesion", "abnormality"],
+    "note": "泛化「病灶/病变」：性质未知（可为炎症、囊肿、肿瘤），任何映射都是猜测。本插件据此**一律不映射**，只记录它出现在哪个部位，进「未归一化」。这是刻意的取舍——宁可漏，不可错。"
+  },
+  {
+    "id": "morph-recurrence",
+    "kind": "morphology",
+    "action": "recurrence",
+    "mesh": "Neoplasm Recurrence, Local",
+    "zh": ["复发", "术后复发", "复发灶", "再发", "复发病变"],
+    "en": ["recurrence", "recurrent", "relapse"],
+    "note": "「复发」在 CT 报告里默认指局部复发，映射到 Neoplasm Recurrence, Local。有部位时一并给出该部位的肿瘤概念。"
+  }
+]

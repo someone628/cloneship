@@ -1,0 +1,1047 @@
+[
+  {
+    "id": "abdomen",
+    "kind": "anatomy",
+    "mesh": "Abdomen",
+    "neoplasm": "Abdominal Neoplasms",
+    "region": "abdomen",
+    "zh": ["腹部", "腹内", "全腹", "腹壁"],
+    "en": ["abdomen", "abdominal"]
+  },
+  {
+    "id": "abdominal-cavity",
+    "kind": "anatomy",
+    "mesh": "Abdominal Cavity",
+    "region": "abdomen",
+    "zh": ["腹腔", "腹腔内", "盆腹腔", "腹盆腔", "腹腔各区"],
+    "en": ["abdominal cavity", "peritoneal space"]
+  },
+  {
+    "id": "adnexa-uteri",
+    "kind": "anatomy",
+    "mesh": "Adnexa Uteri",
+    "region": "pelvis",
+    "zh": ["附件", "附件区", "子宫附件"],
+    "en": ["adnexa", "adnexal"]
+  },
+  {
+    "id": "adrenal-cortex",
+    "kind": "anatomy",
+    "mesh": "Adrenal Cortex",
+    "region": "abdomen",
+    "zh": ["肾上腺皮质", "肾上腺皮质区"],
+    "en": ["adrenal cortex"]
+  },
+  {
+    "id": "adrenal-glands",
+    "kind": "anatomy",
+    "mesh": "Adrenal Glands",
+    "neoplasm": "Adrenal Gland Neoplasms",
+    "region": "abdomen",
+    "zh": ["肾上腺", "肾上腺区", "肾上腺内", "肾上腺窝"],
+    "en": ["adrenal gland", "adrenal"]
+  },
+  {
+    "id": "adrenal-medulla",
+    "kind": "anatomy",
+    "mesh": "Adrenal Medulla",
+    "region": "abdomen",
+    "zh": ["肾上腺髓质", "肾上腺髓质区"],
+    "en": ["adrenal medulla"]
+  },
+  {
+    "id": "aorta",
+    "kind": "anatomy",
+    "mesh": "Aorta",
+    "region": "vascular",
+    "zh": ["主动脉", "胸主动脉", "主动脉弓", "升主动脉", "降主动脉", "主动脉壁"],
+    "en": ["aorta", "aortic"]
+  },
+  {
+    "id": "aorta-abdominal",
+    "kind": "anatomy",
+    "mesh": "Aorta, Abdominal",
+    "region": "vascular",
+    "zh": ["腹主动脉", "腹主动脉段", "肾下腹主动脉"],
+    "en": ["abdominal aorta"]
+  },
+  {
+    "id": "appendix",
+    "kind": "anatomy",
+    "mesh": "Appendix",
+    "region": "abdomen",
+    "zh": ["阑尾", "阑尾区", "阑尾周围", "阑尾根部"],
+    "en": ["appendix", "appendiceal"]
+  },
+  {
+    "id": "axilla",
+    "kind": "anatomy",
+    "mesh": "Axilla",
+    "region": "chest",
+    "zh": ["腋窝", "腋下", "腋窝区"],
+    "en": ["axilla", "axillary"]
+  },
+  {
+    "id": "basal-ganglia",
+    "kind": "anatomy",
+    "mesh": "Basal Ganglia",
+    "region": "neuro",
+    "zh": ["基底节", "基底节区", "豆状核", "尾状核"],
+    "en": ["basal ganglia"]
+  },
+  {
+    "id": "bile-ducts",
+    "kind": "anatomy",
+    "mesh": "Bile Ducts",
+    "neoplasm": "Bile Duct Neoplasms",
+    "region": "abdomen",
+    "zh": ["胆管", "胆道", "肝内胆管", "肝外胆管", "胆总管", "肝总管", "胆管壁"],
+    "en": ["bile duct", "biliary tract"]
+  },
+  {
+    "id": "bone",
+    "kind": "anatomy",
+    "mesh": "Bone and Bones",
+    "neoplasm": "Bone Neoplasms",
+    "region": "msk",
+    "zh": ["骨", "骨骼", "骨质", "骨内", "骨皮质", "骨小梁", "骨组织"],
+    "en": ["bone", "osseous"]
+  },
+  {
+    "id": "bone-marrow",
+    "kind": "anatomy",
+    "mesh": "Bone Marrow",
+    "neoplasm": "Bone Marrow Neoplasms",
+    "region": "msk",
+    "zh": ["骨髓", "骨髓腔", "骨髓内"],
+    "en": ["bone marrow", "marrow"]
+  },
+  {
+    "id": "brain",
+    "kind": "anatomy",
+    "mesh": "Brain",
+    "neoplasm": "Brain Neoplasms",
+    "region": "neuro",
+    "zh": ["脑", "脑内", "脑实质", "大脑", "大脑半球", "额叶", "顶叶", "颞叶", "枕叶", "颅内"],
+    "approx": ["颅内"],
+    "en": ["brain", "cerebral"]
+  },
+  {
+    "id": "brain-stem",
+    "kind": "anatomy",
+    "mesh": "Brain Stem",
+    "region": "neuro",
+    "zh": ["脑干", "中脑", "脑桥", "延髓"],
+    "en": ["brain stem", "brainstem"]
+  },
+  {
+    "id": "breast",
+    "kind": "anatomy",
+    "mesh": "Breast",
+    "neoplasm": "Breast Neoplasms",
+    "region": "chest",
+    "zh": ["乳腺", "乳房", "乳腺区", "乳腺组织", "腺体层"],
+    "en": ["breast", "mammary"]
+  },
+  {
+    "id": "bronchi",
+    "kind": "anatomy",
+    "mesh": "Bronchi",
+    "region": "chest",
+    "zh": ["支气管", "主支气管", "叶支气管", "段支气管", "支气管壁"],
+    "en": ["bronchus", "bronchi", "bronchial"]
+  },
+  {
+    "id": "cecum",
+    "kind": "anatomy",
+    "mesh": "Cecum",
+    "neoplasm": "Cecal Neoplasms",
+    "region": "abdomen",
+    "zh": ["盲肠", "回盲部", "回盲区"],
+    "en": ["cecum", "caecum"]
+  },
+  {
+    "id": "celiac-artery",
+    "kind": "anatomy",
+    "mesh": "Celiac Artery",
+    "region": "vascular",
+    "zh": ["腹腔干", "腹腔动脉"],
+    "en": ["celiac artery", "coeliac artery"]
+  },
+  {
+    "id": "cerebellum",
+    "kind": "anatomy",
+    "mesh": "Cerebellum",
+    "region": "neuro",
+    "zh": ["小脑", "小脑半球", "小脑蚓部"],
+    "en": ["cerebellum", "cerebellar"]
+  },
+  {
+    "id": "cerebral-ventricles",
+    "kind": "anatomy",
+    "mesh": "Cerebral Ventricles",
+    "region": "neuro",
+    "zh": ["脑室", "侧脑室", "第三脑室", "第四脑室", "脑室系统"],
+    "en": ["cerebral ventricle", "ventricle"]
+  },
+  {
+    "id": "cervical-vertebrae",
+    "kind": "anatomy",
+    "mesh": "Cervical Vertebrae",
+    "region": "msk",
+    "zh": ["颈椎", "颈段椎体"],
+    "en": ["cervical vertebra", "cervical spine"]
+  },
+  {
+    "id": "cervix-uteri",
+    "kind": "anatomy",
+    "mesh": "Cervix Uteri",
+    "neoplasm": "Uterine Cervical Neoplasms",
+    "region": "pelvis",
+    "zh": ["宫颈", "子宫颈", "宫颈区", "宫颈管"],
+    "en": ["cervix", "cervical"]
+  },
+  {
+    "id": "clavicle",
+    "kind": "anatomy",
+    "mesh": "Clavicle",
+    "region": "msk",
+    "zh": ["锁骨", "锁骨区", "锁骨上"],
+    "approx": ["锁骨上"],
+    "en": ["clavicle", "clavicular"]
+  },
+  {
+    "id": "colon",
+    "kind": "anatomy",
+    "mesh": "Colon",
+    "neoplasm": "Colonic Neoplasms",
+    "region": "abdomen",
+    "zh": ["结肠", "结肠壁", "结肠肠管", "结肠区"],
+    "en": ["colon", "colonic"]
+  },
+  {
+    "id": "colon-ascending",
+    "kind": "anatomy",
+    "mesh": "Colon, Ascending",
+    "neoplasm": "Colonic Neoplasms",
+    "region": "abdomen",
+    "zh": ["升结肠"],
+    "en": ["ascending colon"]
+  },
+  {
+    "id": "colon-descending",
+    "kind": "anatomy",
+    "mesh": "Colon, Descending",
+    "neoplasm": "Colonic Neoplasms",
+    "region": "abdomen",
+    "zh": ["降结肠"],
+    "en": ["descending colon"]
+  },
+  {
+    "id": "colon-sigmoid",
+    "kind": "anatomy",
+    "mesh": "Colon, Sigmoid",
+    "neoplasm": "Sigmoid Neoplasms",
+    "region": "abdomen",
+    "zh": ["乙状结肠"],
+    "en": ["sigmoid colon", "sigmoid"]
+  },
+  {
+    "id": "colon-transverse",
+    "kind": "anatomy",
+    "mesh": "Colon, Transverse",
+    "neoplasm": "Colonic Neoplasms",
+    "region": "abdomen",
+    "zh": ["横结肠"],
+    "en": ["transverse colon"]
+  },
+  {
+    "id": "diaphragm",
+    "kind": "anatomy",
+    "mesh": "Diaphragm",
+    "region": "chest",
+    "zh": ["膈肌", "膈", "膈面", "膈下", "膈上", "膈脚"],
+    "en": ["diaphragm", "diaphragmatic"]
+  },
+  {
+    "id": "duodenum",
+    "kind": "anatomy",
+    "mesh": "Duodenum",
+    "neoplasm": "Duodenal Neoplasms",
+    "region": "abdomen",
+    "zh": ["十二指肠", "十二指肠球部", "十二指肠降部", "十二指肠水平部", "十二指肠乳头"],
+    "en": ["duodenum", "duodenal"]
+  },
+  {
+    "id": "epididymis",
+    "kind": "anatomy",
+    "mesh": "Epididymis",
+    "region": "pelvis",
+    "zh": ["附睾", "附睾头", "附睾尾"],
+    "en": ["epididymis"]
+  },
+  {
+    "id": "esophagus",
+    "kind": "anatomy",
+    "mesh": "Esophagus",
+    "neoplasm": "Esophageal Neoplasms",
+    "region": "chest",
+    "zh": ["食管", "食道", "食管壁", "食管上段", "食管中段", "食管下段", "胸段食管"],
+    "en": ["esophagus", "esophageal", "oesophagus"]
+  },
+  {
+    "id": "eye",
+    "kind": "anatomy",
+    "mesh": "Eye",
+    "region": "head-neck",
+    "zh": ["眼球", "眼内", "球后", "眼球壁"],
+    "approx": ["球后"],
+    "en": ["eye", "ocular", "globe"]
+  },
+  {
+    "id": "fallopian-tubes",
+    "kind": "anatomy",
+    "mesh": "Fallopian Tubes",
+    "region": "pelvis",
+    "zh": ["输卵管", "输卵管区", "输卵管伞端"],
+    "en": ["fallopian tube", "oviduct"]
+  },
+  {
+    "id": "femur",
+    "kind": "anatomy",
+    "mesh": "Femur",
+    "neoplasm": "Femoral Neoplasms",
+    "region": "msk",
+    "zh": ["股骨", "股骨头", "股骨颈", "股骨干", "股骨粗隆"],
+    "en": ["femur", "femoral"]
+  },
+  {
+    "id": "gallbladder",
+    "kind": "anatomy",
+    "mesh": "Gallbladder",
+    "neoplasm": "Gallbladder Neoplasms",
+    "region": "abdomen",
+    "zh": ["胆囊", "胆囊内", "胆囊壁", "胆囊区", "胆囊窝", "胆囊颈部"],
+    "en": ["gallbladder", "gall bladder"]
+  },
+  {
+    "id": "groin",
+    "kind": "anatomy",
+    "mesh": "Groin",
+    "region": "pelvis",
+    "zh": ["腹股沟", "腹股沟区", "腹股沟部"],
+    "en": ["groin", "inguinal"]
+  },
+  {
+    "id": "neck",
+    "kind": "anatomy",
+    "mesh": "Neck",
+    "region": "head-neck",
+    "zh": ["颈部", "颈段", "颈深部", "颈后区", "颈前区"],
+    "en": ["neck", "cervical region"]
+  },
+  {
+    "id": "heart",
+    "kind": "anatomy",
+    "mesh": "Heart",
+    "neoplasm": "Heart Neoplasms",
+    "region": "chest",
+    "zh": ["心脏", "心影", "心腔", "心房", "心室", "心内"],
+    "en": ["heart", "cardiac"]
+  },
+  {
+    "id": "hepatic-veins",
+    "kind": "anatomy",
+    "mesh": "Hepatic Veins",
+    "region": "abdomen",
+    "zh": ["肝静脉", "肝中静脉", "肝短静脉"],
+    "en": ["hepatic vein"]
+  },
+  {
+    "id": "humerus",
+    "kind": "anatomy",
+    "mesh": "Humerus",
+    "region": "msk",
+    "zh": ["肱骨", "肱骨头", "肱骨干", "肱骨外科颈"],
+    "en": ["humerus", "humeral"]
+  },
+  {
+    "id": "ileum",
+    "kind": "anatomy",
+    "mesh": "Ileum",
+    "neoplasm": "Ileal Neoplasms",
+    "region": "abdomen",
+    "zh": ["回肠", "末端回肠", "回肠末段"],
+    "en": ["ileum", "ileal"]
+  },
+  {
+    "id": "iliac-artery",
+    "kind": "anatomy",
+    "mesh": "Iliac Artery",
+    "region": "vascular",
+    "zh": ["髂动脉", "髂总动脉", "髂内动脉", "髂外动脉"],
+    "en": ["iliac artery"]
+  },
+  {
+    "id": "iliac-vein",
+    "kind": "anatomy",
+    "mesh": "Iliac Vein",
+    "region": "vascular",
+    "zh": ["髂静脉", "髂总静脉", "髂外静脉"],
+    "en": ["iliac vein"]
+  },
+  {
+    "id": "inguinal-canal",
+    "kind": "anatomy",
+    "mesh": "Inguinal Canal",
+    "region": "pelvis",
+    "zh": ["腹股沟管", "腹股沟管内"],
+    "en": ["inguinal canal"]
+  },
+  {
+    "id": "jejunum",
+    "kind": "anatomy",
+    "mesh": "Jejunum",
+    "neoplasm": "Jejunal Neoplasms",
+    "region": "abdomen",
+    "zh": ["空肠", "近端空肠"],
+    "en": ["jejunum", "jejunal"]
+  },
+  {
+    "id": "kidney",
+    "kind": "anatomy",
+    "mesh": "Kidney",
+    "neoplasm": "Kidney Neoplasms",
+    "region": "abdomen",
+    "zh": ["肾", "肾脏", "肾内", "肾实质", "肾窦", "肾门", "肾区", "肾周"],
+    "approx": ["肾门", "肾周"],
+    "en": ["kidney", "renal"]
+  },
+  {
+    "id": "kidney-pelvis",
+    "kind": "anatomy",
+    "mesh": "Kidney Pelvis",
+    "region": "abdomen",
+    "zh": ["肾盂", "肾盂内", "肾盏"],
+    "en": ["renal pelvis", "kidney pelvis"]
+  },
+  {
+    "id": "large-intestine",
+    "kind": "anatomy",
+    "mesh": "Intestine, Large",
+    "neoplasm": "Intestinal Neoplasms",
+    "region": "abdomen",
+    "zh": ["大肠", "结直肠", "大肠肠管", "结直肠区"],
+    "en": ["large intestine", "colorectum"]
+  },
+  {
+    "id": "larynx",
+    "kind": "anatomy",
+    "mesh": "Larynx",
+    "neoplasm": "Laryngeal Neoplasms",
+    "region": "head-neck",
+    "zh": ["喉", "喉部", "喉腔", "声门", "声带"],
+    "en": ["larynx", "laryngeal"]
+  },
+  {
+    "id": "liver",
+    "kind": "anatomy",
+    "mesh": "Liver",
+    "neoplasm": "Liver Neoplasms",
+    "region": "abdomen",
+    "zh": ["肝", "肝脏", "肝内", "肝实质", "肝区", "肝叶", "肝门", "肝被膜"],
+    "approx": ["肝门", "肝被膜"],
+    "en": ["liver", "hepatic"]
+  },
+  {
+    "id": "lumbar-vertebrae",
+    "kind": "anatomy",
+    "mesh": "Lumbar Vertebrae",
+    "region": "msk",
+    "zh": ["腰椎", "腰段椎体"],
+    "en": ["lumbar vertebra", "lumbar spine"]
+  },
+  {
+    "id": "lung",
+    "kind": "anatomy",
+    "mesh": "Lung",
+    "neoplasm": "Lung Neoplasms",
+    "region": "chest",
+    "zh": ["肺", "肺部", "肺内", "肺实质", "肺野", "肺叶", "肺段", "肺尖", "肺门", "肺组织"],
+    "approx": ["肺野", "肺尖", "肺门"],
+    "en": ["lung", "pulmonary"]
+  },
+  {
+    "id": "mandible",
+    "kind": "anatomy",
+    "mesh": "Mandible",
+    "region": "head-neck",
+    "zh": ["下颌骨", "下颌支", "下颌体", "下颌角"],
+    "en": ["mandible", "mandibular"]
+  },
+  {
+    "id": "maxilla",
+    "kind": "anatomy",
+    "mesh": "Maxilla",
+    "region": "head-neck",
+    "zh": ["上颌骨", "上颌区"],
+    "en": ["maxilla", "maxillary"]
+  },
+  {
+    "id": "lymph-nodes",
+    "kind": "anatomy",
+    "mesh": "Lymph Nodes",
+    "region": "systemic",
+    "zh": ["淋巴结", "淋巴结区", "淋巴链", "淋巴组织", "淋巴"],
+    "approx": ["淋巴链", "淋巴组织"],
+    "note": "刻意不给 neoplasm 组合目标：「淋巴结肿瘤」在临床上更可能是淋巴瘤或转移，二者不能用同一条规则外推；「淋巴结转移」由 morph-metastasis 的淋巴特例（Lymphatic Metastasis）处理。",
+    "en": ["lymph node", "lymphatic"]
+  },
+  {
+    "id": "mediastinum",
+    "kind": "anatomy",
+    "mesh": "Mediastinum",
+    "neoplasm": "Mediastinal Neoplasms",
+    "region": "chest",
+    "zh": ["纵隔", "纵隔内", "前纵隔", "中纵隔", "后纵隔", "上纵隔", "纵隔区"],
+    "en": ["mediastinum", "mediastinal"]
+  },
+  {
+    "id": "meninges",
+    "kind": "anatomy",
+    "mesh": "Meninges",
+    "region": "neuro",
+    "zh": ["脑膜", "硬脑膜", "软脑膜", "蛛网膜", "硬膜"],
+    "en": ["meninges", "meningeal", "dura"]
+  },
+  {
+    "id": "mesentery",
+    "kind": "anatomy",
+    "mesh": "Mesentery",
+    "region": "abdomen",
+    "zh": ["肠系膜", "肠系膜根部", "肠系膜区"],
+    "en": ["mesentery", "mesenteric"]
+  },
+  {
+    "id": "mesocolon",
+    "kind": "anatomy",
+    "mesh": "Mesocolon",
+    "region": "abdomen",
+    "zh": ["结肠系膜", "乙状结肠系膜"],
+    "en": ["mesocolon"]
+  },
+  {
+    "id": "mouth",
+    "kind": "anatomy",
+    "mesh": "Mouth",
+    "neoplasm": "Mouth Neoplasms",
+    "region": "head-neck",
+    "zh": ["口腔", "口腔内", "口底", "颊部", "腭部"],
+    "en": ["mouth", "oral cavity"]
+  },
+  {
+    "id": "muscle-skeletal",
+    "kind": "anatomy",
+    "mesh": "Muscle, Skeletal",
+    "region": "msk",
+    "zh": ["骨骼肌", "横纹肌"],
+    "en": ["skeletal muscle", "striated muscle"]
+  },
+  {
+    "id": "muscles",
+    "kind": "anatomy",
+    "mesh": "Muscles",
+    "region": "msk",
+    "zh": ["肌肉", "肌层", "肌群", "肌间隙", "肌组织"],
+    "en": ["muscle", "muscular"]
+  },
+  {
+    "id": "myocardium",
+    "kind": "anatomy",
+    "mesh": "Myocardium",
+    "region": "chest",
+    "zh": ["心肌", "心肌壁"],
+    "en": ["myocardium", "myocardial"]
+  },
+  {
+    "id": "nasopharynx",
+    "kind": "anatomy",
+    "mesh": "Nasopharynx",
+    "neoplasm": "Nasopharyngeal Neoplasms",
+    "region": "head-neck",
+    "zh": ["鼻咽", "鼻咽部", "鼻咽腔"],
+    "en": ["nasopharynx", "nasopharyngeal"]
+  },
+  {
+    "id": "omentum",
+    "kind": "anatomy",
+    "mesh": "Omentum",
+    "region": "abdomen",
+    "zh": ["网膜", "大网膜", "小网膜", "网膜区"],
+    "en": ["omentum", "omental"]
+  },
+  {
+    "id": "orbit",
+    "kind": "anatomy",
+    "mesh": "Orbit",
+    "neoplasm": "Orbital Neoplasms",
+    "region": "head-neck",
+    "zh": ["眼眶", "眶内", "眶周", "眶尖"],
+    "en": ["orbit", "orbital"]
+  },
+  {
+    "id": "ovary",
+    "kind": "anatomy",
+    "mesh": "Ovary",
+    "neoplasm": "Ovarian Neoplasms",
+    "region": "pelvis",
+    "zh": ["卵巢", "卵巢区", "卵巢内"],
+    "en": ["ovary", "ovarian"]
+  },
+  {
+    "id": "palatine-tonsil",
+    "kind": "anatomy",
+    "mesh": "Palatine Tonsil",
+    "neoplasm": "Tonsillar Neoplasms",
+    "region": "head-neck",
+    "zh": ["扁桃体", "扁桃体区", "腭扁桃体"],
+    "en": ["tonsil", "tonsillar"]
+  },
+  {
+    "id": "pancreas",
+    "kind": "anatomy",
+    "mesh": "Pancreas",
+    "neoplasm": "Pancreatic Neoplasms",
+    "region": "abdomen",
+    "zh": ["胰腺", "胰", "胰头", "胰体", "胰尾", "胰管", "胰腺区"],
+    "en": ["pancreas", "pancreatic"]
+  },
+  {
+    "id": "paranasal-sinuses",
+    "kind": "anatomy",
+    "mesh": "Paranasal Sinuses",
+    "region": "head-neck",
+    "zh": ["鼻窦", "上颌窦", "筛窦", "额窦", "蝶窦"],
+    "en": ["paranasal sinus", "sinus"]
+  },
+  {
+    "id": "pelvic-bones",
+    "kind": "anatomy",
+    "mesh": "Pelvic Bones",
+    "region": "msk",
+    "zh": ["髂骨", "坐骨", "耻骨", "髋臼", "骨盆骨"],
+    "en": ["pelvic bone", "ilium", "ischium", "pubis"]
+  },
+  {
+    "id": "pelvis",
+    "kind": "anatomy",
+    "mesh": "Pelvis",
+    "neoplasm": "Pelvic Neoplasms",
+    "region": "pelvis",
+    "zh": ["骨盆", "盆腔", "盆腔内", "骨盆腔"],
+    "approx": ["盆腔"],
+    "en": ["pelvis", "pelvic"]
+  },
+  {
+    "id": "penis",
+    "kind": "anatomy",
+    "mesh": "Penis",
+    "region": "pelvis",
+    "zh": ["阴茎", "阴茎根部"],
+    "en": ["penis", "penile"]
+  },
+  {
+    "id": "pericardium",
+    "kind": "anatomy",
+    "mesh": "Pericardium",
+    "region": "chest",
+    "zh": ["心包", "心包腔", "心包内", "心包壁层"],
+    "en": ["pericardium", "pericardial"]
+  },
+  {
+    "id": "peritoneum",
+    "kind": "anatomy",
+    "mesh": "Peritoneum",
+    "neoplasm": "Peritoneal Neoplasms",
+    "region": "abdomen",
+    "zh": ["腹膜", "壁层腹膜", "脏层腹膜", "腹膜表面"],
+    "en": ["peritoneum", "peritoneal"]
+  },
+  {
+    "id": "peritoneal-cavity",
+    "kind": "anatomy",
+    "mesh": "Peritoneal Cavity",
+    "region": "abdomen",
+    "zh": ["腹膜腔", "腹膜腔内"],
+    "en": ["peritoneal cavity"]
+  },
+  {
+    "id": "pharynx",
+    "kind": "anatomy",
+    "mesh": "Pharynx",
+    "neoplasm": "Pharyngeal Neoplasms",
+    "region": "head-neck",
+    "zh": ["咽部", "口咽", "下咽", "咽后", "咽旁"],
+    "approx": ["咽后", "咽旁"],
+    "en": ["pharynx", "pharyngeal"]
+  },
+  {
+    "id": "pituitary-gland",
+    "kind": "anatomy",
+    "mesh": "Pituitary Gland",
+    "region": "neuro",
+    "zh": ["垂体", "鞍区", "垂体窝", "蝶鞍"],
+    "approx": ["鞍区", "蝶鞍"],
+    "en": ["pituitary", "sella"]
+  },
+  {
+    "id": "pleura",
+    "kind": "anatomy",
+    "mesh": "Pleura",
+    "neoplasm": "Pleural Neoplasms",
+    "region": "chest",
+    "zh": ["胸膜", "脏层胸膜", "壁层胸膜", "叶间胸膜", "叶间裂"],
+    "en": ["pleura", "pleural"]
+  },
+  {
+    "id": "pleural-cavity",
+    "kind": "anatomy",
+    "mesh": "Pleural Cavity",
+    "region": "chest",
+    "zh": ["胸腔", "胸膜腔", "胸腔内", "胸膜腔内"],
+    "en": ["pleural cavity", "pleural space"]
+  },
+  {
+    "id": "portal-vein",
+    "kind": "anatomy",
+    "mesh": "Portal Vein",
+    "region": "abdomen",
+    "zh": ["门静脉", "门脉", "门静脉主干"],
+    "en": ["portal vein", "portal venous"]
+  },
+  {
+    "id": "prostate",
+    "kind": "anatomy",
+    "mesh": "Prostate",
+    "neoplasm": "Prostatic Neoplasms",
+    "region": "pelvis",
+    "zh": ["前列腺", "前列腺内", "前列腺区", "前列腺外周带"],
+    "en": ["prostate", "prostatic"]
+  },
+  {
+    "id": "psoas-muscles",
+    "kind": "anatomy",
+    "mesh": "Psoas Muscles",
+    "region": "msk",
+    "zh": ["腰大肌", "髂腰肌", "腰大肌区"],
+    "en": ["psoas", "iliopsoas"]
+  },
+  {
+    "id": "rectum",
+    "kind": "anatomy",
+    "mesh": "Rectum",
+    "neoplasm": "Rectal Neoplasms",
+    "region": "pelvis",
+    "zh": ["直肠", "直肠壁", "直肠周围", "直肠系膜", "直肠下段", "直肠上段"],
+    "en": ["rectum", "rectal"]
+  },
+  {
+    "id": "renal-artery",
+    "kind": "anatomy",
+    "mesh": "Renal Artery",
+    "region": "vascular",
+    "zh": ["肾动脉", "肾动脉主干"],
+    "en": ["renal artery"]
+  },
+  {
+    "id": "retroperitoneal-space",
+    "kind": "anatomy",
+    "mesh": "Retroperitoneal Space",
+    "neoplasm": "Retroperitoneal Neoplasms",
+    "region": "abdomen",
+    "zh": ["腹膜后", "后腹膜", "腹膜后区", "腹膜后间隙"],
+    "en": ["retroperitoneum", "retroperitoneal"]
+  },
+  {
+    "id": "ribs",
+    "kind": "anatomy",
+    "mesh": "Ribs",
+    "region": "msk",
+    "zh": ["肋骨", "肋骨区", "肋弓"],
+    "en": ["rib", "costal"]
+  },
+  {
+    "id": "sacrum",
+    "kind": "anatomy",
+    "mesh": "Sacrum",
+    "region": "msk",
+    "zh": ["骶骨", "骶椎", "骶骨区", "骶前"],
+    "approx": ["骶前"],
+    "en": ["sacrum", "sacral"]
+  },
+  {
+    "id": "salivary-glands",
+    "kind": "anatomy",
+    "mesh": "Salivary Glands",
+    "neoplasm": "Salivary Gland Neoplasms",
+    "region": "head-neck",
+    "zh": ["腮腺", "颌下腺", "舌下腺", "唾液腺"],
+    "en": ["salivary gland", "parotid"]
+  },
+  {
+    "id": "scapula",
+    "kind": "anatomy",
+    "mesh": "Scapula",
+    "region": "msk",
+    "zh": ["肩胛骨", "肩胛区", "肩胛冈"],
+    "en": ["scapula", "scapular"]
+  },
+  {
+    "id": "seminal-vesicles",
+    "kind": "anatomy",
+    "mesh": "Seminal Vesicles",
+    "region": "pelvis",
+    "zh": ["精囊", "精囊腺", "精囊区"],
+    "en": ["seminal vesicle"]
+  },
+  {
+    "id": "skin",
+    "kind": "anatomy",
+    "mesh": "Skin",
+    "region": "systemic",
+    "zh": ["皮肤", "皮肤层", "体表"],
+    "en": ["skin", "cutaneous"]
+  },
+  {
+    "id": "skull",
+    "kind": "anatomy",
+    "mesh": "Skull",
+    "neoplasm": "Skull Neoplasms",
+    "region": "msk",
+    "zh": ["颅骨", "颅板", "头颅", "颅骨内板", "颅骨外板"],
+    "approx": ["头颅"],
+    "en": ["skull", "cranium", "calvarium"]
+  },
+  {
+    "id": "small-intestine",
+    "kind": "anatomy",
+    "mesh": "Intestine, Small",
+    "neoplasm": "Intestinal Neoplasms",
+    "region": "abdomen",
+    "zh": ["小肠", "空回肠", "小肠肠管"],
+    "en": ["small intestine", "small bowel"]
+  },
+  {
+    "id": "spinal-cord",
+    "kind": "anatomy",
+    "mesh": "Spinal Cord",
+    "neoplasm": "Spinal Cord Neoplasms",
+    "region": "neuro",
+    "zh": ["脊髓", "脊髓内", "脊髓圆锥", "椎管内"],
+    "approx": ["椎管内"],
+    "en": ["spinal cord", "intramedullary"]
+  },
+  {
+    "id": "spine",
+    "kind": "anatomy",
+    "mesh": "Spine",
+    "neoplasm": "Spinal Neoplasms",
+    "region": "msk",
+    "zh": ["脊柱", "脊椎", "椎体", "椎骨", "椎弓", "椎管", "椎间隙"],
+    "approx": ["椎管", "椎间隙"],
+    "en": ["spine", "vertebra", "vertebral"]
+  },
+  {
+    "id": "spleen",
+    "kind": "anatomy",
+    "mesh": "Spleen",
+    "neoplasm": "Splenic Neoplasms",
+    "region": "abdomen",
+    "zh": ["脾", "脾脏", "脾内", "脾门", "脾实质", "脾区"],
+    "en": ["spleen", "splenic"]
+  },
+  {
+    "id": "splenic-vein",
+    "kind": "anatomy",
+    "mesh": "Splenic Vein",
+    "region": "abdomen",
+    "zh": ["脾静脉", "脾静脉主干"],
+    "en": ["splenic vein"]
+  },
+  {
+    "id": "stomach",
+    "kind": "anatomy",
+    "mesh": "Stomach",
+    "neoplasm": "Stomach Neoplasms",
+    "region": "abdomen",
+    "zh": ["胃", "胃壁", "胃窦", "胃体", "胃底", "贲门", "胃腔内", "胃小弯", "胃大弯"],
+    "en": ["stomach", "gastric"]
+  },
+  {
+    "id": "sternum",
+    "kind": "anatomy",
+    "mesh": "Sternum",
+    "region": "msk",
+    "zh": ["胸骨", "胸骨柄", "胸骨体", "胸骨角"],
+    "en": ["sternum", "sternal"]
+  },
+  {
+    "id": "subcutaneous-tissue",
+    "kind": "anatomy",
+    "mesh": "Subcutaneous Tissue",
+    "region": "systemic",
+    "zh": ["皮下", "皮下脂肪", "皮下软组织", "皮下组织"],
+    "en": ["subcutaneous", "subcutis"]
+  },
+  {
+    "id": "temporal-bone",
+    "kind": "anatomy",
+    "mesh": "Temporal Bone",
+    "region": "head-neck",
+    "zh": ["颞骨", "乳突", "颞骨岩部"],
+    "en": ["temporal bone", "mastoid"]
+  },
+  {
+    "id": "testis",
+    "kind": "anatomy",
+    "mesh": "Testis",
+    "neoplasm": "Testicular Neoplasms",
+    "region": "pelvis",
+    "zh": ["睾丸", "睾丸区", "睾丸鞘膜"],
+    "en": ["testis", "testicle", "testicular"]
+  },
+  {
+    "id": "thalamus",
+    "kind": "anatomy",
+    "mesh": "Thalamus",
+    "region": "neuro",
+    "zh": ["丘脑", "丘脑区"],
+    "en": ["thalamus", "thalamic"]
+  },
+  {
+    "id": "thoracic-duct",
+    "kind": "anatomy",
+    "mesh": "Thoracic Duct",
+    "region": "chest",
+    "zh": ["胸导管", "胸导管区"],
+    "en": ["thoracic duct"]
+  },
+  {
+    "id": "thoracic-vertebrae",
+    "kind": "anatomy",
+    "mesh": "Thoracic Vertebrae",
+    "region": "msk",
+    "zh": ["胸椎", "胸段椎体"],
+    "en": ["thoracic vertebra", "thoracic spine"]
+  },
+  {
+    "id": "thoracic-wall",
+    "kind": "anatomy",
+    "mesh": "Thoracic Wall",
+    "region": "chest",
+    "zh": ["胸壁", "胸壁软组织", "胸壁肌肉"],
+    "en": ["chest wall", "thoracic wall"]
+  },
+  {
+    "id": "thorax",
+    "kind": "anatomy",
+    "mesh": "Thorax",
+    "region": "chest",
+    "zh": ["胸部", "胸廓", "胸内"],
+    "en": ["thorax", "thoracic"]
+  },
+  {
+    "id": "thyroid-gland",
+    "kind": "anatomy",
+    "mesh": "Thyroid Gland",
+    "neoplasm": "Thyroid Neoplasms",
+    "region": "head-neck",
+    "zh": ["甲状腺", "甲状腺区", "甲状腺叶", "甲状腺组织", "甲状腺峡部"],
+    "en": ["thyroid", "thyroid gland"]
+  },
+  {
+    "id": "tibia",
+    "kind": "anatomy",
+    "mesh": "Tibia",
+    "region": "msk",
+    "zh": ["胫骨", "胫骨干", "胫骨平台"],
+    "en": ["tibia", "tibial"]
+  },
+  {
+    "id": "tongue",
+    "kind": "anatomy",
+    "mesh": "Tongue",
+    "neoplasm": "Tongue Neoplasms",
+    "region": "head-neck",
+    "zh": ["舌", "舌根", "舌体", "舌部"],
+    "en": ["tongue", "lingual"]
+  },
+  {
+    "id": "trachea",
+    "kind": "anatomy",
+    "mesh": "Trachea",
+    "region": "chest",
+    "zh": ["气管", "气管内", "颈段气管", "气管壁"],
+    "en": ["trachea", "tracheal"]
+  },
+  {
+    "id": "ureter",
+    "kind": "anatomy",
+    "mesh": "Ureter",
+    "neoplasm": "Ureteral Neoplasms",
+    "region": "pelvis",
+    "zh": ["输尿管", "输尿管上段", "输尿管中段", "输尿管下段", "输尿管壁"],
+    "en": ["ureter", "ureteral"]
+  },
+  {
+    "id": "urethra",
+    "kind": "anatomy",
+    "mesh": "Urethra",
+    "region": "pelvis",
+    "zh": ["尿道", "尿道内", "尿道周围"],
+    "en": ["urethra", "urethral"]
+  },
+  {
+    "id": "urinary-bladder",
+    "kind": "anatomy",
+    "mesh": "Urinary Bladder",
+    "neoplasm": "Urinary Bladder Neoplasms",
+    "region": "pelvis",
+    "zh": ["膀胱", "膀胱壁", "膀胱内", "膀胱区", "膀胱三角"],
+    "en": ["urinary bladder", "bladder"]
+  },
+  {
+    "id": "urinary-tract",
+    "kind": "anatomy",
+    "mesh": "Urinary Tract",
+    "region": "pelvis",
+    "zh": ["尿路", "泌尿系", "泌尿系统"],
+    "en": ["urinary tract"]
+  },
+  {
+    "id": "uterus",
+    "kind": "anatomy",
+    "mesh": "Uterus",
+    "neoplasm": "Uterine Neoplasms",
+    "region": "pelvis",
+    "zh": ["子宫", "子宫壁", "宫腔", "宫体", "子宫内", "子宫区"],
+    "en": ["uterus", "uterine", "womb"]
+  },
+  {
+    "id": "vagina",
+    "kind": "anatomy",
+    "mesh": "Vagina",
+    "neoplasm": "Vaginal Neoplasms",
+    "region": "pelvis",
+    "zh": ["阴道", "阴道壁", "阴道上段"],
+    "en": ["vagina", "vaginal"]
+  },
+  {
+    "id": "vena-cava-inferior",
+    "kind": "anatomy",
+    "mesh": "Vena Cava, Inferior",
+    "region": "vascular",
+    "zh": ["下腔静脉", "下腔静脉内"],
+    "en": ["inferior vena cava"]
+  }
+]

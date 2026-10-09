@@ -1,0 +1,36 @@
+# ============================================================================
+# dsh-ct-norm —— DSH bundle patch
+# ============================================================================
+# 把「CT 报告归一化」面板挂进 Web profile 的配置树。
+#
+# 安装：
+#   dsh plugin --profile <你的 web profile> add file:<tgz 的绝对路径>
+#
+# 依赖说明：本插件**零 npm 依赖、全程离线**——归一化只用随包分发的
+#   data/ct.lexicon.jsonl（人工整理的中文别名层）与
+#   data/mesh.subset.jsonl（从 NLM MeSH 2026 索引提取的概念子集）。
+#   不联网、不调用模型，因此结果可复现、可审计。
+#
+# 本机 DSH 运行时未附带 TypeScript 编译器，插件以纯 ESM JavaScript 交付，
+# 入口是 lib/index.js，无需构建步骤。
+# ============================================================================
+
+- insert:
+    - id: dsh-ct-norm
+      name: dsh-ct-norm
+      config:
+        # 别名词表路径。留空/null = 插件自带的 data/ct.lexicon.jsonl。
+        lexiconFile: null
+        # MeSH 概念子集路径。留空/null = 插件自带的 data/mesh.subset.jsonl。
+        # 子集由 build-ct-lexicon.mjs 从 NLM 的 MeSH 2026 索引提取，
+        # 只含词表真正引用到的概念——插件因此不可能产出子集之外的 MeSH 编号。
+        meshSubsetFile: null
+        # 抽取规则路径（否定 / 可疑 / 程度 / 数量 / 侧别 / 尺寸）。留空/null = data/ct.rules.json。
+        rulesFile: null
+        # 单次归一化的文本上限（字符）。超长报告请自行切段，避免一次塞爆上下文。
+        maxChars: 60000
+        # 输出里每个实体的 MeSH 释义截断到多少字符。
+        defChars: 200
+        # 部位与病变跨小句绑定时的最大字符距离（中文 CT 报告里
+        # 「肝内多发低密度灶，考虑转移瘤可能」这类写法很常见）。
+        siteLookback: 40

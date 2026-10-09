@@ -1,0 +1,331 @@
+[
+  {
+    "id": "adenocarcinoma",
+    "kind": "neoplasm",
+    "mesh": "Adenocarcinoma",
+    "region": "systemic",
+    "zh": ["腺癌", "腺癌成分", "腺癌灶", "腺癌组织"],
+    "en": ["adenocarcinoma"],
+    "note": "组织学类型。报告写「腺癌」时给组织学概念；若同时写了部位（如「肺腺癌」），部位概念由解剖条目的 neoplasm 另行给出。"
+  },
+  {
+    "id": "adenoma",
+    "kind": "neoplasm",
+    "mesh": "Adenoma",
+    "region": "systemic",
+    "zh": ["腺瘤", "腺瘤性病变", "腺瘤组织"],
+    "en": ["adenoma"],
+    "note": "良性上皮性肿瘤。「腺瘤性息肉」按最长优先命中的是「腺瘤性息肉」这一写法，故不在此处重复收纳。"
+  },
+  {
+    "id": "carcinoid-tumor",
+    "kind": "neoplasm",
+    "mesh": "Carcinoid Tumor",
+    "region": "abdomen",
+    "zh": ["类癌", "类癌瘤", "类癌病变"],
+    "en": ["carcinoid tumor", "carcinoid"],
+    "note": "神经内分泌肿瘤的一个亚型；与 neuroendocrine-tumors 分列。"
+  },
+  {
+    "id": "carcinoma-hepatocellular",
+    "kind": "neoplasm",
+    "mesh": "Carcinoma, Hepatocellular",
+    "region": "abdomen",
+    "zh": ["肝细胞癌", "肝细胞肝癌", "肝细胞性肝癌"],
+    "en": ["hepatocellular carcinoma", "hcc"],
+    "approx": ["肝细胞性肝癌"],
+    "note": "「原发性肝癌」未收录：它在中国临床语境下通常指 HCC，但也可能指肝内胆管癌，属不确定写法，交由「肝 + 癌」组合规则给出 Liver Neoplasms，不在此处替用户定为 HCC。"
+  },
+  {
+    "id": "carcinoma-nsclc",
+    "kind": "neoplasm",
+    "mesh": "Carcinoma, Non-Small-Cell Lung",
+    "region": "chest",
+    "zh": ["非小细胞肺癌", "非小细胞型肺癌", "肺非小细胞癌"],
+    "en": ["non-small cell lung carcinoma", "nsclc"],
+    "note": "与 small-cell-lung-carcinoma 分列。两者字面高度相似，靠最长优先区分（「非小细胞肺癌」6 字 > 「小细胞肺癌」5 字，且起始位置不同）。"
+  },
+  {
+    "id": "carcinoma-squamous-cell",
+    "kind": "neoplasm",
+    "mesh": "Carcinoma, Squamous Cell",
+    "region": "systemic",
+    "zh": ["鳞癌", "鳞状细胞癌", "鳞状上皮癌"],
+    "en": ["squamous cell carcinoma", "scc"],
+    "note": "组织学类型，不限定器官。"
+  },
+  {
+    "id": "chondrosarcoma",
+    "kind": "neoplasm",
+    "mesh": "Chondrosarcoma",
+    "region": "msk",
+    "zh": ["软骨肉瘤", "软骨肉瘤性病变"],
+    "en": ["chondrosarcoma"],
+    "note": ""
+  },
+  {
+    "id": "cholangiocarcinoma",
+    "kind": "neoplasm",
+    "mesh": "Cholangiocarcinoma",
+    "region": "abdomen",
+    "zh": ["胆管癌", "胆管细胞癌", "肝内胆管癌", "胆管腺癌"],
+    "en": ["cholangiocarcinoma"],
+    "note": "「肝内胆管癌」同时含部位（肝内）与组织学（胆管癌）；按最长优先命中本条目，部位由 anatomical 行定位另行给出。"
+  },
+  {
+    "id": "endometrial-neoplasms",
+    "kind": "neoplasm",
+    "mesh": "Endometrial Neoplasms",
+    "region": "pelvis",
+    "zh": ["子宫内膜癌", "内膜癌", "子宫内膜癌变"],
+    "en": ["endometrial neoplasm", "endometrial cancer"],
+    "note": ""
+  },
+  {
+    "id": "fibroadenoma",
+    "kind": "neoplasm",
+    "mesh": "Fibroadenoma",
+    "region": "chest",
+    "zh": ["纤维腺瘤", "乳腺纤维腺瘤"],
+    "en": ["fibroadenoma"],
+    "note": ""
+  },
+  {
+    "id": "fibrosis",
+    "kind": "neoplasm",
+    "mesh": "Fibrosis",
+    "region": "systemic",
+    "zh": ["纤维化", "纤维化改变", "纤维化灶"],
+    "en": ["fibrosis"],
+    "note": "全身泛用纤维化；肺纤维化有专门的 Lung Diseases, Interstitial / Pulmonary Fibrosis 条目，按最长优先区分。"
+  },
+  {
+    "id": "giant-cell-tumor-bone",
+    "kind": "neoplasm",
+    "mesh": "Giant Cell Tumor of Bone",
+    "region": "msk",
+    "zh": ["骨巨细胞瘤", "巨细胞瘤"],
+    "en": ["giant cell tumor of bone"],
+    "approx": ["巨细胞瘤"],
+    "note": "「巨细胞瘤」未限定部位时略宽（其它器官也有巨细胞病变），标近似。"
+  },
+  {
+    "id": "gist",
+    "kind": "neoplasm",
+    "mesh": "Gastrointestinal Stromal Tumors",
+    "region": "abdomen",
+    "zh": ["胃肠间质瘤", "胃肠道间质瘤", "间质瘤"],
+    "en": ["gastrointestinal stromal tumor", "gist"],
+    "approx": ["间质瘤"],
+    "note": "「间质瘤」未限定消化道，范围更宽，标近似。"
+  },
+  {
+    "id": "glioma",
+    "kind": "neoplasm",
+    "mesh": "Glioma",
+    "region": "neuro",
+    "zh": ["胶质瘤", "脑胶质瘤", "神经胶质瘤"],
+    "en": ["glioma"],
+    "note": ""
+  },
+  {
+    "id": "hemangioma",
+    "kind": "neoplasm",
+    "mesh": "Hemangioma",
+    "region": "systemic",
+    "zh": ["血管瘤", "肝血管瘤", "海绵状血管瘤", "血管瘤病变"],
+    "en": ["hemangioma"],
+    "note": "与 aneurysm 条目下的「血管瘤样扩张」不同：后者是描述动脉瘤样改变的写法，靠最长优先区分，两者不可混用。"
+  },
+  {
+    "id": "hemorrhage",
+    "kind": "neoplasm",
+    "mesh": "Hemorrhage",
+    "region": "systemic",
+    "zh": ["出血", "出血灶", "出血性病变", "新鲜出血", "陈旧性出血"],
+    "en": ["hemorrhage", "bleeding"],
+    "note": "泛用出血。「血肿」归 hematoma 条目，脑出血归 cerebral-hemorrhage，按最长优先与条目分工区分。"
+  },
+  {
+    "id": "inflammation",
+    "kind": "neoplasm",
+    "mesh": "Inflammation",
+    "region": "systemic",
+    "zh": ["炎症", "炎性改变", "炎性病变"],
+    "en": ["inflammation", "inflammatory change"],
+    "note": "泛用炎症。「炎症」单独出现时信息量很低，但确实是 MeSH 概念；器官特异的炎症（胆囊炎、胰腺炎等）各有专门条目，按最长优先命中后者。"
+  },
+  {
+    "id": "leukemia",
+    "kind": "neoplasm",
+    "mesh": "Leukemia",
+    "region": "systemic",
+    "zh": ["白血病", "急性白血病", "慢性白血病"],
+    "en": ["leukemia"],
+    "approx": ["急性白血病", "慢性白血病"],
+    "note": "急性/慢性白血病在 MeSH 中另有更窄的描述符，归到上位概念 Leukemia 属近似。"
+  },
+  {
+    "id": "lymphoma",
+    "kind": "neoplasm",
+    "mesh": "Lymphoma",
+    "region": "systemic",
+    "zh": ["淋巴瘤", "恶性淋巴瘤", "淋巴瘤病变"],
+    "en": ["lymphoma"],
+    "note": "泛用淋巴瘤；非霍奇金淋巴瘤另有条目。"
+  },
+  {
+    "id": "lymphoma-non-hodgkin",
+    "kind": "neoplasm",
+    "mesh": "Lymphoma, Non-Hodgkin",
+    "region": "systemic",
+    "zh": ["非霍奇金淋巴瘤", "非何杰金淋巴瘤", "非霍奇金氏淋巴瘤"],
+    "en": ["non-hodgkin lymphoma", "nhl"],
+    "note": "「何杰金」「霍奇金」两种中文音译都收，报告中两种写法都常见。"
+  },
+  {
+    "id": "melanoma",
+    "kind": "neoplasm",
+    "mesh": "Melanoma",
+    "region": "systemic",
+    "zh": ["黑色素瘤", "恶性黑色素瘤", "黑色素瘤病变"],
+    "en": ["melanoma"],
+    "note": ""
+  },
+  {
+    "id": "meningioma",
+    "kind": "neoplasm",
+    "mesh": "Meningioma",
+    "region": "neuro",
+    "zh": ["脑膜瘤", "脑膜瘤病变"],
+    "en": ["meningioma"],
+    "note": "与 meningeal-carcinomatosis 条目不可混：脑膜瘤是原发肿瘤，脑膜癌病是转移。"
+  },
+  {
+    "id": "multiple-myeloma",
+    "kind": "neoplasm",
+    "mesh": "Multiple Myeloma",
+    "region": "msk",
+    "zh": ["多发性骨髓瘤", "浆细胞骨髓瘤"],
+    "en": ["multiple myeloma", "mm"],
+    "note": "「骨髓瘤」未收录：单独写「骨髓瘤」时可能是孤立性浆细胞瘤等，范围更宽，不做映射。"
+  },
+  {
+    "id": "neoplasm-invasiveness",
+    "kind": "neoplasm",
+    "mesh": "Neoplasm Invasiveness",
+    "region": "systemic",
+    "zh": ["侵犯", "侵犯邻近", "侵犯周围", "侵袭性", "浸润性生长"],
+    "en": ["invasiveness", "invasion"],
+    "note": "「浸润」未收录：中文「浸润」既可指肿瘤浸润，也可指炎性细胞浸润与肺浸润影，语义不确定，交由抽取层如实报出。"
+  },
+  {
+    "id": "neuroendocrine-tumors",
+    "kind": "neoplasm",
+    "mesh": "Neuroendocrine Tumors",
+    "region": "systemic",
+    "zh": ["神经内分泌肿瘤", "神经内分泌瘤"],
+    "en": ["neuroendocrine tumor", "net"],
+    "note": "「神经内分泌癌」未收录（分级更高、另有概念），避免把分化程度不同的病变归到同一概念。"
+  },
+  {
+    "id": "osteosarcoma",
+    "kind": "neoplasm",
+    "mesh": "Osteosarcoma",
+    "region": "msk",
+    "zh": ["骨肉瘤", "成骨肉瘤", "骨肉瘤性病变"],
+    "en": ["osteosarcoma"],
+    "note": ""
+  },
+  {
+    "id": "pheochromocytoma",
+    "kind": "neoplasm",
+    "mesh": "Pheochromocytoma",
+    "region": "abdomen",
+    "zh": ["嗜铬细胞瘤", "肾上腺嗜铬细胞瘤"],
+    "en": ["pheochromocytoma"],
+    "note": ""
+  },
+  {
+    "id": "polyps",
+    "kind": "neoplasm",
+    "mesh": "Polyps",
+    "region": "abdomen",
+    "zh": ["息肉", "胆囊息肉", "肠息肉", "胃息肉"],
+    "en": ["polyp"],
+    "note": "泛用息肉 + 常见部位写法。部位写法按最长优先命中本条目，而不是被拆成「胆囊」+「息肉」。"
+  },
+  {
+    "id": "postoperative-complications",
+    "kind": "neoplasm",
+    "mesh": "Postoperative Complications",
+    "region": "systemic",
+    "zh": ["术后改变", "术后并发症", "术后改变征象"],
+    "en": ["postoperative complication", "post-surgical change"],
+    "approx": ["术后改变", "术后改变征象"],
+    "note": "「术后改变」是影像报告里的套话，多数情况是正常术后表现而非并发症，归到 Postoperative Complications 属近似，必须带近似标记。"
+  },
+  {
+    "id": "sarcoma",
+    "kind": "neoplasm",
+    "mesh": "Sarcoma",
+    "region": "systemic",
+    "zh": ["肉瘤", "肉瘤成分", "肉瘤组织"],
+    "en": ["sarcoma"],
+    "note": "泛用肉瘤；骨肉瘤、软骨肉瘤、尤文肉瘤另有条目。"
+  },
+  {
+    "id": "sarcoma-ewing",
+    "kind": "neoplasm",
+    "mesh": "Sarcoma, Ewing",
+    "region": "msk",
+    "zh": ["尤文肉瘤", "尤因肉瘤", "尤文氏肉瘤"],
+    "en": ["ewing sarcoma"],
+    "note": "中文音译不统一，三种常见写法都收。"
+  },
+  {
+    "id": "skull-fractures",
+    "kind": "neoplasm",
+    "mesh": "Skull Fractures",
+    "region": "msk",
+    "zh": ["颅骨骨折", "颅骨线性骨折", "颅骨凹陷骨折"],
+    "en": ["skull fracture"],
+    "note": ""
+  },
+  {
+    "id": "small-cell-lung-carcinoma",
+    "kind": "neoplasm",
+    "mesh": "Small Cell Lung Carcinoma",
+    "region": "chest",
+    "zh": ["小细胞肺癌", "小细胞型肺癌", "肺小细胞癌"],
+    "en": ["small cell lung carcinoma", "sclc"],
+    "note": "与 carcinoma-nsclc（非小细胞肺癌）严格区分——两者治疗方案完全不同，绝不能互相归一。"
+  },
+  {
+    "id": "tuberculosis",
+    "kind": "neoplasm",
+    "mesh": "Tuberculosis",
+    "region": "systemic",
+    "zh": ["结核", "结核性病变", "结核灶"],
+    "en": ["tuberculosis", "tb"],
+    "note": "泛用结核；肺结核有更专门的 Tuberculosis, Pulmonary 条目，按最长优先区分。"
+  },
+  {
+    "id": "ulcer",
+    "kind": "neoplasm",
+    "mesh": "Ulcer",
+    "region": "systemic",
+    "zh": ["溃疡", "溃疡性病变", "溃疡形成"],
+    "en": ["ulcer"],
+    "note": ""
+  },
+  {
+    "id": "edema",
+    "kind": "neoplasm",
+    "mesh": "Edema",
+    "region": "systemic",
+    "zh": ["水肿", "软组织水肿", "水肿改变"],
+    "en": ["edema", "oedema"],
+    "note": "泛用水肿；肺水肿、脑水肿、淋巴水肿各有专门条目，按最长优先区分。"
+  }
+]

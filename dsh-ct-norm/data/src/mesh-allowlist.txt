@@ -1,0 +1,425 @@
+# dsh-ct-norm 允许使用的 MeSH 2026 规范名（白名单）
+#
+# 每行一个 MeSH **描述符规范名**（DescriptorRecord 的 Name）。
+# 这一份白名单是在 MeSH 2026 索引（355,232 条记录 / 840,392 条术语）上逐条实测命中的结果，
+# 不是凭记忆写的。源文件里 `mesh` 字段取这里的名字即可。
+#
+# 说明：
+#   * 名字大小写、逗号必须与这里完全一致（如 `Colon, Sigmoid`，不是 `Sigmoid Colon`）。
+#     实际上构建脚本按 MeSH 术语索引反解，MeSH 的入口词（entry term）也能命中，
+#     但白名单以规范名为准，避免你写了一个我没想到的入口词却在别处对不上。
+#   * 构建脚本最终仍会拿源文件去**真实索引**里反解一次；这里只是写作阶段的对照表。
+#   * 需要用到白名单之外的概念时，先加进本文件并跑 `node build-ct-lexicon.mjs --check` 验证。
+#   * `[解剖]` 段里带 `→ 肿瘤:` 的，就是该部位可用于 `neoplasm` 字段的组合目标。
+
+## ===== [解剖] 胸部 =====
+Lung
+Pleura
+Pleural Cavity
+Mediastinum
+Trachea
+Bronchi
+Thorax
+Thoracic Wall
+Thoracic Duct
+Diaphragm
+Heart                                   → 肿瘤: Heart Neoplasms
+Myocardium
+Pericardium
+Esophagus                               → 肿瘤: Esophageal Neoplasms
+Axilla
+
+## ===== [解剖] 腹部 / 腹膜后 =====
+Liver                                   → 肿瘤: Liver Neoplasms
+Gallbladder                             → 肿瘤: Gallbladder Neoplasms
+Bile Ducts                              → 肿瘤: Bile Duct Neoplasms
+Pancreas                                → 肿瘤: Pancreatic Neoplasms
+Spleen                                  → 肿瘤: Splenic Neoplasms
+Stomach                                 → 肿瘤: Stomach Neoplasms
+Duodenum                                → 肿瘤: Duodenal Neoplasms
+Intestine, Small                        → 肿瘤: Intestinal Neoplasms
+Ileum                                   → 肿瘤: Ileal Neoplasms
+Jejunum                                 → 肿瘤: Jejunal Neoplasms
+Intestine, Large                        → 肿瘤: Intestinal Neoplasms
+Colon                                   → 肿瘤: Colonic Neoplasms
+Colon, Ascending                        → 肿瘤: Colonic Neoplasms
+Colon, Descending                       → 肿瘤: Colonic Neoplasms
+Colon, Transverse                       → 肿瘤: Colonic Neoplasms
+Colon, Sigmoid                          → 肿瘤: Sigmoid Neoplasms
+Cecum                                   → 肿瘤: Cecal Neoplasms
+Rectum                                  → 肿瘤: Rectal Neoplasms
+Anus Neoplasms
+Appendix
+Mesentery
+Mesocolon
+Omentum
+Peritoneum                              → 肿瘤: Peritoneal Neoplasms
+Peritoneal Cavity
+Abdominal Cavity
+Abdomen                                 → 肿瘤: Abdominal Neoplasms
+Retroperitoneal Space                   → 肿瘤: Retroperitoneal Neoplasms
+Adrenal Glands                          → 肿瘤: Adrenal Gland Neoplasms
+Adrenal Cortex
+Adrenal Medulla
+Psoas Muscles
+Groin
+Inguinal Canal
+
+## ===== [解剖] 泌尿 / 生殖 =====
+Kidney                                  → 肿瘤: Kidney Neoplasms
+Kidney Pelvis
+Ureter                                  → 肿瘤: Ureteral Neoplasms
+Urethra
+Urinary Tract
+Urinary Bladder                         → 肿瘤: Urinary Bladder Neoplasms
+Prostate                                → 肿瘤: Prostatic Neoplasms
+Seminal Vesicles
+Testis                                  → 肿瘤: Testicular Neoplasms
+Epididymis
+Penis
+Uterus                                  → 肿瘤: Uterine Neoplasms
+Cervix Uteri                            → 肿瘤: Uterine Cervical Neoplasms
+Ovary                                   → 肿瘤: Ovarian Neoplasms
+Adnexa Uteri
+Fallopian Tubes
+Vagina                                  → 肿瘤: Vaginal Neoplasms
+Breast                                  → 肿瘤: Breast Neoplasms
+
+## ===== [解剖] 骨肌 / 体表 =====
+Bone and Bones                          → 肿瘤: Bone Neoplasms
+Bone Marrow                             → 肿瘤: Bone Marrow Neoplasms
+Spine                                   → 肿瘤: Spinal Neoplasms
+Cervical Vertebrae
+Thoracic Vertebrae
+Lumbar Vertebrae
+Sacrum
+Skull                                   → 肿瘤: Skull Neoplasms
+Ribs
+Sternum
+Clavicle
+Scapula
+Pelvis                                  → 肿瘤: Pelvic Neoplasms
+Pelvic Bones
+Femur                                   → 肿瘤: Femoral Neoplasms
+Humerus
+Tibia
+Muscles
+Muscle, Skeletal
+Subcutaneous Tissue
+Skin
+
+## ===== [解剖] 头颈 / 神经 =====
+Head
+Neck
+Brain                                   → 肿瘤: Brain Neoplasms
+Cerebellum
+Brain Stem
+Cerebral Ventricles
+Basal Ganglia
+Thalamus
+Pituitary Gland
+Meninges
+Spinal Cord                             → 肿瘤: Spinal Cord Neoplasms
+Eye
+Orbit                                   → 肿瘤: Orbital Neoplasms
+Paranasal Sinuses
+Nasopharynx                             → 肿瘤: Nasopharyngeal Neoplasms
+Pharynx                                 → 肿瘤: Pharyngeal Neoplasms
+Larynx                                  → 肿瘤: Laryngeal Neoplasms
+Mouth                                   → 肿瘤: Mouth Neoplasms
+Tongue                                  → 肿瘤: Tongue Neoplasms
+Palatine Tonsil                         → 肿瘤: Tonsillar Neoplasms
+Salivary Glands                         → 肿瘤: Salivary Gland Neoplasms
+Mandible
+Maxilla
+Temporal Bone
+
+## ===== [解剖] 大血管 =====
+Aorta
+Aorta, Abdominal
+Vena Cava, Inferior
+Portal Vein
+Hepatic Veins
+Splenic Vein
+Celiac Artery
+Renal Artery
+Iliac Artery
+Iliac Vein
+
+## ===== [部位 → 肿瘤] 组合规则可直接引用的肿瘤规范名 =====
+Liver Neoplasms
+Gallbladder Neoplasms
+Bile Duct Neoplasms
+Pancreatic Neoplasms
+Splenic Neoplasms
+Stomach Neoplasms
+Duodenal Neoplasms
+Intestinal Neoplasms
+Ileal Neoplasms
+Jejunal Neoplasms
+Colonic Neoplasms
+Sigmoid Neoplasms
+Cecal Neoplasms
+Rectal Neoplasms
+Peritoneal Neoplasms
+Abdominal Neoplasms
+Retroperitoneal Neoplasms
+Adrenal Gland Neoplasms
+Kidney Neoplasms
+Ureteral Neoplasms
+Urinary Bladder Neoplasms
+Prostatic Neoplasms
+Testicular Neoplasms
+Uterine Neoplasms
+Uterine Cervical Neoplasms
+Ovarian Neoplasms
+Vaginal Neoplasms
+Breast Neoplasms
+Lung Neoplasms
+Pleural Neoplasms
+Mediastinal Neoplasms
+Esophageal Neoplasms
+Heart Neoplasms
+Bone Neoplasms
+Bone Marrow Neoplasms
+Spinal Neoplasms
+Spinal Cord Neoplasms
+Skull Neoplasms
+Pelvic Neoplasms
+Femoral Neoplasms
+Brain Neoplasms
+Orbital Neoplasms
+Nasopharyngeal Neoplasms
+Pharyngeal Neoplasms
+Laryngeal Neoplasms
+Mouth Neoplasms
+Tongue Neoplasms
+Tonsillar Neoplasms
+Salivary Gland Neoplasms
+Head and Neck Neoplasms
+Neoplasms
+Neoplasms, Multiple Primary
+Neoplasm Metastasis
+Lymphatic Metastasis
+Neoplasm Recurrence, Local
+Neoplasm Invasiveness
+Neoplasm Staging
+Neoplasm Grading
+
+## ===== [肿瘤] 组织学 / 具体瘤种 =====
+Carcinoma
+Carcinoma, Squamous Cell
+Adenocarcinoma
+Carcinoma, Hepatocellular
+Cholangiocarcinoma
+Carcinoma, Non-Small-Cell Lung
+Small Cell Lung Carcinoma
+Sarcoma
+Sarcoma, Ewing
+Osteosarcoma
+Chondrosarcoma
+Giant Cell Tumor of Bone
+Gastrointestinal Stromal Tumors
+Lymphoma
+Lymphoma, Non-Hodgkin
+Melanoma
+Glioma
+Meningioma
+Carcinoid Tumor
+Neuroendocrine Tumors
+Leukemia
+Multiple Myeloma
+Fibroadenoma
+Adenoma
+Polyps
+Bone Cysts
+Pheochromocytoma
+Hemangioma
+Thyroid Nodule
+Goiter
+Thyroid Neoplasms
+
+## ===== [征象] 胸 / 呼吸 =====
+Pleural Effusion
+Hydrothorax
+Chylothorax
+Hemothorax
+Pulmonary Atelectasis
+Pneumonia
+Pulmonary Embolism
+Pulmonary Edema
+Respiratory Distress Syndrome
+Respiratory Insufficiency
+Respiratory Tract Infections
+Emphysema
+Pneumothorax
+Mediastinal Emphysema
+Subcutaneous Emphysema
+Bronchiectasis
+Lung Diseases, Interstitial
+Pulmonary Fibrosis
+Solitary Pulmonary Nodule
+Multiple Pulmonary Nodules
+Pleural Diseases
+Mediastinal Diseases
+Pleural Neoplasms
+Mediastinal Neoplasms
+Hemorrhage
+Tuberculosis
+Tuberculosis, Pulmonary
+Sarcoidosis
+Amyloidosis
+Lymphadenopathy
+Lymphatic Diseases
+Empyema
+
+## ===== [征象] 腹 / 消化 =====
+Ascites
+Hepatomegaly
+Splenomegaly
+Liver Cirrhosis
+Fatty Liver
+Liver Abscess
+Hypertension, Portal
+Splenic Infarction
+Splenic Rupture
+Cholecystitis
+Cholelithiasis
+Choledocholithiasis
+Gallstones
+Cholangitis
+Cholangitis, Sclerosing
+Cholestasis
+Biliary Tract Diseases
+Pancreatitis
+Pancreatitis, Acute Necrotizing
+Pancreatitis, Chronic
+Pancreatic Cyst
+Pancreatic Pseudocyst
+Appendicitis
+Diverticulitis
+Colitis
+Gastritis
+Esophagitis
+Gastrointestinal Hemorrhage
+Intestinal Obstruction
+Ileus
+Intussusception
+Intestinal Volvulus
+Gastric Outlet Obstruction
+Constriction, Pathologic
+Fistula
+Peritonitis
+Retroperitoneal Fibrosis
+Mesenteric Ischemia
+Hernia
+Hernia, Diaphragmatic
+Hernia, Hiatal
+Jaundice
+
+## ===== [征象] 泌尿生殖 =====
+Hydronephrosis
+Nephrolithiasis
+Kidney Calculi
+Ureteral Calculi
+Urinary Bladder Calculi
+Urolithiasis
+Cystitis
+Pyelonephritis
+Urinary Tract Infections
+Urinary Bladder Neck Obstruction
+Prostatic Hyperplasia
+Prostatitis
+Uterine Neoplasms
+Endometriosis
+Endometrial Neoplasms
+Ovarian Cysts
+Polycystic Ovary Syndrome
+Pregnancy, Ectopic
+Mastitis
+Hematuria
+
+## ===== [征象] 神经 =====
+Brain Edema
+Hydrocephalus
+Cerebral Hemorrhage
+Subarachnoid Hemorrhage
+Intracranial Hemorrhages
+Ischemic Stroke
+Stroke
+Brain Ischemia
+Brain Infarction
+Meningeal Carcinomatosis
+Spinal Cord Compression
+Skull Fractures
+Intracranial Hemorrhages
+
+## ===== [征象] 骨肌 =====
+Fractures, Bone
+Fractures, Spontaneous
+Spinal Fractures
+Osteoporosis
+Osteolysis
+Osteosclerosis
+Spinal Stenosis
+Intervertebral Disc Displacement
+Spondylitis
+Scoliosis
+Kyphosis
+
+## ===== [征象] 血管 / 全身 =====
+Cardiomegaly
+Pericardial Effusion
+Thrombosis
+Venous Thrombosis
+Venous Thromboembolism
+Arterial Occlusive Diseases
+Aneurysm
+Aortic Aneurysm
+Aortic Aneurysm, Abdominal
+Aortic Dissection
+Superior Vena Cava Syndrome
+Budd-Chiari Syndrome
+Lymphedema
+Lymphocele
+Seroma
+Hematoma
+Abscess
+Cysts
+Necrosis
+Fibrosis
+Edema
+Inflammation
+Ulcer
+Sepsis
+Postoperative Complications
+Multiple Endocrine Neoplasia
+
+## ===== [评估 / 检查] =====
+Response Evaluation Criteria in Solid Tumors
+Tumor Burden
+Treatment Outcome
+Remission Induction
+Remission, Spontaneous
+Disease Progression
+Disease-Free Survival
+Progression-Free Survival
+Neoplasm Staging
+Neoplasm Grading
+Watchful Waiting
+Neoadjuvant Therapy
+Chemotherapy, Adjuvant
+Radiotherapy
+Tomography, X-Ray Computed
+Positron Emission Tomography Computed Tomography
+Magnetic Resonance Imaging
+Ultrasonography
+Radiography
+Diagnostic Imaging
+Contrast Media
+Radiopharmaceuticals
+Fluorodeoxyglucose F18
+Biopsy
+Biopsy, Fine-Needle
+Pathology, Surgical
+Neoplastic Cells, Circulating

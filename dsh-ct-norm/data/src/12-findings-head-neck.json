@@ -1,0 +1,20 @@
+[
+  {
+    "id": "goiter",
+    "kind": "finding",
+    "mesh": "Goiter",
+    "region": "head-neck",
+    "zh": ["甲状腺肿", "甲状腺肿大", "甲状腺体积增大", "弥漫性甲状腺肿", "甲状腺增大"],
+    "en": ["goiter", "goitre"],
+    "note": "「弥漫性甲状腺肿」含修饰词「弥漫」，由「原文匹配」通道处理，照常命中。"
+  },
+  {
+    "id": "thyroid-nodule",
+    "kind": "finding",
+    "mesh": "Thyroid Nodule",
+    "region": "head-neck",
+    "zh": ["甲状腺结节", "甲状腺结节影", "甲状腺内结节", "甲状腺实性结节", "甲状腺囊性结节"],
+    "en": ["thyroid nodule", "thyroid nodular goiter"],
+    "note": "甲状腺结节在 MeSH 里有**独立描述符**，因此不走 morph-nodule 的「部位+结节」规则——那条规则只适用于肺（Solitary / Multiple Pulmonary Nodules），其余部位无对应概念。两者靠条目分工区分，不靠猜测。"
+  }
+]

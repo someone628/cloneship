@@ -1,6 +1,6 @@
 # cloneship
 
-`someone628` 的 **DSH（DeepSeek Harness）插件单仓**。目前收录两个插件，都是「本地优先」的
+`someone628` 的 **DSH（DeepSeek Harness）插件单仓**。目前收录三个插件，都是「本地优先」的
 医疗/文献工具：零 npm 依赖、零外部服务调用，数据随包发布。
 
 > 推送时把本文件改名为仓库根目录的 `README.md` 即可（现有的 `README.md` 是 NCIt 构建笔记，
@@ -10,6 +10,7 @@
 | --- | --- | --- | --- | --- |
 | [`dsh-onco-lexicon/`](dsh-onco-lexicon/) | 离线肿瘤学术语词典 | 0.6.1 | `onco_term` / `onco_abbr` / `onco_browse` / `onco_translate` | **全程不联网** |
 | [`dsh-lit-translate/`](dsh-lit-translate/) | 文献翻译（学术英译中） | 0.1.1 | `lit_translate` | 只调用 DSH 当前默认模型 |
+| [`dsh-ct-norm/`](dsh-ct-norm/) | CT 报告实体归一化 | 0.1.0 | `ct_norm` / `ct_lexicon` | **全程不联网、不调用模型** |
 
 ---
 
@@ -65,28 +66,82 @@
 
 ---
 
-## 3. 安装
+## 3. dsh-ct-norm —— CT 报告实体归一化
+
+把中文 CT 报告里的**自由描述**（「右肺上叶见一 2.3cm 结节影」「纵隔及右肺门见多发肿大淋巴结」
+「肝内多发低密度灶」…）按本地人工整理的词表，**确定性**映射到 **MeSH 2026 标准概念**
+（规范名 + `mesh:D######` 编号 + 树号）。要解决的就是「同一个影像发现，临床医生写法五花八门」——
+「胸腔积液 / 胸膜腔积液 / 胸水 / 胸腔内积液」是同一个概念。
+
+**给模型用的两个工具**
+
+| 工具 | 作用 |
+| --- | --- |
+| `ct_norm` | 输入报告原文，输出「实体 → MeSH 概念」对照表；分四栏：归一化结果 / 未归一化 / 概念汇总 / 仅识别到部位。`format: "json"` 拿结构化结果 |
+| `ct_lexicon` | 查词表本身：某写法对应哪个 MeSH 概念、收录了哪些写法、某编号有哪些中文写法、以及**没**收录什么 |
+
+**与另外两个插件的关键差别：它不调用模型。** 归一化只走两条路径——词表命中，或
+「部位 + 形态学词」的固定规则组合。所以同一段报告跑一百次，结果逐字节相同。
+
+**它凭什么可信（这是本插件最花心思的地方）**
+
+| 做法 | 后果 |
+| --- | --- |
+| 源词表里**只写 MeSH 英文规范名**，不写编号 | 人没有机会写错编号 |
+| 构建时把规范名拿去 NLM 索引**反解**，反解不到就**构建失败** | 编号只有一个来源 |
+| 运行时只读**从索引提取的 370 条概念子集**（111 KiB） | 插件在物理上产不出子集之外的编号 |
+| 打包脚本扫描源文件，出现手写 `D######` 就**拒绝打包** | 这条性质不会在某次手改后悄悄失效 |
+| 测试遍历**每一个别名**（2190 个），验证它真的能命中 | 「写进词表」≠「真的能用」 |
+
+以及一条同样重要的：**MeSH 收录不了的东西，它就不映射，并如实报出来。**
+MeSH 主题词表以**疾病实体**为粒度——`pleural effusion`、`lymphadenopathy`、
+`spinal cord compression` 有命中；而 `ground-glass opacity`、`spiculated margin`、
+`liver metastasis`、`bowel wall thickening`、`osteolytic lesion` 在全量索引里**一条都没有**。
+磨玻璃影、毛刺、分叶、低密度灶、壁增厚这些一律进「未归一化」栏并附上原因，不猜。
+
+**数据**
+
+| 内容 | 数量 | 许可 |
+| --- | --- | --- |
+| 写法条目（人工整理） | 327 | MIT |
+| 表面写法（中文 / 英文别名） | 2190 | MIT |
+| 可产出的 MeSH 概念（子集上限） | 370 | NLM MeSH 2026 派生，**非 MIT** |
+| 未归一化征象词 | 33 组 | MIT |
+
+整包 **158.8 KiB**（不需要那 74 MiB 的全量 MeSH 索引，只带一份概念子集），
+因此**可以直接进 git 仓库**，不像另外两个插件那样要单独分发大文件。
+重建步骤见 [`dsh-ct-norm/data/README.md`](dsh-ct-norm/data/README.md)，
+第三方条款见 [`dsh-ct-norm/THIRD-PARTY-NOTICES.md`](dsh-ct-norm/THIRD-PARTY-NOTICES.md)。
+
+---
+
+## 4. 安装
 
 前提：Node.js ≥ 22，DSH 已安装，且你有一个 Web profile（下例为 `web`）。
 
-两个插件都以 **tgz** 安装（**不要用 `link:`** —— 详见各插件 README 里 junction 与裸模块解析的说明）：
+三个插件都以 **tgz** 安装（**不要用 `link:`** —— 详见各插件 README 里 junction 与裸模块解析的说明）：
 
 ```powershell
 # 1) 先删后装；升级时务必递增版本号
 dsh plugin --profile web remove dsh-onco-lexicon
-dsh plugin --profile web add file:<dsh-onco-lexicon-0.6.1.tgz 的绝对路径>
+dsh plugin --profile web add file:<dsh-onco-lexicon-0.7.0.tgz 的绝对路径>
 
 dsh plugin --profile web remove dsh-lit-translate
-dsh plugin --profile web add file:<dsh-lit-translate-0.1.1.tgz 的绝对路径>
+dsh plugin --profile web add file:<dsh-lit-translate-0.2.0.tgz 的绝对路径>
+
+dsh plugin --profile web remove dsh-ct-norm
+dsh plugin --profile web add file:<dsh-ct-norm-0.1.0.tgz 的绝对路径>
 ```
 
-安装后重载或重启 DSH：侧边栏会出现「术语词典」与「文献翻译」两个入口。
-本单仓的 tgz 由根目录的 `build-package.ps1` 与 `build-package-lit-translate.ps1` 生成
-（脚本内含随包文件的 BOM 校验等不变量检查）。
+安装后重载或重启 DSH：侧边栏会出现「术语词典」「文献翻译」「CT 归一化」三个入口。
+本单仓的 tgz 由根目录的 `build-package.ps1`、`build-package-lit-translate.ps1`
+与 `build-package-ct-norm.ps1` 生成
+（脚本内含随包文件的 BOM 校验等不变量检查；ct-norm 那份还会校验
+「源词表里不得出现手写 MeSH 编号」）。
 
 ---
 
-## 4. 主词典怎么分发
+## 5. 主词典怎么分发
 
 `dsh-onco-lexicon/data/onco.ncit.jsonl` 有 **81.6 MB（77.9 MiB）**，**不进 git 历史**。给它三条出口：
 
@@ -111,7 +166,7 @@ dsh plugin --profile web add file:<dsh-lit-translate-0.1.1.tgz 的绝对路径>
 
 ---
 
-## 5. 许可与版权
+## 6. 许可与版权
 
 本仓库是**单仓**，版权分属不同作者：
 
@@ -120,17 +175,22 @@ dsh plugin --profile web add file:<dsh-lit-translate-0.1.1.tgz 的绝对路径>
 | 根目录（构建脚本、文档） | MIT | `Copyright (c) 2026 someone628` |
 | `dsh-onco-lexicon/` | MIT（代码） | `Copyright (c) 2026 evilfies` |
 | `dsh-lit-translate/` | MIT | `Copyright (c) 2026 director` |
+| `dsh-ct-norm/` 代码 + 自建中文别名层 | MIT | `Copyright (c) 2026 someone628` |
 | `dsh-onco-lexicon/data/onco.ncit.jsonl` | **CC BY 4.0**（NCIt 派生数据，非 MIT） | NCI Enterprise Vocabulary Services |
+| `dsh-ct-norm/data/mesh.subset.jsonl` | **非 MIT**（MeSH 2026 派生概念子集） | U.S. National Library of Medicine（NLM） |
 
 各子目录内的 `LICENSE` 各自写明其版权人，可脱离本仓库独立分发；根目录的 [`LICENSE`](LICENSE)
 说明了"子目录版权归各自作者"这一分工。数据侧的第三方义务见
-[`dsh-onco-lexicon/THIRD-PARTY-NOTICES.md`](dsh-onco-lexicon/THIRD-PARTY-NOTICES.md)。
+[`dsh-onco-lexicon/THIRD-PARTY-NOTICES.md`](dsh-onco-lexicon/THIRD-PARTY-NOTICES.md)
+与 [`dsh-ct-norm/THIRD-PARTY-NOTICES.md`](dsh-ct-norm/THIRD-PARTY-NOTICES.md)。
 
 ---
 
-## 6. 状态
+## 7. 状态
 
 * 代码已推送到 GitHub：<https://github.com/someone628/cloneship>（`main` 分支）；
-* 两个插件均已在本机 DSH Web profile 上安装并实测可用；
+* 三个插件均已在本机 DSH Web profile 上安装；
+  onco-lexicon 与 lit-translate 已实测可用；ct-norm 已装入 profile 并逐字节校验过安装副本
+  （`node verify-installed-ct-norm.mjs`），**待 DSH 重启后生效**；
 * **尚未提交到 dsh.so 插件注册表**（截至 2026-09-30，`https://www.dsh.so/plugin/dsh-onco-lexicon.json`
   与 `.../dsh-lit-translate.json` 均为 404）。

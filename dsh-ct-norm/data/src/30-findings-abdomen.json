@@ -1,0 +1,687 @@
+[
+  {
+    "id": "acute-necrotizing-pancreatitis",
+    "kind": "finding",
+    "mesh": "Pancreatitis, Acute Necrotizing",
+    "zh": [
+      "急性坏死性胰腺炎",
+      "坏死性胰腺炎",
+      "急性出血坏死性胰腺炎",
+      "出血坏死性胰腺炎",
+      "胰腺坏死性炎症"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 描述符本身即「急性坏死性胰腺炎」，出血坏死性为同一概念的临床习惯说法。"
+  },
+  {
+    "id": "appendicitis",
+    "kind": "finding",
+    "mesh": "Appendicitis",
+    "zh": [
+      "阑尾炎",
+      "阑尾炎症",
+      "急性阑尾炎",
+      "化脓性阑尾炎",
+      "坏疽性阑尾炎",
+      "阑尾炎改变",
+      "阑尾炎表现"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义即「急性阑尾炎，分为单纯性、坏疽性、穿孔性」，故急性/化脓性/坏疽性写法不外于该描述符。"
+  },
+  {
+    "id": "ascites",
+    "kind": "finding",
+    "mesh": "Ascites",
+    "zh": [
+      "腹水",
+      "腹腔积液",
+      "腹腔内积液",
+      "盆腹腔积液",
+      "盆腔积液",
+      "腹膜腔积液",
+      "腹盆腔积液"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "含 CT 报告常见的「盆腹腔积液」「腹盆腔积液」等部位组合写法，均指腹膜腔游离积液。"
+  },
+  {
+    "id": "biliary-tract-diseases",
+    "kind": "finding",
+    "mesh": "Biliary Tract Diseases",
+    "zh": [
+      "胆道疾病",
+      "胆道病变",
+      "胆系疾病",
+      "胆系病变",
+      "胆道疾患",
+      "胆道系统病变"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义为胆管与胆囊任何部位的疾病，故不细分部位。"
+  },
+  {
+    "id": "cholangitis",
+    "kind": "finding",
+    "mesh": "Cholangitis",
+    "zh": [
+      "胆管炎",
+      "胆管炎症",
+      "胆道感染",
+      "胆系感染",
+      "胆管炎改变",
+      "胆管炎表现",
+      "胆道炎症"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "故意不收「急性胆管炎」「化脓性胆管炎」等分型别称，以免与上级概念混淆；胆道感染为胆管炎的临床等价说法。"
+  },
+  {
+    "id": "cholecystitis",
+    "kind": "finding",
+    "mesh": "Cholecystitis",
+    "zh": [
+      "胆囊炎",
+      "胆囊炎症",
+      "急性胆囊炎",
+      "慢性胆囊炎",
+      "胆囊炎改变",
+      "胆囊炎表现",
+      "化脓性胆囊炎"
+    ],
+    "approx": [
+      "急性胆囊炎",
+      "慢性胆囊炎"
+    ],
+    "region": "abdomen",
+    "note": "「急性胆囊炎」在 MeSH 2026 有独立描述符 Cholecystitis, Acute（不在白名单），归到上级 Cholecystitis 属近似。"
+  },
+  {
+    "id": "choledocholithiasis",
+    "kind": "finding",
+    "mesh": "Choledocholithiasis",
+    "zh": [
+      "胆总管结石",
+      "胆总管内结石",
+      "胆总管下段结石",
+      "胆总管末端结石",
+      "胆总管泥沙样结石",
+      "胆总管结石影"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义即「胆总管内结石」，写法限于胆总管；「胆管结石」按规范归入 Gallstones，两处不重复。"
+  },
+  {
+    "id": "cholelithiasis",
+    "kind": "finding",
+    "mesh": "Cholelithiasis",
+    "zh": [
+      "胆囊结石",
+      "胆囊内结石",
+      "胆囊腔结石",
+      "胆囊泥沙样结石",
+      "胆囊内泥沙样结石",
+      "胆石症"
+    ],
+    "approx": [
+      "胆囊结石",
+      "胆囊内结石",
+      "胆囊腔结石",
+      "胆囊泥沙样结石",
+      "胆囊内泥沙样结石"
+    ],
+    "region": "abdomen",
+    "note": "「胆囊结石」在 MeSH 2026 有独立描述符 Cholecystolithiasis（不在白名单），故归入上级 Cholelithiasis 记近似。"
+  },
+  {
+    "id": "cholestasis",
+    "kind": "finding",
+    "mesh": "Cholestasis",
+    "zh": [
+      "胆汁淤积",
+      "淤胆",
+      "胆汁淤积症",
+      "淤胆改变",
+      "胆汁淤滞",
+      "胆汁淤积表现"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "未收「肝内胆汁淤积」——MeSH 另有 Cholestasis, Intrahepatic，不在白名单。"
+  },
+  {
+    "id": "chronic-pancreatitis",
+    "kind": "finding",
+    "mesh": "Pancreatitis, Chronic",
+    "zh": [
+      "慢性胰腺炎",
+      "胰腺慢性炎症",
+      "慢性胰腺炎改变",
+      "慢性胰腺炎表现",
+      "慢性复发性胰腺炎"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义包含反复发作的胰腺炎症，故「慢性复发性胰腺炎」同属该描述符。"
+  },
+  {
+    "id": "colitis",
+    "kind": "finding",
+    "mesh": "Colitis",
+    "zh": [
+      "结肠炎",
+      "结肠炎症",
+      "乙状结肠炎",
+      "结肠炎改变",
+      "结肠炎表现",
+      "结肠壁炎症"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "不收「溃疡性结肠炎」（MeSH 独立描述符）与「缺血性结肠炎/缺血性肠病」（Colitis, Ischemic）。"
+  },
+  {
+    "id": "diaphragmatic-hernia",
+    "kind": "finding",
+    "mesh": "Hernia, Diaphragmatic",
+    "zh": [
+      "膈疝",
+      "膈肌疝",
+      "膈疝形成",
+      "膈肌疝形成"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "不含食管裂孔疝（另立 Hernia, Hiatal 条目）；不收创伤性膈疝（MeSH 另有 Hernia, Diaphragmatic, Traumatic）。"
+  },
+  {
+    "id": "diverticulitis",
+    "kind": "finding",
+    "mesh": "Diverticulitis",
+    "zh": [
+      "憩室炎",
+      "憩室炎症",
+      "结肠憩室炎",
+      "肠憩室炎",
+      "憩室炎改变",
+      "憩室炎表现"
+    ],
+    "approx": [
+      "结肠憩室炎",
+      "肠憩室炎"
+    ],
+    "region": "abdomen",
+    "note": "「结肠憩室炎」在 MeSH 2026 有独立描述符 Diverticulitis, Colonic（不在白名单），归到上级 Diverticulitis 属近似。"
+  },
+  {
+    "id": "esophagitis",
+    "kind": "finding",
+    "mesh": "Esophagitis",
+    "zh": [
+      "食管炎",
+      "食道炎",
+      "食管炎症",
+      "食管下段炎",
+      "食管炎改变",
+      "食管炎表现"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "不收「反流性食管炎」——MeSH 另有 Esophagitis, Peptic。"
+  },
+  {
+    "id": "fatty-liver",
+    "kind": "finding",
+    "mesh": "Fatty Liver",
+    "zh": [
+      "脂肪肝",
+      "肝脂肪变",
+      "肝脂肪变性",
+      "肝脏脂肪变性",
+      "肝脂肪浸润",
+      "脂肪肝改变",
+      "肝脏脂肪沉积"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义为肝细胞脂质浸润，故「肝脂肪浸润」「肝脂肪变性」同义。"
+  },
+  {
+    "id": "fistula",
+    "kind": "finding",
+    "mesh": "Fistula",
+    "zh": [
+      "瘘管",
+      "瘘管形成",
+      "瘘道形成",
+      "肠瘘",
+      "胆肠瘘",
+      "胃结肠瘘"
+    ],
+    "approx": [
+      "肠瘘",
+      "胆肠瘘",
+      "胃结肠瘘"
+    ],
+    "region": "abdomen",
+    "note": "MeSH 2026 把肠瘘（Intestinal Fistula）、胆瘘（Biliary Fistula）等部位瘘立为独立描述符且不在白名单，故部位写法归上级 Fistula 记近似。"
+  },
+  {
+    "id": "gallstones",
+    "kind": "finding",
+    "mesh": "Gallstones",
+    "zh": [
+      "胆结石",
+      "胆管结石",
+      "胆道结石",
+      "胆系结石",
+      "胆石"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义为「胆道内的固态结晶沉淀」，故「胆管结石/胆道结石/胆系结石」均落在该描述符内；「胆总管结石」另归 Choledocholithiasis。"
+  },
+  {
+    "id": "gastric-outlet-obstruction",
+    "kind": "finding",
+    "mesh": "Gastric Outlet Obstruction",
+    "zh": [
+      "胃出口梗阻",
+      "幽门梗阻",
+      "胃流出道梗阻",
+      "胃窦幽门梗阻",
+      "幽门部梗阻"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "「幽门梗阻」指梗阻（非狭窄），与 MeSH 释义「胃向小肠排空受阻」一致；不收「幽门狭窄」以免混入 Pyloric Stenosis。"
+  },
+  {
+    "id": "gastritis",
+    "kind": "finding",
+    "mesh": "Gastritis",
+    "zh": [
+      "胃炎",
+      "胃窦炎",
+      "胃体炎",
+      "胃炎改变",
+      "胃炎表现",
+      "胃黏膜炎症"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "部位写法（胃窦炎、胃体炎）无对应独立描述符；不收「萎缩性胃炎」（MeSH 另有 Gastritis, Atrophic）。"
+  },
+  {
+    "id": "gastrointestinal-hemorrhage",
+    "kind": "finding",
+    "mesh": "Gastrointestinal Hemorrhage",
+    "zh": [
+      "消化道出血",
+      "胃肠道出血",
+      "上消化道出血",
+      "下消化道出血",
+      "胃肠出血",
+      "消化道出血表现"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义覆盖从食管到直肠的任何一段，故上/下消化道出血仅为部位限定，仍属同一描述符。"
+  },
+  {
+    "id": "hepatomegaly",
+    "kind": "finding",
+    "mesh": "Hepatomegaly",
+    "zh": [
+      "肝大",
+      "肝增大",
+      "肝脏增大",
+      "肝体积增大",
+      "肝脏体积增大",
+      "肝影增大"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "纯体积增大概念，与胸部文件无重叠。"
+  },
+  {
+    "id": "hernia",
+    "kind": "finding",
+    "mesh": "Hernia",
+    "zh": [
+      "疝气",
+      "腹壁疝",
+      "腹外疝",
+      "腹股沟疝",
+      "切口疝",
+      "股疝"
+    ],
+    "approx": [
+      "腹股沟疝",
+      "切口疝",
+      "股疝"
+    ],
+    "region": "abdomen",
+    "note": "MeSH 2026 另有 Hernia, Inguinal、Hernia, Femoral、Hernia, Ventral（含切口疝）等独立描述符且不在白名单，部位写法归上级 Hernia 记近似。"
+  },
+  {
+    "id": "hiatal-hernia",
+    "kind": "finding",
+    "mesh": "Hernia, Hiatal",
+    "zh": [
+      "食管裂孔疝",
+      "裂孔疝",
+      "食管裂孔疝形成",
+      "膈食管裂孔疝"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义即胃经食管裂孔疝入胸腔；不收滑动型/食管旁型等亚型。"
+  },
+  {
+    "id": "ileus",
+    "kind": "finding",
+    "mesh": "Ileus",
+    "zh": [
+      "肠麻痹",
+      "麻痹性肠梗阻",
+      "动力性肠梗阻",
+      "无力性肠梗阻"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义强调「无机械性梗阻的蠕动/运动缺失」，与机械性肠梗阻分属两条，匹配按最长优先。"
+  },
+  {
+    "id": "intestinal-obstruction",
+    "kind": "finding",
+    "mesh": "Intestinal Obstruction",
+    "zh": [
+      "肠梗阻",
+      "小肠梗阻",
+      "结肠梗阻",
+      "不全性肠梗阻",
+      "完全性肠梗阻",
+      "机械性肠梗阻",
+      "肠管梗阻"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "本条目只收形态学意义上的梗阻总称；麻痹性肠梗阻归 Ileus，胃出口梗阻归 Gastric Outlet Obstruction。"
+  },
+  {
+    "id": "intestinal-volvulus",
+    "kind": "finding",
+    "mesh": "Intestinal Volvulus",
+    "zh": [
+      "肠扭转",
+      "小肠扭转",
+      "结肠扭转",
+      "乙状结肠扭转",
+      "肠扭转改变",
+      "肠扭转表现"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义为肠管扭转，部位写法（乙状结肠扭转为最常见类型）仍属同一描述符。"
+  },
+  {
+    "id": "intussusception",
+    "kind": "finding",
+    "mesh": "Intussusception",
+    "zh": [
+      "肠套叠",
+      "小肠套叠",
+      "结肠套叠",
+      "回结肠套叠",
+      "肠套叠改变",
+      "肠套叠表现"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义已列出结肠型、小肠型、回结肠型，故分型写法不另计近似。"
+  },
+  {
+    "id": "jaundice",
+    "kind": "finding",
+    "mesh": "Jaundice",
+    "zh": [
+      "黄疸",
+      "梗阻性黄疸",
+      "皮肤巩膜黄染",
+      "巩膜黄染",
+      "皮肤黄染",
+      "黄染"
+    ],
+    "approx": [
+      "梗阻性黄疸"
+    ],
+    "region": "abdomen",
+    "note": "「梗阻性黄疸」在 MeSH 2026 有独立描述符 Jaundice, Obstructive（不在白名单），归上级 Jaundice 属近似；黄染类写法为体征等价说法。"
+  },
+  {
+    "id": "liver-abscess",
+    "kind": "finding",
+    "mesh": "Liver Abscess",
+    "zh": [
+      "肝脓肿",
+      "肝脏脓肿",
+      "肝内脓肿",
+      "肝脓肿形成",
+      "肝实质脓肿"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "不收细菌性/阿米巴性等病因亚型写法。"
+  },
+  {
+    "id": "liver-cirrhosis",
+    "kind": "finding",
+    "mesh": "Liver Cirrhosis",
+    "zh": [
+      "肝硬化",
+      "肝硬变",
+      "肝硬化改变",
+      "肝硬化表现",
+      "肝硬化征象",
+      "肝硬变表现"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "不收结节性/门脉性/胆汁性等病因-形态亚型与失代偿期等分期写法。"
+  },
+  {
+    "id": "mesenteric-ischemia",
+    "kind": "finding",
+    "mesh": "Mesenteric Ischemia",
+    "zh": [
+      "肠系膜缺血",
+      "肠缺血",
+      "小肠缺血",
+      "肠系膜血管缺血",
+      "肠系膜动脉缺血",
+      "肠系膜静脉缺血"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "不收「缺血性肠病」——MeSH 另有 Colitis, Ischemic。"
+  },
+  {
+    "id": "pancreatic-cyst",
+    "kind": "finding",
+    "mesh": "Pancreatic Cyst",
+    "zh": [
+      "胰腺囊肿",
+      "胰囊肿",
+      "胰腺内囊肿",
+      "胰腺单纯性囊肿",
+      "胰腺真性囊肿"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义强调「真性囊肿（有上皮衬里）」，与假性囊肿互为对照，两者分列两个条目。"
+  },
+  {
+    "id": "pancreatic-pseudocyst",
+    "kind": "finding",
+    "mesh": "Pancreatic Pseudocyst",
+    "zh": [
+      "胰腺假性囊肿",
+      "假性胰腺囊肿",
+      "胰腺假囊肿",
+      "胰周假性囊肿",
+      "胰假性囊肿"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义为无上皮衬里的囊样腔隙，常伴慢性胰腺炎。"
+  },
+  {
+    "id": "pancreatitis",
+    "kind": "finding",
+    "mesh": "Pancreatitis",
+    "zh": [
+      "胰腺炎",
+      "胰腺炎症",
+      "急性胰腺炎",
+      "胰腺炎改变",
+      "胰腺炎表现",
+      "胰腺实质炎症"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义明确「除非有慢性胰腺炎证据，否则均归为急性」，故「急性胰腺炎」不外于该描述符；慢性与急性坏死性另立条目。"
+  },
+  {
+    "id": "pathologic-constriction",
+    "kind": "finding",
+    "mesh": "Constriction, Pathologic",
+    "zh": [
+      "管腔狭窄",
+      "管腔变窄",
+      "肠管狭窄",
+      "胆管狭窄",
+      "吻合口狭窄",
+      "狭窄性改变"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 2026 中该描述符位于 C23.300.287，释义为解剖结构异常缩窄，故各部位狭窄写法统一归此条。"
+  },
+  {
+    "id": "peritonitis",
+    "kind": "finding",
+    "mesh": "Peritonitis",
+    "zh": [
+      "腹膜炎",
+      "腹膜炎症",
+      "腹腔感染",
+      "腹膜炎改变",
+      "腹膜炎表现",
+      "腹膜炎性改变"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "不收结核性腹膜炎（MeSH 另有 Peritonitis, Tuberculous）。"
+  },
+  {
+    "id": "portal-hypertension",
+    "kind": "finding",
+    "mesh": "Hypertension, Portal",
+    "zh": [
+      "门静脉高压",
+      "门脉高压",
+      "门静脉高压症",
+      "门脉高压症",
+      "门静脉压力增高",
+      "门静脉高压改变"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 规范名的逗号位置为 Hypertension, Portal，索引反解命中描述符（见 ct.manifest.json 的 mesh_release）。"
+  },
+  {
+    "id": "retroperitoneal-fibrosis",
+    "kind": "finding",
+    "mesh": "Retroperitoneal Fibrosis",
+    "zh": [
+      "腹膜后纤维化",
+      "后腹膜纤维化",
+      "腹膜后纤维性变",
+      "腹膜后纤维化改变",
+      "腹膜后纤维化表现"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义为腹膜后间隙纤维组织沉积并压迫输尿管与大血管。"
+  },
+  {
+    "id": "sclerosing-cholangitis",
+    "kind": "finding",
+    "mesh": "Cholangitis, Sclerosing",
+    "zh": [
+      "硬化性胆管炎",
+      "原发性硬化性胆管炎",
+      "硬化性胆管炎改变",
+      "硬化性胆管炎表现",
+      "硬化性胆管炎征象"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义为胆道慢性炎症伴纤维化硬化，涵盖原发与继发，故「原发性硬化性胆管炎」不外于该描述符。"
+  },
+  {
+    "id": "splenic-infarction",
+    "kind": "finding",
+    "mesh": "Splenic Infarction",
+    "zh": [
+      "脾梗死",
+      "脾梗塞",
+      "脾脏梗死",
+      "脾脏梗塞",
+      "脾内梗死",
+      "脾梗死灶"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "「脾梗塞」为 CT 报告常用异写，与「脾梗死」同义。"
+  },
+  {
+    "id": "splenic-rupture",
+    "kind": "finding",
+    "mesh": "Splenic Rupture",
+    "zh": [
+      "脾破裂",
+      "脾脏破裂",
+      "脾包膜破裂",
+      "脾实质破裂",
+      "脾破裂出血",
+      "脾脏破裂出血"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "MeSH 释义含外伤性与病理性破裂；包膜下/实质破裂为部位描述，不收「脾撕裂」（属损伤分级术语）。"
+  },
+  {
+    "id": "splenomegaly",
+    "kind": "finding",
+    "mesh": "Splenomegaly",
+    "zh": [
+      "脾大",
+      "脾增大",
+      "脾脏增大",
+      "脾体积增大",
+      "脾脏体积增大",
+      "脾影增大"
+    ],
+    "approx": false,
+    "region": "abdomen",
+    "note": "纯体积增大概念，与 Hepatomegaly 结构对称。"
+  }
+]

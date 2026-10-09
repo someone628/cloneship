@@ -6,6 +6,7 @@ node_modules/
 *.tgz
 .pack/
 .pack-lit-translate/
+.pack-ct-norm/
 
 # ---- Python ----
 __pycache__/
@@ -14,6 +15,11 @@ __pycache__/
 # ---- 体积大的数据与中间产物 ----
 # 主词典 81.6 MB：随 tgz / npm 包发布，不进 git 历史（见 dsh-onco-lexicon/data/README.md）
 dsh-onco-lexicon/data/onco.ncit.jsonl
+# MeSH 2026 派生术语索引 74.0 MiB：同上，随 tgz / npm 包发布，不进 git 历史
+# （见 dsh-lit-translate/data/README.md；用根目录的 mesh_build.py 从 NLM 原始 XML 重建）
+dsh-lit-translate/data/mesh_index.bin
+# MeSH 构建的中间产物
+mesh_out/
 # NCIt 解析中间产物（84.9 MiB）与各类索引输出
 onco-ncit-dsh.jsonl
 kb_out/
