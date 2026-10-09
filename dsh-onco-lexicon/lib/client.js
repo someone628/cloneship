@@ -185,6 +185,24 @@ window.__ModuleLoader__.load({
 .onco-hint{font-size:11px;color:var(--onco-ink-3)}
 .onco-err{color:var(--dsw-alias-state-error-primary,#b91c1c);font-size:12px}
 .onco-empty{font-size:12.5px;padding:14px 0;text-align:center;color:var(--onco-ink-3)}
+/* 联网兜底卡片：本地零命中才出现，视觉上刻意与本地词条卡片区分开 */
+.onco-online{margin:10px 0 4px;padding:10px 12px;border:1px solid var(--onco-line);
+  border-radius:8px;background:var(--onco-soft)}
+.onco-online-head{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;
+  color:var(--onco-ink);margin-bottom:4px}
+.onco-online-tag{font-size:11px;font-weight:500;padding:1px 6px;border-radius:9px;
+  border:1px solid var(--onco-line);color:var(--onco-ink-3)}
+.onco-online-meta{font-size:11px;font-weight:400;color:var(--onco-ink-3);margin-left:auto}
+.onco-online-src{font-size:11.5px;font-weight:600;color:var(--onco-ink-3);margin:8px 0 2px}
+.onco-online-item{padding:5px 0;border-top:1px dashed var(--onco-line)}
+.onco-online-name{font-size:12.5px;color:var(--onco-ink);font-weight:500}
+/* 拆成单选择器规则：测试会按「选择器{」逐个断言样式存在，合并写法会漏掉。
+   注意本段是 JS 模板字符串，注释里不能出现反引号。 */
+.onco-online-note{font-size:11.5px;color:var(--onco-ink-2);line-height:1.65;margin-top:2px}
+.onco-online-syn{font-size:11.5px;color:var(--onco-ink-2);line-height:1.65;margin-top:2px}
+.onco-online-def{font-size:11.5px;color:var(--onco-ink-2);line-height:1.65;margin-top:2px}
+.onco-online-notes{margin-top:8px;padding-top:6px;border-top:1px solid var(--onco-line);
+  font-size:11px;color:var(--onco-ink-3);line-height:1.7}
 .onco-icon{display:flex;align-items:center;justify-content:center;width:100%;height:100%;
   cursor:pointer;font-size:11px;border:none;background:transparent;color:inherit;padding:0}
 .onco-icon:hover{color:var(--onco-accent,#7c3aed)}
@@ -243,7 +261,46 @@ window.__ModuleLoader__.load({
     }
 
     /** 把当前结果拼成纯文本。用 CRLF —— Windows 记事本才不会把换行吃掉。 */
-    function resultsToText(query, mode, hits, dictLabel, fuzzy) {
+    /**
+     * 联网兜底结果的纯文本片段（供导出）。
+     *
+     * 与界面同一份数据，并在导出文件里单独成段、带「联网」抬头——
+     * 混进本地词条列表会让人以为这些是词典收录的词条。
+     */
+    function onlineToText(o) {
+      const L = []
+      const state = o.skipped && !o.ok ? '未查询' : o.ok ? '已查到' : '无结果'
+      L.push('# ---- 联网兜底（本地词典未收录，以下来自 NCIt / MeSH 实时查询）----')
+      L.push('# 状态：' + state + ' · 耗时 ' + (o.ms || 0) + ' ms' + (o.cached ? '（缓存命中）' : ''))
+      if (o.skipped && !o.ok) L.push('# 原因：' + o.skipped.message)
+      const concepts = (o.ncit && o.ncit.concepts) || []
+      if (concepts.length) {
+        L.push('')
+        L.push('[NCIt' + (o.ncit.version ? ' v' + o.ncit.version : '') + (o.ncit.mode ? ' · 口径 ' + o.ncit.mode : '') + ']')
+        concepts.forEach((c, i) => {
+          L.push(`${i + 1}. ${c.code}  ${c.name}${c.active === false ? '  [已停用]' : ''}`)
+          if (c.matchedAs) L.push(`   为何算作该缩写：${c.matchedAs}`)
+          if (c.synonyms && c.synonyms.length) L.push(`   同义词：${c.synonyms.join('；')}`)
+          if (c.def) L.push(`   释义：${String(c.def).replace(/\s*\n+\s*/g, ' / ')}`)
+        })
+      }
+      const descriptors = (o.mesh && o.mesh.descriptors) || []
+      if (descriptors.length) {
+        L.push('')
+        L.push('[MeSH 主题词]')
+        descriptors.forEach((d, i) => {
+          L.push(`${i + 1}. ${d.code || '—'}  ${d.label}`)
+          if (d.entryTerms && d.entryTerms.length) L.push(`   入口词：${d.entryTerms.join('；')}`)
+        })
+      }
+      if (o.notes && o.notes.length) {
+        L.push('')
+        o.notes.forEach((n) => L.push('# ' + n))
+      }
+      return L
+    }
+
+    function resultsToText(query, mode, hits, dictLabel, fuzzy, online) {
       const L = []
       L.push('# 肿瘤学术语词典 导出')
       L.push('# 词典：' + (dictLabel || '?'))
@@ -270,7 +327,14 @@ window.__ModuleLoader__.load({
         L.push(`   ID：${e.id}`)
         L.push('')
       })
-      L.push('以上内容来自本地离线词典，仅供科研与文献理解参考，不构成诊疗建议；')
+      if (online) {
+        L.push('')
+        L.push(...onlineToText(online))
+      }
+      L.push('')
+      L.push('以上内容来自本地词典' +
+        (online ? '与联网实时查询（已在上面分段标注，联网部分未经本地人工整理）' : '') +
+        '，仅供科研与文献理解参考，不构成诊疗建议；')
       L.push('编码与释义请以官方词表（NCIt / MeSH）最新版本为准。')
       return L.join('\r\n')
     }
@@ -438,6 +502,14 @@ window.__ModuleLoader__.load({
           row('最慢', fmtMs(p.queries.maxMs)),
           row('样本数', num(p.queries.samples), '只保留最近若干次'),
         ]),
+        // 联网耗时不计进上面的统计（网络往返不是检索性能），所以单独列一组
+        p.online
+          ? group('联网兜底', [
+              row('状态', p.online.enabled ? '已启用' : '已关闭', '仅本地零命中时查 NCIt / MeSH'),
+              row('单次预算', fmtMs(p.online.timeoutMs)),
+              row('缓存条目', num(p.online.cacheSize || 0)),
+            ])
+          : null,
         p.loadError ? h('div', { className: 'onco-err' }, '加载错误：' + p.loadError) : null,
       )
     }
@@ -524,6 +596,66 @@ window.__ModuleLoader__.load({
       )
     }
 
+    /**
+     * 联网兜底卡片。
+     *
+     * 只在本地零命中、且服务端确实挂了 online 结果时才渲染（服务端只在零命中时才会去查）。
+     * 措辞上刻意与本地词条卡片拉开距离：联网内容未经本地人工整理，也没有 category /
+     * 中文名这些本词典字段，混淆了就会让人以为词典收了这一条。
+     */
+    function OnlineBlock({ data }) {
+      if (!data) return null
+      const concepts = (data.ncit && data.ncit.concepts) || []
+      const descriptors = (data.mesh && data.mesh.descriptors) || []
+      const skipped = !!(data.skipped && !data.ok)
+      const notes = data.notes || []
+      const tag = skipped ? '未查询' : data.ok ? '已查到' : '无结果'
+      return h('div', { className: 'onco-online' },
+        h('div', { className: 'onco-online-head' },
+          '联网兜底',
+          h('span', { className: 'onco-online-tag' }, tag),
+          h('span', { className: 'onco-online-meta' },
+            `耗时 ${data.ms || 0} ms${data.cached ? '（缓存）' : ''}`),
+        ),
+        skipped ? h('div', { className: 'onco-online-note' }, data.skipped.message) : null,
+        concepts.length
+          ? h('div', null,
+              h('div', { className: 'onco-online-src' },
+                'NCIt' + (data.ncit.version ? ' v' + data.ncit.version : '') +
+                (data.ncit.mode ? ` · 口径 ${data.ncit.mode}` : '')),
+              concepts.map((c, i) =>
+                h('div', { key: c.code || i, className: 'onco-online-item' },
+                  h('div', { className: 'onco-online-name' }, `${c.code}  ${c.name}`),
+                  c.matchedAs
+                    ? h('div', { className: 'onco-online-note' }, `为何算作该缩写：${c.matchedAs}`)
+                    : null,
+                  c.synonyms && c.synonyms.length
+                    ? h('div', { className: 'onco-online-syn' },
+                        '同义词：' + c.synonyms.slice(0, 8).join('；') +
+                        (c.synonyms.length > 8 ? ` …（共 ${c.synonyms.length} 个）` : ''))
+                    : null,
+                  c.def ? h('div', { className: 'onco-online-def' }, c.def) : null,
+                )))
+          : null,
+        descriptors.length
+          ? h('div', null,
+              h('div', { className: 'onco-online-src' }, 'MeSH 主题词'),
+              descriptors.map((d, i) =>
+                h('div', { key: d.code || i, className: 'onco-online-item' },
+                  h('div', { className: 'onco-online-name' }, `${d.code || '—'}  ${d.label}`),
+                  d.entryTerms && d.entryTerms.length
+                    ? h('div', { className: 'onco-online-syn' },
+                        '入口词：' + d.entryTerms.slice(0, 6).join('；'))
+                    : null,
+                )))
+          : null,
+        notes.length
+          ? h('div', { className: 'onco-online-notes' },
+              notes.map((n, i) => h('div', { key: i }, '· ' + n)))
+          : null,
+      )
+    }
+
     // ---- 主面板 ----
     function SearchPanel() {
       const [mode, setMode] = React.useState('search')
@@ -543,6 +675,7 @@ window.__ModuleLoader__.load({
       const [ta, setTa] = React.useState('') // 翻译模式的原文（多行）
       const [dir, setDir] = React.useState('auto') // 翻译方向 auto / zh2en / en2zh
       const [tr, setTr] = React.useState(null) // 翻译对照结果
+      const [online, setOnline] = React.useState(null) // 本地零命中时的联网兜底结果
 
       React.useEffect(() => {
         let alive = true
@@ -586,6 +719,7 @@ window.__ModuleLoader__.load({
         setErr('')
         setTouched(true)
         setNotice('')
+        setOnline(null) // 上一轮的联网结果不能留到这一轮
         setRelated(null) // 新一次检索会换掉结果集，关联视图随之失效
         try {
           const args = { limit: MAX_HITS }
@@ -603,6 +737,7 @@ window.__ModuleLoader__.load({
           }
           if (!r.ok) { setErr(r.error || '查询失败'); setHits([]); return }
           setHits(md === 'browse' ? (r.entries || []).map((e) => ({ entry: e })) : (r.hits || []))
+          setOnline(r.online || null)
         } catch (e) {
           setErr(String((e && e.message) || e))
           setHits([])
@@ -649,6 +784,7 @@ window.__ModuleLoader__.load({
         setTouched(false)
         setErr('')
         setNotice('')
+        setOnline(null)
         setRelated(null)
         if (md === 'browse') run({ mode: 'browse' })
       }
@@ -685,12 +821,12 @@ window.__ModuleLoader__.load({
           countText = ` ${tr.stats.distinctTerms} 个术语对照`
           name = `onco-lexicon-translate-${stamp}.txt`
         } else {
-          if (!hits.length) {
+          if (!hits.length && !online) {
             setNotice('当前没有可导出的结果')
             return
           }
-          text = resultsToText(q, mode, hits, meta ? meta.dictLabel : '', fuzzy)
-          countText = ` ${hits.length} 条`
+          text = resultsToText(q, mode, hits, meta ? meta.dictLabel : '', fuzzy, online)
+          countText = ` ${hits.length} 条` + (online ? (online.ok ? ' + 联网兜底' : ' + 联网说明') : '')
           name = `onco-lexicon-${stamp}.txt`
         }
         setBusy(true)
@@ -757,7 +893,7 @@ window.__ModuleLoader__.load({
       // 只会让标注看起来漏词。筛查留给检索 / 缩写 / 浏览三种模式。
       const canExport = mode === 'translate'
         ? !!(tr && ((tr.terms || []).length || (tr.segments || []).length))
-        : hits.length > 0
+        : (hits.length > 0 || !!online)
       const catOptions = [['', '全部类别'], ...CATEGORIES]
       const srcOptions = [['', '全部出处'], ['NCIt', 'NCIt 本体'], ['自建库', '自建库（人工整理）']]
       // NCIt 语义类型是权威维度，按词条数降序（122 种，原生下拉可键盘检索）
@@ -841,7 +977,9 @@ window.__ModuleLoader__.load({
                     }, '模糊检索'),
                 h('button', {
                   className: 'onco-btn',
-                  disabled: busy || !hits.length,
+                  // 与 doExport 的判断保持一致：联网兜底结果也可以导出，
+                  // 这里若仍只看 hits.length，就会出现「能导出但按钮是灰的」。
+                  disabled: busy || !canExport,
                   title: '把当前结果导出为 txt',
                   onClick: doExport,
                 }, '导出 TXT'),
@@ -880,7 +1018,10 @@ window.__ModuleLoader__.load({
           ? h('div', { className: 'onco-meta' },
               '词典：' + (meta.dictLabel || '?') + ' · 共 ' + meta.total + ' 条' +
               (meta.byCategory ? ' · ' + Object.entries(meta.byCategory).map((kv) => (CATEGORY_LABEL[kv[0]] || kv[0]) + ' ' + kv[1]).join(' / ') : '') +
-              (meta.bySource ? ' · 出处 ' + Object.entries(meta.bySource).map((kv) => kv[0] + ' ' + kv[1]).join(' / ') : ''),
+              (meta.bySource ? ' · 出处 ' + Object.entries(meta.bySource).map((kv) => kv[0] + ' ' + kv[1]).join(' / ') : '') +
+              (meta.online && meta.online.enabled
+                ? ' · 联网兜底：本地零命中时查 NCIt / MeSH'
+                : ' · 全程离线（联网兜底已关闭）'),
             )
           : null,
         notice ? h('div', { className: 'onco-notice' }, notice) : null,
@@ -910,7 +1051,10 @@ window.__ModuleLoader__.load({
                       })
                     })
                   : touched && !busy
-                    ? h('div', { className: 'onco-empty' }, '没有匹配的词条。可试试「模糊检索」，或放宽 / 清除筛查条件，也可换用英文名、缩写或编码。')
+                    ? h('div', { className: 'onco-list' },
+                        h('div', { className: 'onco-empty' }, '本地词典没有匹配的词条。可试试「模糊检索」，或放宽 / 清除筛查条件，也可换用英文名、缩写或编码。'),
+                        h(OnlineBlock, { data: online }),
+                      )
                     : h('div', { className: 'onco-empty' }, '输入关键词后回车即可查询；也可以切换到「类别浏览」逐类翻看。'),
               ),
       )

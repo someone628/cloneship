@@ -52,13 +52,13 @@ Copy-Item (Join-Path $src "assets\icon.png") (Join-Path $stage "assets") -Force
 # ---- 不变量检查（都是曾经踩过的坑）----
 if (-not $SkipChecks) {
   # 1) 随包文本文件不得带 BOM
-  foreach ($rel in @("package.json", "cordis.patch.yml", "skill.md", "README.md", "lib\index.js", "lib\client.js", "LICENSE", "THIRD-PARTY-NOTICES.md")) {
+  foreach ($rel in @("package.json", "cordis.patch.yml", "skill.md", "README.md", "lib\index.js", "lib\client.js", "lib\online.js", "LICENSE", "THIRD-PARTY-NOTICES.md")) {
     $p = Join-Path $stage $rel
     if (-not (Test-Path $p)) { Fail "staging 缺少 $rel" }
     $b = [IO.File]::ReadAllBytes($p)
     if ($b.Length -ge 3 -and $b[0] -eq 0xEF -and $b[1] -eq 0xBB -and $b[2] -eq 0xBF) { Fail "$rel 带 BOM" }
   }
-  Ok "8 个文本文件均无 BOM"
+  Ok "9 个文本文件均无 BOM"
 
   # 2) 图标必须随包（否则图标路由 404，客户端只剩文字回退）
   if (-not (Test-Path (Join-Path $stage "assets\icon.png"))) { Fail "assets/icon.png 未随包" }

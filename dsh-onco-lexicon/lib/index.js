@@ -1,8 +1,13 @@
 /**
- * dsh-onco-lexicon — 离线肿瘤学术语词典插件
+ * dsh-onco-lexicon — 肿瘤学术语词典插件
  *
  * 提供三个工具：onco_term（查术语）、onco_abbr（缩写消歧）、onco_browse（按类别浏览），
- * 并向系统提示词注入"必须先查词典、不许编造"的使用约束。全程不联网。
+ * 并向系统提示词注入"必须先查词典、不许编造"的使用约束。
+ *
+ * 取数策略是**本地优先、联网兜底**：本地词典命中时一个网络请求都不发；
+ * 只有 onco_term / onco_abbr 本地查不到时，才由 lib/online.js 去查
+ * NCI EVS（NCIt）与 NLM MeSH，并把结果单独标注为「联网兜底」。
+ * onco_browse / onco_translate 只作用于本地词典，不联网。
  *
  * 实现说明：原项目以 TypeScript 编写，但本机 DSH 运行时**未附带 tsc/esbuild**，
  * 无法在安装期编译，故此处直接以纯 ESM JavaScript 交付（Node 24 原生执行），
@@ -13,6 +18,7 @@ import { fileURLToPath } from 'node:url'
 import os from 'node:os'
 import path from 'node:path'
 import { defineTool } from '@deepseek-ai/dsh-tools'
+import { onlineLookup, renderOnline, resolveOnlineConfig, OnlineCache, summarizeOnline } from './online.js'
 
 export const name = 'onco-lexicon'
 export const inject = ['tools', 'systemPrompt', 'webServer', 'connection']
@@ -1077,20 +1083,88 @@ export function apply(ctx, config = {}) {
 
   const dictNote = loadError ? `（词典不可用：${loadError}）` : `（词典：${dictLabel}）`
 
+  // ---------- 联网兜底层：本地优先，只在本地未命中时才用 ----------
+  const onlineCfg = resolveOnlineConfig(config)
+  const onlineCache = onlineCfg.enabled
+    ? new OnlineCache({ ttlMs: onlineCfg.cacheTtlMs, errorTtlMs: onlineCfg.errorTtlMs, max: onlineCfg.cacheMax })
+    : null
+  logInfo(
+    ctx,
+    onlineCfg.enabled
+      ? `联网兜底已启用：本地未命中时查 NCIt / MeSH，单次预算 ${onlineCfg.timeoutMs} ms`
+      : '联网兜底已关闭（online: false），词典保持全程离线',
+  )
+
+  /**
+   * 工具调用预算。
+   *
+   * dsh-tools 的 timeoutMs 只是声明，真正设期限的是 tool-call-timeout-policy，
+   * 而它**只在 timeoutMs 存在时才武装截止时间**。联网兜底会把一次调用的最坏耗时
+   * 从毫秒级拉到 onlineCfg.timeoutMs，所以这里显式声明一个更宽的外层预算；
+   * 联网关闭时不声明，工具行为与改造前完全一致。
+   */
+  const toolBudgetMs = onlineCfg.enabled ? onlineCfg.timeoutMs + 15000 : undefined
+  const budgetOpt = toolBudgetMs ? { timeoutMs: toolBudgetMs } : {}
+
+  /**
+   * 跑一次联网兜底。
+   *
+   * 这里把所有异常都吃掉：兜底层自己出问题，绝不能连「本地未收录」这个
+   * 已经确定的事实都拿不到——那会让模型退回凭记忆作答。
+   */
+  async function onlineFallback(term, kind, options = {}) {
+    if (!onlineCfg.enabled) return { result: null, text: '' }
+    const topK = options.topK || 3
+    try {
+      const result = await onlineLookup(term, {
+        kind,
+        topK,
+        config: onlineCfg,
+        cache: onlineCache,
+        signal: options.signal,
+      })
+      return { result, text: renderOnline(result) }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error)
+      logInfo(ctx, `联网兜底异常：${msg}`)
+      return {
+        result: null,
+        text:
+          `【联网兜底】本地词典未收录「${term}」，联网查询也未能完成（内部错误：${msg}）。\n` +
+          '请如实说明未收录，不要据此编造释义、别名或编码。',
+      }
+    }
+  }
+
   // ---------- 提示词层：约束模型必须查词典、不许编造 ----------
   try {
+    const onlineHint = onlineCfg.enabled
+      ? [
+          '2. 本地词典未收录时，onco_term / onco_abbr 会**自动**联网查 NCI EVS（NCIt）与 NLM MeSH 兜底，',
+          '   输出里会分成「本地未收录」与「【联网兜底】」两段。引用时必须区分这两者：联网内容未经本地人工整理，',
+          '   不得说成是本词典的词条；联网也查不到时，如实说明未收录，禁止编造释义、别名、编码或文献出处。',
+          '3. 缩写往往有多个义项（例如 OS、PD、MM）。工具返回多个义项时，必须先向用户确认所指或说明歧义，不要默认取第一条。',
+          '   联网对缩写的召回**不完整**（NCIt 按字符串排序，MM 在前 50 条候选里都找不到 Multiple Myeloma），',
+          '   联网给出的缩写候选只能当补充线索，不能当成穷尽列表转述。',
+          '4. 联网兜底所用的是 NCIt 与 MeSH 两个**英文**词表：不能用中文检索，也不会返回中文名。',
+          '   中文查询本地未收录时，应如实说明并请用户提供该术语的英文名或缩写，不得据中文名反推或编造英文名。',
+          '5. onco_browse 与 onco_translate 只作用于本地词典，不联网——不要在它们的结果里期待联网内容。',
+        ]
+      : [
+          '2. 联网兜底已在配置里关闭。工具返回「未收录」时，必须如实说明词典中未收录，禁止编造释义、别名、编码或文献出处。',
+          '3. 缩写往往有多个义项（例如 OS、PD、MM）。工具返回多个义项时，必须先向用户确认所指或说明歧义，不要默认取第一条。',
+        ]
     ctx.systemPrompt.section({
       name: 'onco-lexicon-usage',
       order: 45,
       text: [
-        '本环境装有一部离线肿瘤学术语词典（工具名 onco_term / onco_abbr / onco_browse / onco_translate）。',
+        '本环境装有一部肿瘤学术语词典（工具名 onco_term / onco_abbr / onco_browse / onco_translate），以本地离线词典为主、联网为兜底。',
         '当用户询问肿瘤学术语、缩写、生物标志物、抗肿瘤药物、临床试验终点的名称、释义或编码时：',
         '1. 必须先调用 onco_term（查术语）或 onco_abbr（查缩写），不要凭记忆作答。',
-        '2. 工具返回「未收录」时，必须如实说明词典中未收录，禁止编造释义、别名、编码或文献出处。',
-        '3. 缩写往往有多个义项（例如 OS、PD、MM）。工具返回多个义项时，必须先向用户确认所指或说明歧义，不要默认取第一条。',
-        '4. 引用编码时注明来源词表；本词典的编码字段仅供线索，正式引用应以 NCIt / MeSH 官方版本核对。',
-        '5. 涉及具体用药剂量、方案选择、诊断结论的问题，只做文献层面的名词解释，并提示用户以临床指南和医师意见为准。',
-        '6. onco_translate 只做「术语级对照」，不是机器翻译：词典不提供语序调整与语法重组能力。',
+        ...onlineHint,
+        '6. 引用编码时注明来源词表；本地词典的编码字段仅供线索，正式引用应以 NCIt / MeSH 官方版本核对。',
+        '7. 涉及具体用药剂量、方案选择、诊断结论的问题，只做文献层面的名词解释，并提示用户以临床指南和医师意见为准。',
+        '8. onco_translate 只做「术语级对照」，不是机器翻译：词典不提供语序调整与语法重组能力。',
         '   严禁把术语对照结果包装成流畅译文转述给用户；未被词典收录的部分必须原样保留，不得自行补译。',
         '   词典中带中文名的条目仅 106 条（人工整理），英译中时大量术语没有中文名，此时应如实说明，不要替它编一个中文名。',
       ].join('\n'),
@@ -1141,10 +1215,12 @@ export function apply(ctx, config = {}) {
     defineTool({
       name: 'onco_term',
       description:
-        '在本地离线肿瘤学词典中查询术语。支持中文名、英文名、缩写、别名、' +
+        '在肿瘤学词典中查询术语，本地优先：先查本地离线词典，本地未收录时再联网查 NCIt（NCI EVS）与 MeSH 兜底。' +
+        '支持中文名、英文名、缩写、别名、' +
         '外部编码（如 MeSH 的 D002289，或带词表的 mesh:D002289）与中英混输，' +
         '返回标准名称、缩写、别名、类别、释义与外部编码。查询肿瘤学术语、药物、标志物、' +
-        '临床试验终点、实验方法时优先使用本工具。',
+        '临床试验终点、实验方法时优先使用本工具。' +
+        '注意：联网兜底只用英文词表，纯中文查询拿不到联网结果。',
       parameters: {
         term: {
           type: 'string',
@@ -1178,14 +1254,36 @@ export function apply(ctx, config = {}) {
         },
       },
       output: textOutput(),
-      execute(args) {
+      ...budgetOpt,
+      async execute(args, exec) {
         if (!lex) return `肿瘤学词典不可用${dictNote}，无法查询，请勿据记忆作答。`
         const k = args.topK && args.topK > 0 ? Math.min(args.topK, 20) : topK
         const filter = toolFilter(args)
-        const hits = lex.search(args.term, k, filter)
         const scope = describeScope(args)
-        const body = renderHits(hits, args.term, dictLabel)
-        return scope ? `${scope}\n\n${body}` : body
+        const hits = lex.search(args.term, k, filter)
+        if (hits.length) {
+          const body = renderHits(hits, args.term, dictLabel)
+          return scope ? `${scope}\n\n${body}` : body
+        }
+
+        const localMiss = renderHits(hits, args.term, dictLabel)
+
+        // 先分清「本地确实没有」与「被筛查条件挡掉了」。后者去联网毫无意义——
+        // 联网结果没有本地那套 category / source / ncitType 字段，过滤不了，
+        // 拿一份不受筛查约束的结果回来只会让模型以为筛查生效了。
+        if (filter) {
+          const unfiltered = lex.search(args.term, k, null)
+          if (unfiltered.length) {
+            const note =
+              `注意：本地词典中确有「${args.term}」的命中（不加筛查条件时 ${unfiltered.length} 条），` +
+              '只是被当前筛查条件排除了，因此本次不进行联网兜底。' +
+              '请放宽或清除筛查条件后重试。'
+            return [scope, localMiss, note].filter(Boolean).join('\n\n')
+          }
+        }
+
+        const fallback = await onlineFallback(args.term, 'term', { topK: k, signal: exec && exec.signal })
+        return [scope, localMiss, fallback.text].filter(Boolean).join('\n\n')
       },
     }),
   )
@@ -1195,7 +1293,8 @@ export function apply(ctx, config = {}) {
       name: 'onco_abbr',
       description:
         '查询肿瘤学缩写的全部可能义项，用于消歧。缩写如 OS、PD、MM、CR 在肿瘤学中常有多个含义，' +
-        '当用户只给出缩写或需要确认缩写所指时使用本工具。',
+        '当用户只给出缩写或需要确认缩写所指时使用本工具。本地优先：本地词典未收录该缩写时，' +
+        '会联网在 NCIt 中补查（召回不保证完整，结果只作线索）。',
       parameters: {
         abbr: { type: 'string', required: true, description: '缩写本身，例如 OS、PFS、PD-L1、MM' },
         category: {
@@ -1210,12 +1309,28 @@ export function apply(ctx, config = {}) {
         },
       },
       output: textOutput(),
-      execute(args) {
+      ...budgetOpt,
+      async execute(args, exec) {
         if (!lex) return `肿瘤学词典不可用${dictNote}，无法查询，请勿据记忆作答。`
         const filter = toolFilter(args)
-        const body = renderAbbr(lex.lookupAbbr(args.abbr, 10, filter), args.abbr, dictLabel)
+        const hits = lex.lookupAbbr(args.abbr, 10, filter)
         const scope = describeScope(args)
-        return scope ? `${scope}\n\n${body}` : body
+        const localMiss = renderAbbr(hits, args.abbr, dictLabel)
+        if (hits.length) return scope ? `${scope}\n\n${localMiss}` : localMiss
+
+        // 同样先排除「被筛查条件挡掉」的情形
+        if (filter) {
+          const unfiltered = lex.lookupAbbr(args.abbr, 10, null)
+          if (unfiltered.length) {
+            const note =
+              `注意：本地词典中确有缩写「${args.abbr}」的义项（不加筛查条件时 ${unfiltered.length} 条），` +
+              '只是被当前筛查条件排除了，因此本次不进行联网兜底。请放宽或清除筛查条件后重试。'
+            return [scope, localMiss, note].filter(Boolean).join('\n\n')
+          }
+        }
+
+        const fallback = await onlineFallback(args.abbr, 'abbr', { topK: 5, signal: exec && exec.signal })
+        return [scope, localMiss, fallback.text].filter(Boolean).join('\n\n')
       },
     }),
   )
@@ -1224,8 +1339,9 @@ export function apply(ctx, config = {}) {
     defineTool({
       name: 'onco_browse',
       description:
-        '按类别浏览本地离线肿瘤学词典中的词条，也可用于确认词典覆盖范围。' +
-        '当用户问「词典里有哪些 XX」或需要了解可用术语清单时使用。',
+        '按类别浏览本地词典中的词条，也可用于确认词典覆盖范围。' +
+        '当用户问「词典里有哪些 XX」或需要了解可用术语清单时使用。' +
+        '本工具只作用于本地词典，不联网（联网兜底仅用于 onco_term / onco_abbr 的未命中查询）。',
       parameters: {
         category: {
           type: 'string',
@@ -1269,8 +1385,8 @@ export function apply(ctx, config = {}) {
     defineTool({
       name: 'onco_translate',
       description:
-        '用本地离线词典做「术语级」中英对照：给出术语的中文名与英文标准名，' +
-        '或在一段文本里找出所有命中的术语并逐条列出对应名称。' +
+        '用本地词典做「术语级」中英对照：给出术语的中文名与英文标准名，' +
+        '或在一段文本里找出所有命中的术语并逐条列出对应名称。本工具只作用于本地词典，不联网。' +
         '重要：这不是机器翻译——词典只提供术语级对应，不做语序调整、语法重组与整句润色；' +
         '请勿把对照结果当作译文转述给用户。文本中未被词典收录的部分保持原样、不作翻译。',
       parameters: {
@@ -1406,6 +1522,7 @@ export function apply(ctx, config = {}) {
             byCategory: s.byCategory,
             bySource: s.bySource,
             byType: s.byType,
+            online: { enabled: onlineCfg.enabled, timeoutMs: onlineCfg.timeoutMs },
           }
         }
         if (op === 'search') {
@@ -1443,6 +1560,11 @@ export function apply(ctx, config = {}) {
             loadError,
             loadMs: Math.round(loadMs ?? 0),
             dictBytes,
+            online: {
+              enabled: onlineCfg.enabled,
+              timeoutMs: onlineCfg.timeoutMs,
+              cacheSize: onlineCache ? onlineCache.size : 0,
+            },
             index: { ...ix, typeCount: Object.keys(s.byType).length },
             byCategory: s.byCategory,
             bySource: s.bySource,
@@ -1555,6 +1677,27 @@ export function apply(ctx, config = {}) {
         return { ok: false, error: `unknown op: ${String(op)}` }
       }
 
+      /**
+       * 给面板结果挂上联网兜底。
+       *
+       * 与工具层同一套口径：**只在本地零命中时**触发，避免用户每次检索都打外网；
+       * 客户端可以传 `online: false` 显式关掉单次兜底。
+       * 这里刻意放在 recordQuery 之后——网络往返不该污染面板的本地检索性能统计。
+       */
+      async function attachOnline(result, op, args) {
+        if (!result || !result.ok) return result
+        if (op !== 'search' && op !== 'abbr') return result
+        if (args && args.online === false) return result
+        if (result.hits && result.hits.length) return result
+        const q = String((args && args.q) || '').trim()
+        if (!q) return result
+        const { result: fb } = await onlineFallback(q, op === 'abbr' ? 'abbr' : 'term', { topK: 3 })
+        if (fb) {
+          result.online = { ...fb, summary: summarizeOnline(fb) }
+        }
+        return result
+      }
+
       ctx.effect(
         () =>
           webServer.register({
@@ -1587,6 +1730,7 @@ export function apply(ctx, config = {}) {
                 const t0 = timing ? performance.now() : 0
                 const result = respond(payload)
                 if (timing && result && result.ok) recordQuery(performance.now() - t0)
+                await attachOnline(result, op, (payload && payload.args) || {})
                 sendJson(res, result)
               } catch (error) {
                 sendJson(res, { ok: false, error: String((error && error.message) || error) }, 500)

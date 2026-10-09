@@ -224,8 +224,56 @@ const STATS = {
   byCategory: { disease: 26814, drug: 22786 },
   bySource: { NCIt: 185880, 自建库: 106 },
   byType: { 'Neoplastic Process': 15806, 'Pharmacologic Substance': 22823 },
+  online: { enabled: true, timeoutMs: 6000 },
 }
 const SEARCH = { ok: true, dictLabel: STATS.dictLabel, hits: [flatEntry] }
+
+// 联网兜底：与 host 侧 attachOnline 挂上的 online 字段同构（本地零命中才会出现）。
+// 形状对不上会直接走进错误边界，所以这里刻意按真实字段逐个写全。
+const ONLINE_HIT = {
+  ok: true,
+  dictLabel: STATS.dictLabel,
+  hits: [],
+  online: {
+    query: 'Tirofiban', kind: 'term', ok: true, mode: 'term', skipped: null,
+    ncit: {
+      version: '26.09d', mode: 'match', total: 2, url: 'https://api-evsrest.nci.nih.gov/...',
+      concepts: [{
+        code: 'C76405', name: 'Tirofiban', version: '26.09d', active: true, leaf: true,
+        conceptStatus: 'DEFAULT', synonyms: ['Tirofiban', 'AGGRASTAT'], abbrTerms: [],
+        synonymTags: ['PT/NCI'], def: 'A synthetic, non-peptide tyrosine derivative with antiplatelet activity.',
+        defTruncated: false,
+      }],
+    },
+    mesh: {
+      mode: 'exact',
+      descriptors: [{ code: 'D000077552', label: 'Tirofiban', entryTerms: ['Aggrastat'] }],
+    },
+    errors: [],
+    notes: ['联网结果都是英文词表内容，不提供中文名；本词典的中文名仅 106 条人工整理词条，不得据此推造中文译名。'],
+    ms: 812,
+    cached: false,
+    summary: { ok: true, skipped: null, text: 'NCIt 1 条（v26.09d） · MeSH 1 条', ms: 812, cached: false },
+  },
+}
+// 纯中文查询：host 侧不发网络请求，只回一句原因
+const ONLINE_SKIPPED = {
+  ok: true,
+  dictLabel: STATS.dictLabel,
+  hits: [],
+  online: {
+    query: '完全不存在的术语', kind: 'term', ok: false, mode: null,
+    skipped: {
+      reason: 'cjk-only',
+      message: '联网兜底只用 NCIt 与 MeSH 两个英文词表，无法用纯中文检索（实测 NCIt 对中文查询返回 0 条）。',
+    },
+    ncit: null, mesh: null, errors: [],
+    notes: ['联网兜底只用 NCIt 与 MeSH 两个英文词表，无法用纯中文检索（实测 NCIt 对中文查询返回 0 条）。'],
+    ms: 0,
+    cached: false,
+    summary: { ok: false, skipped: 'cjk-only', text: '无法用纯中文检索', ms: 0 },
+  },
+}
 // 性能统计：字段与 host 侧 rpc('perf') 的返回保持一致，客户端排版依赖这些嵌套层级
 const PERF = {
   ok: true,
@@ -237,6 +285,7 @@ const PERF = {
   memory: { rss: 861234567, heapUsed: 231234567, heapTotal: 300000000, external: 12345678 },
   process: { uptimeSec: 321, node: 'v22.14.0', platform: 'win32' },
   queries: { count: 28, lastMs: 6.2, avgMs: 7.62, maxMs: 24, p50Ms: 6.1, p95Ms: 19.33, samples: 28 },
+  online: { enabled: true, timeoutMs: 6000, cacheSize: 3 },
 }
 // 关联推荐：种子 + 上位 / 下位 / 名称近似
 const RELATED = {
@@ -296,7 +345,11 @@ globalThis.fetch = async (url, init) => {
   calls.push(payload)
   let body
   if (payload.op === 'stats') body = STATS
-  else if (payload.op === 'search') body = SEARCH
+  else if (payload.op === 'search') {
+    // 按查询词分流：只有这两个词走联网兜底，其余仍返回常规命中
+    const q = (payload.args && payload.args.q) || ''
+    body = q === 'Tirofiban' ? ONLINE_HIT : q === '完全不存在的术语' ? ONLINE_SKIPPED : SEARCH
+  }
   else if (payload.op === 'abbr') body = { ok: true, dictLabel: STATS.dictLabel, hits: [] }
   else if (payload.op === 'perf') body = PERF
   else if (payload.op === 'related') body = RELATED
@@ -484,6 +537,7 @@ console.log('[3d] 性能统计面板')
       '索引 / 词典', '内存 / 进程', '查询耗时（本次会话）',
       '加载耗时', '词典体积', '词条数', '检索键数', '词项数', '倒排项数',
       'NCIt 类型数', '下位索引键数', '常驻内存 RSS', 'p50 / p95', '样本数',
+      '联网兜底', '单次预算', '缓存条目',
     ]) {
       check(after.text.includes(label), `性能面板缺少「${label}」`)
     }
@@ -635,6 +689,90 @@ console.log('[3g] 导出 TXT')
     check(!!exp2, '空结果时导出按钮消失（应保留但禁用）')
     check(exp2 && exp2.props.disabled === true, '无结果时导出按钮应被禁用')
   }
+}
+
+console.log('[3g2] 联网兜底卡片（本地零命中）')
+{
+  // [3g] 末尾切到了「缩写消歧」，先回到术语检索
+  let view = await settle(SearchPanel, 2)
+  const back = view.els.find((e) => e.props && e.props.children === '术语检索' && typeof e.props.onClick === 'function')
+  check(!!back, '未找到「术语检索」按钮')
+  if (back) back.props.onClick()
+  view = await settle(SearchPanel, 3)
+
+  const input = view.els.find((e) => e.props && e.props.className === 'onco-input')
+  check(!!input, '未找到搜索输入框（联网用例）')
+  if (input) input.props.onChange({ target: { value: 'Tirofiban' } })
+  view = await settle(SearchPanel, 2)
+  const go = view.els.find((e) => e.props && typeof e.props.onClick === 'function' && e.props.children === '查询')
+  check(!!go, '未找到查询按钮（联网用例）')
+  if (go) go.props.onClick()
+  view = await settle(SearchPanel, 4)
+
+  const text = view.text
+  check(!text.includes('渲染出错'), '联网卡片渲染进入错误边界 —— 形状不匹配回归')
+  check(text.includes('本地词典没有匹配的词条'), '本地零命中的说明仍然保留')
+  for (const s of [
+    '联网兜底', '已查到', 'C76405', 'Tirofiban', 'NCIt',
+    'AGGRASTAT', 'MeSH 主题词', 'D000077552', '已截断的释义不会出现在这里'.slice(0, 0) + 'A synthetic',
+    '不提供中文名',
+  ]) {
+    if (s) check(text.includes(s), `联网卡片缺少「${s}」`)
+  }
+  // 联网结果绝不能伪装成本地词条：不能出现本地卡片才有的字段
+  check(!text.includes('类别：疾病'), '联网卡片不得渲染成本地词条卡片')
+  check(!text.includes('相关度：'), '联网结果不该有本地相关度')
+
+  // 联网内容也要能导出（导出按钮此前只看 hits，会让这个状态下的按钮白禁用）
+  const expBtn = view.els.find((e) => e.props && e.props.children === '导出 TXT')
+  check(!!expBtn, '联网结果下未找到导出按钮')
+  check(expBtn && expBtn.props.disabled === false, '有联网结果时导出按钮应可用')
+  if (expBtn) {
+    calls.length = 0
+    expBtn.props.onClick()
+    const after = await settle(SearchPanel, 4)
+    const expCall = calls.find((c) => c.op === 'export')
+    check(!!expCall, '联网结果下点击导出未发出 export 请求')
+    if (expCall) {
+      const t = expCall.args.text
+      for (const s of [
+        '# 条数：0',
+        '# ---- 联网兜底（本地词典未收录，以下来自 NCIt / MeSH 实时查询）----',
+        '# 状态：已查到',
+        '[NCIt v26.09d · 口径 match]',
+        '1. C76405  Tirofiban',
+        '[MeSH 主题词]',
+        '1. D000077552  Tirofiban',
+        '入口词：Aggrastat',
+        '与联网实时查询（已在上面分段标注，联网部分未经本地人工整理）',
+      ]) {
+        check(t.includes(s), `联网导出文本缺少「${s}」`)
+      }
+      check(!/(?<!\r)\n/.test(t), '联网导出文本里混入了裸 LF 换行')
+    }
+    check(after.text.includes('已导出'), '联网导出后未显示结果提示')
+    console.log('  联网导出提示:', (after.text.match(/已导出[^\r\n]{0,50}/) || [''])[0])
+  }
+
+  // 纯中文：host 不发网络请求，只回一句原因；卡片要如实展示
+  const input2 = view.els.find((e) => e.props && e.props.className === 'onco-input')
+  if (input2) input2.props.onChange({ target: { value: '完全不存在的术语' } })
+  let zhView = await settle(SearchPanel, 2)
+  const go2 = zhView.els.find((e) => e.props && typeof e.props.onClick === 'function' && e.props.children === '查询')
+  if (go2) go2.props.onClick()
+  zhView = await settle(SearchPanel, 4)
+  check(!zhView.text.includes('渲染出错'), '纯中文联网卡片渲染进入错误边界')
+  check(zhView.text.includes('未查询'), '纯中文卡片应显示「未查询」')
+  check(zhView.text.includes('英文词表'), '纯中文卡片应说明联网源是英文词表')
+  check(!zhView.text.includes('[NCIt'), '纯中文不应渲染 NCIt 结果段')
+
+  // 回到常规查询，避免影响后面的用例
+  const input3 = zhView.els.find((e) => e.props && e.props.className === 'onco-input')
+  if (input3) input3.props.onChange({ target: { value: '非小细胞肺癌' } })
+  const back2 = await settle(SearchPanel, 2)
+  const go3 = back2.els.find((e) => e.props && typeof e.props.onClick === 'function' && e.props.children === '查询')
+  if (go3) go3.props.onClick()
+  await settle(SearchPanel, 4)
 }
 
 console.log('[3h] 翻译模式（词典式对照）')
@@ -896,7 +1034,10 @@ for (const sel of ['.onco-notice{', '.onco-rel-btn{', '.onco-related{', '.onco-r
   '.onco-perf-group{', '.onco-perf-title{', '.onco-perf-row{', '.onco-perf-k{', '.onco-perf-v{',
   '.onco-perf-hint{', '.onco-ta{', '.onco-tr{', '.onco-tr-row{', '.onco-tr-src{', '.onco-tr-dst{',
   '.onco-tr-ghead{', '.onco-tr-annot{', '.onco-tr-hit{', '.onco-tr-missing{', '.onco-tr-none{',
-  '.onco-note{', '.onco-hint{']) {
+  '.onco-note{', '.onco-hint{',
+  '.onco-online{', '.onco-online-head{', '.onco-online-tag{', '.onco-online-meta{',
+  '.onco-online-src{', '.onco-online-item{', '.onco-online-name{', '.onco-online-syn{',
+  '.onco-online-def{', '.onco-online-notes{']) {
   check(src.includes(sel), `缺少新功能样式 ${sel}`)
 }
 // 次级文字必须用显式深紫，不能再靠 opacity 淡化（"颜色太浅"的根因）

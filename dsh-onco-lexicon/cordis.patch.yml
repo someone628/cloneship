@@ -1,7 +1,7 @@
 # ============================================================================
 # dsh-onco-lexicon —— DSH bundle patch
 # ============================================================================
-# 把离线肿瘤学术语词典挂进 Web profile 的配置树。
+# 把肿瘤学术语词典挂进 Web profile 的配置树。
 #
 # 安装：
 #   dsh plugin --profile <你的 web profile> add link:<本目录的绝对路径>
@@ -19,3 +19,13 @@
         dictPath: null
         topK: 5
         fuzzy: true
+
+        # 联网兜底（0.7.0）：本地词典命中时一个请求都不发；
+        # 只有 onco_term / onco_abbr 本地零命中时，才去查 NCI EVS（NCIt）与 NLM MeSH。
+        # 设成 false 即回到 0.6.1 的严格离线行为（也可用扁平字段 onlineEnabled 覆盖）。
+        online:
+          enabled: true
+          timeoutMs: 6000        # 单次兜底总预算（含所有上游），毫秒
+          cacheTtlMs: 21600000   # 成功结果缓存 6 小时
+          errorTtlMs: 60000      # 失败结果只缓存 60 秒，网络恢复后不必等
+          cacheMax: 200          # LRU 容量
