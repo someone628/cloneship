@@ -195,46 +195,113 @@ export function sectionAt(marks, offset) {
 
 const ALL_ATTRIBUTE_GROUPS = ['negation', 'uncertainty', 'severity', 'count', 'laterality', 'change']
 
+/** 把一组提示词在小句里的出现位置找出来（每个词只取首次出现，与旧实现一致） */
+function collectCues(clauseText, cues) {
+  const out = []
+  if (!Array.isArray(cues)) return out
+  for (const c of cues) {
+    if (typeof c !== 'string' || !c) continue
+    const at = clauseText.indexOf(c)
+    if (at < 0) continue
+    out.push({ cue: c, at })
+  }
+  return out
+}
+
+/** 命中的提示词里位置最靠前的一条；同位置取更长的（更具体） */
+function earliest(list) {
+  let best = null
+  for (const c of list) {
+    if (best === null || c.at < best.at || (c.at === best.at && c.cue.length > best.cue.length)) best = c
+  }
+  return best
+}
+
+/**
+ * 极性判定（否定 / 不确定）。
+ *
+ * 与程度、侧别这类描述性属性不同，极性会**反转结论**：阳性发现被读成「未见」，
+ * 或者明确的「未见」被读成「可疑」，都是临床意义上的错误。所以它必须按位置判定，
+ * 不能整小句一见「未见」就全盘否定：
+ *
+ *   「肝内见转移灶、未见腹水」
+ *
+ * 顿号刻意不作小句切分点（否则「未见胸腔积液、腹水」里的「腹水」会丢掉否定），
+ * 于是「转移灶」与「未见」落在同一个小句里；整句级的极性判定会把「转移灶」
+ * 也标成否定。位置化判定同样能保住「未见胸腔积液、腹水」——那条提示词在两者之前。
+ *
+ * 规则：
+ *   1. 提示词必须落在该提及**结束位置之前**（`cue.at < span.end`）才算作用到它。
+ *      这样既管住「未见」在提及前的情形，也管住「胸膜[未见]明显增厚」这种提示词
+ *      夹在提及内部的情形——提及是在骨架文本上匹配的，跨度覆盖了被屏蔽的极性词。
+ *   2. 「不除外」含「除外」：落在不确定词区间内的否定词先摘掉，否则会被读成「排除」。
+ *   3. 作用到该提及的提示词取位置最靠前的一条；同位置取更长的。
+ *
+ * `span` 为 null 时退回旧的「整小句」语义（不确定优先），供不便提供位置的调用方使用。
+ */
+export function extractPolarity(clauseText, rules, span = null) {
+  const out = { negated: false, uncertain: false, cues: {} }
+  const attrs = rules?.attributes ?? {}
+  const uncCues = collectCues(clauseText, attrs.uncertainty?.cues)
+  const negCues = collectCues(clauseText, attrs.negation?.cues).filter(
+    (n) => !uncCues.some((u) => n.at >= u.at && n.at + n.cue.length <= u.at + u.cue.length),
+  )
+  if (!span) {
+    const unc = earliest(uncCues)
+    const neg = earliest(negCues)
+    if (unc) { out.uncertain = true; out.cues.uncertainty = unc.cue }
+    else if (neg) { out.negated = true; out.cues.negation = neg.cue }
+    return out
+  }
+  const winner = earliest([...negCues, ...uncCues].filter((c) => c.at < span.end))
+  if (!winner) return out
+  if (uncCues.includes(winner)) { out.uncertain = true; out.cues.uncertainty = winner.cue }
+  else { out.negated = true; out.cues.negation = winner.cue }
+  return out
+}
+
+/**
+ * 数量词。与极性同理，按位置取**离该提及最近**的一条，而不是整小句共用一条：
+ *
+ *   「双肺多发结节、右肺上叶单发结节」
+ *
+ * 两个结节必须分别拿到「多发」与「单发」；整句共用时后一个会被编成
+ * Multiple Pulmonary Nodules——那是**错误的 MeSH 描述符**，比不给概念更糟。
+ */
+export function extractCount(clauseText, rules, span = null) {
+  const cues = collectCues(clauseText, rules?.attributes?.count?.cues)
+  if (!cues.length) return null
+  if (!span) return earliest(cues)?.cue ?? null
+  let best = null
+  for (const c of cues) {
+    if (c.at >= span.end) continue
+    if (best === null || c.at > best.at) best = c
+  }
+  return best?.cue ?? null
+}
+
 /**
  * 属性抽取。规则：
- *   1. `uncertainty` 优先于 `negation` —— 因为中文的「不除外」里含「除外」，
- *      若不先判不确定，就会出现「不除外转移」被读成「排除转移」这种**语义反转**。
+ *   1. 极性（否定 / 不确定）与数量按位置判定，见 `extractPolarity` / `extractCount`；
+ *      程度 / 侧别 / 变化仍按整小句取，它们只作描述，且输出里已声明不保证逐个修饰。
  *   2. 值原样回显（cue），便于人工复核是哪个词触发的判定。
  *   3. 只在小句内生效，不跨句读。
+ *
+ * `span` 是提及在小句内的字符区间（`{start, end}`），用于位置化判定。
  */
-export function extractAttributes(clauseText, rules) {
-  const out = {
-    negated: false,
-    uncertain: false,
-    cues: {},
-    severity: null,
-    count: null,
-    laterality: null,
-    change: null,
-  }
+export function extractAttributes(clauseText, rules, span = null) {
   const attrs = rules?.attributes ?? {}
-  const firstOf = (cues) => {
-    if (!Array.isArray(cues)) return null
-    let best = null
-    for (const c of cues) {
-      if (typeof c !== 'string' || !c) continue
-      const i = clauseText.indexOf(c)
-      if (i < 0) continue
-      // 命中位置最早者优先；同位置取更长的（更具体）
-      if (best === null || i < best.at || (i === best.at && c.length > best.cue.length)) best = { cue: c, at: i }
-    }
-    return best
+  const firstOf = (cues) => earliest(collectCues(clauseText, cues))
+  const pol = extractPolarity(clauseText, rules, span)
+  return {
+    negated: pol.negated,
+    uncertain: pol.uncertain,
+    cues: pol.cues,
+    severity: firstOf(attrs.severity?.cues)?.cue ?? null,
+    count: extractCount(clauseText, rules, span),
+    laterality: firstOf(attrs.laterality?.cues)?.cue ?? null,
+    change: firstOf(attrs.change?.cues)?.cue ?? null,
   }
-  const unc = firstOf(attrs.uncertainty?.cues)
-  const neg = firstOf(attrs.negation?.cues)
-  if (unc) { out.uncertain = true; out.cues.uncertainty = unc.cue }
-  else if (neg) { out.negated = true; out.cues.negation = neg.cue }
-
-  out.severity = firstOf(attrs.severity?.cues)?.cue ?? null
-  out.count = firstOf(attrs.count?.cues)?.cue ?? null
-  out.laterality = firstOf(attrs.laterality?.cues)?.cue ?? null
-  out.change = firstOf(attrs.change?.cues)?.cue ?? null
-  return out
 }
 
 /** 该属性组是否在规则里存在（用于自检） */
@@ -262,18 +329,35 @@ export function extractSize(raw, center, rules, range) {
   if (to <= from) return null
   const slice = raw.slice(from, to)
   let re
-  try { re = new RegExp(cfg.regex, cfg.flags ?? 'i') } catch { return null }
-  const m = re.exec(slice)
-  if (!m) return null
-  const value = Number(m[1])
+  try {
+    const flags = cfg.flags ?? 'i'
+    re = new RegExp(cfg.regex, flags.includes('g') ? flags : `${flags}g`)
+  } catch { return null }
+  // 取窗口里**离该提及最近**的那个数字，而不是第一个：
+  // 「右肺上叶结节2.3cm、左肺下叶结节1.5cm」里顿号不切小句，两个结节共用同一个
+  // ±window 的搜索窗；取第一个会让两个结节都报 2.3cm。
+  let best = null
+  let m
+  while ((m = re.exec(slice)) !== null) {
+    if (m[0].length === 0) { re.lastIndex += 1; continue }
+    const at = from + m.index
+    const after = at >= center
+    const distance = after ? at - center : center - (at + m[0].length)
+    // 同距离时取「提及之后」的那一个：中文报告里尺寸通常写在病变词后面
+    const rank = Math.abs(distance) * 2 + (after ? 0 : 1)
+    if (!best || rank < best.rank) best = { m, at, rank }
+  }
+  if (!best) return null
+  const hit = best.m
+  const value = Number(hit[1])
   if (!Number.isFinite(value)) return null
-  const unit = String(m[2] ?? '').toLowerCase()
+  const unit = String(hit[2] ?? '').toLowerCase()
   const mm = unit === 'cm' || unit === '厘米' || unit === '公分' ? value * 10 : value
   return {
-    text: m[0],
+    text: hit[0],
     value,
     unit,
     mm: Math.round(mm * 100) / 100,
-    at: from + m.index,
+    at: best.at,
   }
 }

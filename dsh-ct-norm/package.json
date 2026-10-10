@@ -1,6 +1,6 @@
 {
   "name": "dsh-ct-norm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "DSH CT 报告实体归一化插件：从中文 CT 影像报告原始文本中抽取自由描述，确定性归一化到 MeSH 2026 标准概念（规范名 / MeSH 编号 / 树号一律取自 NLM 索引，中文别名层自建）。未收录的写法如实报出，不做模型推断。",
   "keywords": [
     "dsh",

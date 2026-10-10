@@ -613,6 +613,96 @@ check(deadAliases === 0, `有 ${deadAliases}/${aliasChecked} 个别名命中不�
 console.log(`  ${aliasChecked} 个别名逐一验证可命中（含中文别名与未归一化征象词表）`)
 
 // ===========================================================================
+section('[15] 回归：单位误命中、极性/数量的位置判定、尺寸就近、部位不丢')
+
+/*
+ * 这一节对应 0.1.1 修掉的六类缺陷，每一条都是实测出来的：
+ *
+ *   1. `5mm` / `mmol/L` 里的 `mm` 命中 multiple-myeloma（毫米被当成缩写）；
+ *   2. 否定整小句生效：「肝内见转移灶、未见腹水」把「转移灶」标成否定（极性反转）；
+ *   3. 不确定无条件压过否定：「未见胸腔积液考虑胸膜粘连」丢掉「未见」；
+ *   4. 尺寸取窗口里第一个数字：两个结节共用窗口时都报前一个的径线；
+ *   5. 数量词被屏蔽却不被抽取：写了「一枚」仍报「没写单发还是多发」；
+ *      而同小句共用数量词会把「单发结节」错编成 Multiple Pulmonary Nodules；
+ *   6. 组合不出概念时丢掉已绑定的部位（「胸壁占位」里「胸壁」整份输出都不见了），
+ *      以及「转移至肝」被更弱的跨小句兜底绑到肺、给出 Lung Neoplasms。
+ */
+
+// --- 15.1 拉丁别名的词边界：mm 是毫米，不是 Multiple Myeloma ---
+const myeloma = (text) => norm.normalize(text).entities.filter((e) => e.entryId === 'multiple-myeloma')
+check(myeloma('较大者约5mm。').length === 0, '「5mm」不该命中 multiple-myeloma（单位不是缩写）')
+check(myeloma('较大者约 5 mm。').length === 0, '「5 mm」不该命中 multiple-myeloma（隔空格也一样）')
+check(myeloma('另一枚 3MM。').length === 0, '「3MM」不该命中 multiple-myeloma')
+check(myeloma('mmol/L 正常。').length === 0, '「mmol/L」里的 mm 不该命中 multiple-myeloma（词内不许起止）')
+check(myeloma('患者MM诊断明确。').length === 1, '「MM 患者」这种真实写法仍应命中 multiple-myeloma')
+check(myeloma('多发性骨髓瘤病史。').length === 1, '「多发性骨髓瘤」（含屏蔽词）仍应命中')
+check(
+  norm.normalize('HCC 术后。').entities.some((e) => e.entryId === 'carcinoma-hepatocellular'),
+  '加了词边界后，HCC / TB 这类拉丁缩写仍应正常命中',
+)
+
+// --- 15.2 极性按提及位置判定 ---
+const attrOf = (text, id, field) =>
+  norm.normalize(text).entities.find((e) => e.entryId === id)?.attrs[field]
+check(
+  attrOf('肝内见转移灶、未见腹水。', 'morph-metastasis', 'negated') === false,
+  '「未见腹水」不该把同小句里前面的「转移灶」标成否定',
+)
+check(attrOf('肝内见转移灶、未见腹水。', 'ascites', 'negated') === true, '「腹水」应判为否定')
+check(attrOf('未见胸腔积液、腹水。', 'pleural-effusion', 'negated') === true, '顿号并列时「胸腔积液」仍应否定')
+check(attrOf('未见胸腔积液、腹水。', 'ascites', 'negated') === true, '顿号并列时「腹水」应继承前面的否定')
+check(
+  attrOf('未见胸腔积液考虑胸膜粘连。', 'pleural-effusion', 'negated') === true,
+  '明确写出的「未见」不该被后面的「考虑」压成不确定',
+)
+check(
+  attrOf('右肺上叶结节，考虑周围型肺癌可能。', 'lung-neoplasms', 'uncertain') === true,
+  '「考虑…肺癌」这种提示词在后的写法仍应判为可疑',
+)
+check(attrOf('不除外转移瘤。', 'morph-metastasis', 'uncertain') === true, '「不除外」应判为不确定而非「排除」')
+check(attrOf('不除外转移瘤。', 'morph-metastasis', 'negated') === false, '「不除外」不该被读成否定')
+
+// --- 15.3 数量按提及位置判定 ---
+const noduleNames = (text) =>
+  norm.normalize(text).entities
+    .filter((e) => e.entryId === 'morph-nodule')
+    .map((e) => e.concepts.map((c) => c.name).join('+'))
+check(
+  noduleNames('右肺上叶见一枚结节。').join('|') === 'Solitary Pulmonary Nodule',
+  '「一枚结节」应只给 Solitary，不该再报「没写单发还是多发」',
+)
+const twoNodules = norm.normalize('双肺多发结节、右肺上叶单发结节。').entities.filter(
+  (e) => e.entryId === 'morph-nodule',
+)
+check(
+  twoNodules.length === 2 &&
+    twoNodules[0].concepts[0].name === 'Multiple Pulmonary Nodules' &&
+    twoNodules[1].concepts[0].name === 'Solitary Pulmonary Nodule',
+  `同小句两个结节应各取各的数量词，实际 ${twoNodules.map((e) => e.attrs.count + ':' + e.concepts[0]?.name).join(' / ')}`,
+)
+
+// --- 15.4 尺寸取离提及最近的那个数字 ---
+const twoSizes = norm.normalize('右肺上叶结节2.3cm、左肺下叶结节1.5cm。').entities
+  .filter((e) => e.entryId === 'morph-nodule')
+  .map((e) => e.size?.text)
+check(twoSizes.join('|') === '2.3cm|1.5cm', `尺寸应就近取，实际 ${twoSizes.join('|')}`)
+
+// --- 15.5 组合不出概念时，已识别到的部位不能丢 ---
+const wallCase = norm.normalize('胸壁见隆起，考虑占位。')
+const occupying = wallCase.unmapped.find((u) => u.surface === '占位')
+check(
+  !!occupying && occupying.site?.name === 'Thoracic Wall',
+  '「胸壁占位」组合不出概念时，已绑定的部位必须挂在未归一化项上（不能整份输出都看不到「胸壁」）',
+)
+
+// --- 15.6 概念后紧跟的部位优先于更弱的跨小句兜底 ---
+const metCase = norm.normalize('右肺未见异常，转移至肝。').entities.find((e) => e.entryId === 'morph-metastasis')
+check(
+  !!metCase && metCase.concepts.some((c) => c.name === 'Liver Neoplasms'),
+  '「转移至肝」应给出 Liver Neoplasms，而不是按同句更远的「右肺」给出 Lung Neoplasms',
+)
+
+// ===========================================================================
 console.log('\n' + '='.repeat(64))
 if (failures.length === 0) {
   console.log(`全部通过：${checks} 项检查`)

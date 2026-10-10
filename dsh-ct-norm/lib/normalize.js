@@ -19,7 +19,9 @@ import {
 import { buildMatcher, matchMentions } from './lexicon.js'
 import { briefConcept } from './mesh.js'
 
-const MULTI_RE = /(多发|多个|数枚|数个|多处|弥漫|散在|簇状|成团)/
+// 数量词的两套口径必须对齐 ct.rules.json 的 attributes.count.cues：
+// 「两枚」曾被 count 表收下、却不在这条正则里，于是报告写了「两枚」仍被判为「没写单发还是多发」。
+const MULTI_RE = /(多发|多个|数枚|数个|两枚|二枚|多处|弥漫|散在|簇状|成团)/
 const SINGLE_RE = /(单发|一枚|一处)/
 
 export function createNormalizer({ entries, meshSubset, rules, config = {} }) {
@@ -70,7 +72,6 @@ export function createNormalizer({ entries, meshSubset, rules, config = {} }) {
     const segIdOfFold = prep.rawStart.map((o) => segOfRaw[o])
     const mentions = matchMentions(prep, segIdOfCompact, segIdOfFold, matcher, raw)
     const sectionMarks = detectSections(raw, rules)
-    const attrsOfSeg = segments.map((s) => extractAttributes(s.text, rules))
 
     const siteMentions = mentions
       .filter((m) => m.type === 'site')
@@ -136,12 +137,20 @@ export function createNormalizer({ entries, meshSubset, rules, config = {} }) {
         sites = prefixSites(concept)
         if (sites.length) binding = 'clause'
         else {
-          const one = nearestSiteInSentence(concept)
-          if (one) { sites = [one]; binding = 'sentence' }
-        }
-        if (!sites.length) {
+          // 概念**之后**紧跟的部位（「转移至肝」）比跨小句的兜底更可信。
+          // 旧顺序把 after 排在同句最近前置之后，于是「右肺未见异常，转移至肝」会绑到肺，
+          // 再按规则给出 Lung Neoplasms——一个由错误部位推出的错误 MeSH 概念。
           const post = suffixSites(concept)
-          if (post.length) { sites = post; binding = 'after' }
+          if (post.length) {
+            sites = post
+            binding = 'after'
+          } else {
+            const one = nearestSiteInSentence(concept)
+            if (one) {
+              sites = [one]
+              binding = 'sentence'
+            }
+          }
         }
         markUsed(sites)
       }
@@ -164,14 +173,18 @@ export function createNormalizer({ entries, meshSubset, rules, config = {} }) {
     /**
      * 未归一化的提及也尽量把部位挂上——「胸膜增厚」虽无 MeSH 概念，但「部位=胸膜」是确定信息。
      *
-     * 部位来源有两种，优先级从高到低：
+     * 部位来源有三种，优先级从高到低：
      *   1. 该未归一化写法在 ct.rules.json 里**声明**的部位（如「胸膜增厚」→ Pleura）。
      *      声明值来自词表，不靠猜。
-     *   2. 同小句内紧邻的部位。
+     *   2. 调用方已经解析好的部位绑定（`bound`）——形态学词绑上了部位、却因为该部位
+     *      没有对应的肿瘤概念而组合不出概念时（「胸壁占位」：胸壁在词表里没有 neoplasm），
+     *      已经识别到的部位不能跟着丢掉。此时它已被标记为「已使用」，这里必须接住，
+     *      否则整份输出里连「胸壁」都不见了。
+     *   3. 同小句内紧邻的部位。
      * **不做**跨小句/跨句绑定：未归一化项本身就缺概念，再给它配一个隔壁小句的部位，
      * 会把「右肺上叶见磨玻璃影，边缘毛刺，胸膜增厚」里的「胸膜增厚」错配成肺。
      */
-    const pushUnmapped = (m, kind, term, reason, attrs, declaredSiteName) => {
+    const pushUnmapped = (m, kind, term, reason, attrs, declaredSiteName, bound = null) => {
       let site = null
       let binding = null
       if (declaredSiteName) {
@@ -183,6 +196,10 @@ export function createNormalizer({ entries, meshSubset, rules, config = {} }) {
           }
           binding = 'declared'
         }
+      }
+      if (!site && bound && bound.sites && bound.sites.length) {
+        site = siteBrief(bound.sites[bound.sites.length - 1], bound.binding === 'after' ? 'after' : 'before')
+        binding = bound.binding
       }
       if (!site) {
         const sameClause = prefixSites(m)
@@ -225,8 +242,13 @@ export function createNormalizer({ entries, meshSubset, rules, config = {} }) {
     const sizeFor = (m) => extractSize(raw, m.start, rules, clauseRange(m)) ?? extractSize(raw, m.start, rules, sentenceRange(m))
 
     for (const m of mentions) {
-      const attrs = attrsOfSeg[m.segIndex] ?? extractAttributes('', rules)
       const seg = segments[m.segIndex]
+      // 极性与数量按**提及位置**判定，必须逐提及算，不能整个小句共用一份：
+      // 「肝内见转移灶、未见腹水」里，「未见」只作用于「腹水」；整小句共用会把
+      // 「转移灶」也标成否定。数量同理（「双肺多发结节、右肺上叶单发结节」）。
+      const attrs = seg
+        ? extractAttributes(seg.text, rules, { start: m.start - seg.start, end: m.end - seg.start })
+        : extractAttributes('', rules)
 
       if (m.type === 'unmapped') {
         const g = matcher.unmapped[m.entryIndex]
@@ -305,8 +327,13 @@ export function createNormalizer({ entries, meshSubset, rules, config = {} }) {
             for (const sn of siteNeoplasms) addConcept(sn.ref, 'site-derived')
             entity.caveats.push('「' + m.surface + '」是影像描述词（MeSH 无对应概念），这里的映射是「部位 + 占位」的规则外推，**不等于病理诊断**，需人工确认。')
           } else {
-            pushUnmapped(m, 'no-site', entry.zh[0] ?? entry.id,
-              '识别到「占位/肿块」类病变词，但同一句内没有可供绑定的部位，无法归一化', attrs)
+            // 部位可能已经绑上、只是该部位没有对应的肿瘤概念（胸壁、气管旁……）。
+            // 这时把 bound 一起传下去：不能给出概念，至少不能把部位也丢了。
+            pushUnmapped(m, sites.length ? 'site-without-neoplasm' : 'no-site', entry.zh[0] ?? entry.id,
+              sites.length
+                ? '识别到「占位/肿块」类病变词，也绑定了部位，但该部位在本词表里没有对应的肿瘤概念，无法归一化'
+                : '识别到「占位/肿块」类病变词，但同一句内没有可供绑定的部位，无法归一化',
+              attrs, undefined, bound)
             continue
           }
         } else if (action === 'nodule') {
@@ -324,7 +351,7 @@ export function createNormalizer({ entries, meshSubset, rules, config = {} }) {
               lung
                 ? 'MeSH 无对应的肺结节描述符候选'
                 : '「结节」在 MeSH 里只有肺结节与甲状腺结节两个概念；本例未绑定到这两个部位，无法归一化',
-              attrs)
+              attrs, undefined, bound)
             continue
           } else {
             const multi = attrs.count && MULTI_RE.test(attrs.count)
@@ -344,7 +371,8 @@ export function createNormalizer({ entries, meshSubset, rules, config = {} }) {
           }
         } else if (action === 'lesion') {
           pushUnmapped(m, 'generic-lesion', entry.zh[0] ?? entry.id,
-            '「病灶/病变」不表明性质（可为炎症、囊肿、肿瘤），任何映射都是猜测；本插件据此一律不映射', attrs)
+            '「病灶/病变」不表明性质（可为炎症、囊肿、肿瘤），任何映射都是猜测；本插件据此一律不映射',
+            attrs, undefined, bound)
           continue
         }
       }

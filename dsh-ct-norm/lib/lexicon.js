@@ -10,6 +10,10 @@
  *
  * 匹配按**最长优先**：`淋巴结肿大`(Lymphadenopathy) 赢过 `淋巴结`(Lymph Nodes)，
  * `磨玻璃结节`(未归一化征象) 赢过 `结节`(泛化形态学词)。
+ *
+ * 拉丁别名另外要过**词边界**（见 `latinBoundaryOk`）：`5mm`、`mmol/L`、`3 MM` 里的
+ * `mm` 是毫米，不是 Multiple Myeloma 的缩写——中文报告里毫米是出现频率最高的单位，
+ * 这条边界比多认一个缩写重要得多。
  */
 import { readFileSync } from 'node:fs'
 import { foldChars } from './text.js'
@@ -128,6 +132,37 @@ export function buildMatcher(entries, unmappedGroups, options = {}) {
   }
 }
 
+const ASCII_WORD_CHAR_RE = /[a-z0-9]/
+const LATIN_LETTER_RE = /[a-z]/
+const SHORT_LATIN_ABBR_RE = /^[a-z]{1,3}$/
+
+/**
+ * 拉丁别名的词边界判定。
+ *
+ * 词表里的英文别名是拿来认「HCC」「TB」「multiple myeloma」这类写法的，但**不能**
+ * 在字母/数字串内部起止——否则：
+ *
+ *   - `5mm` / `3MM` 里的 `mm`（毫米）会被当成 multiple-myeloma 的缩写 `mm`；
+ *   - `mmol/L` 里的 `mm` 同理；
+ *   - `mm2`（平方毫米）也一样。
+ *
+ * 中文报告里毫米是最常见的单位，误命中的代价是把每一处径线都变成一个「多发性骨髓瘤」
+ * 概念，所以这里必须加边界，而不是靠词表里删掉 `mm` 了事（`MM 患者` 这种真实写法还得认）。
+ *
+ * 另外，长度 ≤3 的纯字母缩写**隔着空格**紧跟在数字后面时同样按单位处理：
+ * 「较大者约 5 mm」不该命中 Multiple Myeloma。
+ */
+function latinBoundaryOk(text, start, end, key) {
+  if (!LATIN_LETTER_RE.test(key)) return true
+  if (ASCII_WORD_CHAR_RE.test(text[start - 1] ?? '') || ASCII_WORD_CHAR_RE.test(text[end] ?? '')) return false
+  if (SHORT_LATIN_ABBR_RE.test(key)) {
+    let l = start - 1
+    while (l >= 0 && /\s/.test(text[l])) l -= 1
+    if (l >= 0 && text[l] >= '0' && text[l] <= '9') return false
+  }
+  return true
+}
+
 /** 在一条通道上按「当前小句内最长优先」扫描 */
 function scanChannel(text, segIds, rawStartIdx, rawEndIdx, map, maxLen, raw, out) {
   if (!map.size || maxLen === 0) return
@@ -140,7 +175,12 @@ function scanChannel(text, segIds, rawStartIdx, rawEndIdx, map, maxLen, raw, out
     const maxN = Math.min(maxLen, segEnd - i)
     let n = 0
     for (let k = maxN; k >= 1; k--) {
-      if (map.has(text.slice(i, i + k))) { n = k; break }
+      const candidate = text.slice(i, i + k)
+      if (!map.has(candidate)) continue
+      // 边界不过就继续往短里试：长别名接不上时，短别名可能是合法的（如「肺门淋巴结」→「淋巴结」）
+      if (!latinBoundaryOk(text, i, i + k, candidate)) continue
+      n = k
+      break
     }
     if (n === 0) { i += 1; continue }
     const key = text.slice(i, i + n)

@@ -1,7 +1,7 @@
 {
   "format": "CTNORM1",
-  "version": "0.1.0",
-  "built_utc": "2026-10-09T11:40:02Z",
+  "version": "0.1.1",
+  "built_utc": "2026-10-10T04:43:34Z",
   "mesh_release": "MeSH 2026",
   "mesh_index": {
     "file": "mesh_index.bin",
@@ -69,8 +69,8 @@
   },
   "rules": {
     "file": "ct.rules.json",
-    "sha256": "221b5fe9bb44ce64b20ec7850036084f25f9f5c09dc60aad44b328035fa135a6",
-    "bytes": 12686
+    "sha256": "2d44007a6f41376a5520593579947bb998e3acdb4048e1c3cce00d265a4b1419",
+    "bytes": 13663
   },
   "note": "本清单记录构建期输入与其指纹，用于复现与审计。mesh.subset.jsonl 只含词表引用到的 MeSH 概念，插件在物理上产不出该子集之外的 MeSH 编号。"
 }
