@@ -8,9 +8,11 @@
 
 | 子目录 | 插件 | 版本 | 从模型侧看到的工具 | 网络 |
 | --- | --- | --- | --- | --- |
-| [`dsh-onco-lexicon/`](dsh-onco-lexicon/) | 离线肿瘤学术语词典 | 0.6.1 | `onco_term` / `onco_abbr` / `onco_browse` / `onco_translate` | **全程不联网** |
-| [`dsh-lit-translate/`](dsh-lit-translate/) | 文献翻译（学术英译中） | 0.1.1 | `lit_translate` | 只调用 DSH 当前默认模型 |
-| [`dsh-ct-norm/`](dsh-ct-norm/) | CT 报告实体归一化 | 0.1.0 | `ct_norm` / `ct_lexicon` | **全程不联网、不调用模型** |
+| [`dsh-onco-lexicon/`](dsh-onco-lexicon/) | 离线肿瘤学术语词典 | 0.7.1 | `onco_term` / `onco_abbr` / `onco_browse` / `onco_translate` | 本地优先，零命中时联网兜底 |
+| [`dsh-lit-translate/`](dsh-lit-translate/) | 文献翻译（学术英译中） | 0.2.1 | `lit_translate` | 只调用 DSH 当前默认模型 |
+| [`dsh-ct-norm/`](dsh-ct-norm/) | CT 报告实体归一化 | 0.1.1 | `ct_norm` / `ct_lexicon` | **全程不联网、不调用模型** |
+
+改动记录见 [`CHANGELOG.md`](CHANGELOG.md)（含每个版本修了什么、被哪条测试盯住）。
 
 ---
 
@@ -23,7 +25,7 @@
 | 工具 | 作用 |
 | --- | --- |
 | `onco_term` | 按中文名 / 英文名 / 缩写 / 别名 / 外部编码（如 `mesh:D002289`）查词条；可按 `category`（疾病 / 药物 / 标志物 / 临床试验终点…）、`source`、`ncitType` 筛查 |
-| `onco_abbr` | 列出一个缩写的**全部义项**用于消歧（`OS` 有 10 个义项，`PD`、`MM` 等同样多义） |
+| `onco_abbr` | 列出一个缩写的**全部义项**用于消歧（`OS`、`PD`、`MM` 都高度多义）；义项按「缩写字段真的写着它」判定，同前缀的其它缩写（`MM` → MMP-2 / MM-151）单独成段，不混进义项 |
 | `onco_browse` | 按类别浏览词表，或确认词典覆盖范围 |
 | `onco_translate` | 中英**术语级对照**：给一个术语的中英名，或从一段文本里找出命中的术语逐条对照 |
 
@@ -108,7 +110,7 @@ MeSH 主题词表以**疾病实体**为粒度——`pleural effusion`、`lymphad
 | 可产出的 MeSH 概念（子集上限） | 370 | NLM MeSH 2026 派生，**非 MIT** |
 | 未归一化征象词 | 33 组 | MIT |
 
-整包 **158.8 KiB**（不需要那 74 MiB 的全量 MeSH 索引，只带一份概念子集），
+整包 **163.0 KiB**（不需要那 74 MiB 的全量 MeSH 索引，只带一份概念子集），
 因此**可以直接进 git 仓库**，不像另外两个插件那样要单独分发大文件。
 重建步骤见 [`dsh-ct-norm/data/README.md`](dsh-ct-norm/data/README.md)，
 第三方条款见 [`dsh-ct-norm/THIRD-PARTY-NOTICES.md`](dsh-ct-norm/THIRD-PARTY-NOTICES.md)。
@@ -124,13 +126,13 @@ MeSH 主题词表以**疾病实体**为粒度——`pleural effusion`、`lymphad
 ```powershell
 # 1) 先删后装；升级时务必递增版本号
 dsh plugin --profile web remove dsh-onco-lexicon
-dsh plugin --profile web add file:<dsh-onco-lexicon-0.7.0.tgz 的绝对路径>
+dsh plugin --profile web add file:<dsh-onco-lexicon-0.7.1.tgz 的绝对路径>
 
 dsh plugin --profile web remove dsh-lit-translate
-dsh plugin --profile web add file:<dsh-lit-translate-0.2.0.tgz 的绝对路径>
+dsh plugin --profile web add file:<dsh-lit-translate-0.2.1.tgz 的绝对路径>
 
 dsh plugin --profile web remove dsh-ct-norm
-dsh plugin --profile web add file:<dsh-ct-norm-0.1.0.tgz 的绝对路径>
+dsh plugin --profile web add file:<dsh-ct-norm-0.1.1.tgz 的绝对路径>
 ```
 
 安装后重载或重启 DSH：侧边栏会出现「术语词典」「文献翻译」「CT 归一化」三个入口。
@@ -148,14 +150,14 @@ dsh plugin --profile web add file:<dsh-ct-norm-0.1.0.tgz 的绝对路径>
 1. **GitHub Release 附件（推荐）** —— 直接挂打包好的 tgz，主词典已经在里面：
 
    ```powershell
-   powershell -File build-package.ps1     # 产出 dsh-onco-lexicon-0.6.1.tgz（约 12.9 MB，主词典在内）
-   gh release create v0.6.1 dsh-onco-lexicon-0.6.1.tgz --title "dsh-onco-lexicon 0.6.1"
+   powershell -File build-package.ps1     # 产出 dsh-onco-lexicon-0.7.1.tgz（约 12.9 MB，主词典在内）
+   gh release create v0.7.1 dsh-onco-lexicon-0.7.1.tgz --title "dsh-onco-lexicon 0.7.1"
    ```
 
    （没装 `gh` 就在仓库的 Releases 页面手动上传同一个 tgz。）使用者下载后
    `dsh plugin --profile web add file:<下载路径>` 即可，**不需要自己生成词典**。
 
-2. **npm 发布** —— `npm publish dsh-onco-lexicon-0.6.1.tgz`：包内 `files` 已包含数据文件，
+2. **npm 发布** —— `npm publish dsh-onco-lexicon-0.7.1.tgz`：包内 `files` 已包含数据文件，
    整包约 12.9 MB，其中绝大部分是词典。
 
 3. **使用者自行生成** —— 见 [`dsh-onco-lexicon/data/README.md`](dsh-onco-lexicon/data/README.md)：
@@ -189,8 +191,9 @@ dsh plugin --profile web add file:<dsh-ct-norm-0.1.0.tgz 的绝对路径>
 ## 7. 状态
 
 * 代码已推送到 GitHub：<https://github.com/someone628/cloneship>（`main` 分支）；
-* 三个插件均已在本机 DSH Web profile 上安装；
-  onco-lexicon 与 lit-translate 已实测可用；ct-norm 已装入 profile 并逐字节校验过安装副本
-  （`node verify-installed-ct-norm.mjs`），**待 DSH 重启后生效**；
+* 三个插件均已在本机 DSH Web profile 上安装，安装副本与源码逐字节一致
+  （onco-lexicon 0.7.1 / lit-translate 0.2.1 / ct-norm 0.1.1，2026-10-10 完成一轮缺陷检修，
+  详见 [`CHANGELOG.md`](CHANGELOG.md)）；
+* onco-lexicon 与 lit-translate 涉及联网/模型的路径已实测可用；**修好的版本要在 DSH 重启（或重载插件）后才生效**；
 * **尚未提交到 dsh.so 插件注册表**（截至 2026-09-30，`https://www.dsh.so/plugin/dsh-onco-lexicon.json`
   与 `.../dsh-lit-translate.json` 均为 404）。
