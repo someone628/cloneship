@@ -119,7 +119,24 @@ const ctx = {
   },
 }
 
+/** 再造一个宿主上下文：用于「索引缺失 / 配置不同」这类需要独立插件实例的用例 */
+function makeCtx(sink) {
+  return {
+    logger: { info: () => {} },
+    tools: { register: (tool) => sink.tools.push(tool) },
+    systemPrompt: { section: (section) => sink.sections.push(section) },
+    webServer: { register: (route) => { sink.routes.push(route); return () => {} } },
+    effect: (fn) => { fn(); return () => {} },
+    get: (key) => {
+      if (key === 'llm') return llm
+      if (key === 'agentDefaultModel') return { currentSelection: () => ({ provider: 'deepseek', model: 'deepseek-chat' }) }
+      return undefined
+    },
+  }
+}
+
 host.apply(ctx, { dataDir: tmp, maxChars: 300, annotate: true })
+
 check(registered.tools.length === 1 && registered.tools[0].name === 'lit_translate', '注册了 lit_translate 工具')
 check(
   registered.sections.some((s) => s.name === 'lit-translate-usage'),
@@ -233,6 +250,67 @@ console.log('\n[3] host 半：工具 execute')
   streamBehavior = 'ok'
   check(quota.includes('余额'), '工具失败时带上人话提示')
   check(quota.includes('先把原文交给模型自行翻译'), '工具失败时给出降级路径（别让模型卡住）')
+}
+
+console.log('\n[3b] host 半：MeSH 2026 术语约束')
+{
+  const ping = await callRoute(rpcRoute, { op: 'ping' })
+  const m = ping.json.mesh
+  check(m && m.enabled === true && m.ok === true, 'ping 报告 MeSH 索引可用')
+  check(
+    m.records === 355232 && m.terms === 840392,
+    `ping 报出索引规模（${m.records} 条记录 / ${m.terms} 个检索名）`,
+  )
+
+  const TEXT =
+    'Patients with non-small cell lung carcinoma received trastuzumab; progression-free survival was the primary endpoint.'
+  const res = await callRoute(rpcRoute, { op: 'translate', args: { text: TEXT } })
+  check(res.json.ok === true, '带 MeSH 约束的翻译成功')
+  const sys = calls[calls.length - 1].options.system
+  check(sys.includes('MeSH 2026 术语约束'), '系统提示词注入了 MeSH 术语块')
+  check(sys.includes('Carcinoma, Non-Small-Cell Lung') && sys.includes('mesh:D002289'), '术语块含规范名与 MeSH 编号')
+  check(sys.includes('MeSH 只有英文，没有中文名'), '术语块写明 MeSH 没有中文名')
+  check(!sys.includes('非小细胞肺癌') && !sys.includes('曲妥珠'), '术语块里没有被编出来的中文译名')
+  check(res.json.meshCount >= 3, `RPC 回传命中数（${res.json.meshCount}）`)
+  check(
+    res.json.mesh && res.json.mesh.count === res.json.meshCount && Array.isArray(res.json.mesh.names) && res.json.mesh.names.length > 0,
+    'RPC 回传面板要用的术语摘要',
+  )
+  check(res.json.mesh.names.some((n) => n.includes('D002289')), '摘要里带 MeSH 编号，便于回查')
+  const userText = calls[calls.length - 1].options.messages[0].content[0].text
+  check(!userText.includes('MeSH 术语约束'), '术语块进的是系统提示词，不混进用户消息（免得被当正文翻译）')
+}
+{
+  const res = await callRoute(rpcRoute, { op: 'translate', args: { text: 'Aspirin was given.', mesh: false } })
+  check(res.json.ok === true && res.json.meshDisabled === true && res.json.meshCount === 0, 'mesh=false 时本次不注入术语块')
+  check(!calls[calls.length - 1].options.system.includes('MeSH 2026 术语约束'), 'mesh=false 的系统提示词里没有术语块')
+}
+{
+  const tool = registered.tools[0]
+  const out = await tool.execute({ text: 'Trastuzumab improved progression-free survival.' })
+  check(out.includes('MeSH 术语约束：命中'), '工具输出说明本次的术语约束情况')
+  check(out.includes('Progression-Free Survival'), '工具输出里给出 MeSH 规范名')
+  const off = await tool.execute({ text: 'Trastuzumab was used.', mesh: false })
+  check(off.includes('已按调用方要求关闭'), '工具在 mesh=false 时也说明清楚（不是「没命中」）')
+}
+{
+  // 索引缺失：翻译必须照常成功，只带一条警告——术语层永远不能成为翻译的单点故障
+  const sink = { tools: [], sections: [], routes: [] }
+  const ctx2 = makeCtx(sink)
+  host.apply(ctx2, { dataDir: tmp, maxChars: 300, meshIndexFile: path.join(tmp, 'no-such-mesh.bin') })
+  const route2 = sink.routes.find((r) => r.path === '/dsh-lit-translate/rpc')
+  const ping2 = await callRoute(route2, { op: 'ping' })
+  check(
+    ping2.json.mesh && ping2.json.mesh.ok === false && String(ping2.json.mesh.error).includes('读不到'),
+    '索引缺失时 ping 明确报告（而不是假装可用）',
+  )
+  const res2 = await callRoute(route2, { op: 'translate', args: { text: 'Hello.' } })
+  check(res2.json.ok === true && res2.json.text === '这是译文。', '索引缺失时翻译照常成功')
+  check(
+    typeof res2.json.meshWarning === 'string' && /MeSH 索引/.test(res2.json.meshWarning) && /no-such-mesh/.test(res2.json.meshWarning),
+    '索引缺失时带回警告说明（含具体文件路径）',
+  )
+  check(!calls[calls.length - 1].options.system.includes('MeSH 2026 术语约束'), '索引缺失时不注入空的术语块')
 }
 
 console.log('\n[4] host 半：工作稿落盘')
@@ -441,6 +519,12 @@ const SAMPLE = [PARA_A, '', PARA_B, '', PARA_C].join('\n')
   check(tinySegs[0].includes('Short a.') && tinySegs[0].includes('Short b.'), '过短的相邻碎块被合并')
   check(T.splitSegments('').length === 0, '空文本切成 0 段')
   check(T.splitSegments([PARA_A, '', PARA_B].join('\r\n\r\n')).length === 2, 'CRLF 被归一化后切段正确')
+
+  // 面板必须按宿主配置的上限切段：配置把单次上限调到 300 时，
+  // 若仍写死 1400，切出来的段会被宿主逐段拒掉（批量翻译第一段就中断）。
+  const capped = T.splitSegments(long, 300)
+  check(capped.length > longSegs.length, '传入 maxChars 后切得更碎（按宿主配置切段）')
+  check(capped.every((s) => s.length <= 360), '传入 maxChars 后每段都不超过它（含句尾余量）')
 }
 
 {
@@ -559,6 +643,7 @@ function makeHarness(rootEl) {
         dataFile: path.join(tmp, 'doc.json'),
         maxChars: 120000,
         annotate: true,
+        mesh: { enabled: true, ok: true, file: 'data/mesh_index.bin', bytes: 77593601, records: 355232, terms: 840392, loaded: false, error: null },
         model: { provider: 'deepseek', model: 'deepseek-chat' },
         modelError: null,
       }
@@ -574,6 +659,13 @@ function makeHarness(rootEl) {
         annotate: true,
         provider: 'deepseek',
         model: 'deepseek-chat',
+        meshCount: args.mesh === false ? 0 : 2,
+        mesh:
+          args.mesh === false
+            ? null
+            : { count: 2, names: ['Carcinoma, Non-Small-Cell Lung（D002289）', 'Trastuzumab（D000068878）'], terms: [] },
+        meshDisabled: args.mesh === false,
+        meshWarning: null,
       }
     }
     return { json: async () => payload }
@@ -584,6 +676,8 @@ function makeHarness(rootEl) {
   await harness.settle()
   check(harness.text.includes('文献翻译'), '面板渲染出标题')
   check(harness.text.includes('deepseek / deepseek-chat'), '状态条显示默认模型')
+  check(harness.text.includes('355,232 条'), '状态条显示 MeSH 索引规模')
+  check(harness.text.includes('MeSH 术语约束'), '面板上有 MeSH 术语约束开关')
   check(harness.text.includes('还没有分段'), '初始提示切段')
   check(harness.text.includes('机器翻译'), '界面上说明是机器翻译')
 
@@ -612,6 +706,29 @@ function makeHarness(rootEl) {
     '第二段带上一段原文作上文参考',
   )
   check(translateCalls[1].args.annotate === true, '按开关传 annotate')
+  check(translateCalls[0].args.mesh === true, '默认把「MeSH 术语约束」开关传给 host')
+  const meshChips = () => harness.els.filter((e) => e.props && e.props.className === 'lt-chip is-mesh').length
+  check(meshChips() === 3 && harness.text.includes('MeSH 2'), '每张分段卡片都显示本次的 MeSH 命中数')
+
+  // 关掉 MeSH 开关后再重译：请求里应带 mesh=false，该段卡片上的 MeSH 标记随之消失
+  const meshLabel = harness.els.find(
+    (e) => e.type === 'label' && Array.isArray(e.props.children) && e.props.children[1] === 'MeSH 术语约束',
+  )
+  check(!!meshLabel, '找到「MeSH 术语约束」勾选框')
+  const meshBox = meshLabel.props.children[0]
+  meshBox.props.onChange({ target: { checked: false } })
+  harness.repaint()
+  const retranslateForMesh = harness.els.find(
+    (e) => e.type === 'button' && e.props.title && String(e.props.title).startsWith('重新翻译这一段'),
+  )
+  check(!!retranslateForMesh, '找到可重译的分段按钮')
+  retranslateForMesh.props.onClick()
+  await harness.settle(8)
+  check(
+    seen.filter((s) => s.op === 'translate').slice(-1)[0].args.mesh === false,
+    '关掉开关后 host 收到 mesh=false',
+  )
+  check(meshChips() === 2, '关掉开关后重译的那一段不再显示 MeSH 标记（没注入过就不谎报）')
 
   // 已译后再点只翻未译：不该重复请求
   const before = seen.filter((s) => s.op === 'translate').length

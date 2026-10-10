@@ -266,3 +266,42 @@ New-Item -ItemType Junction -Path .\dsh-lit-translate\node_modules\@deepseek-ai\
 - 提示词（`SYSTEM_ANNOTATE` / `SYSTEM_PLAIN` / `CONTEXT_RULE`）与切段口径来自
   `dsh-literature-reading` v1.19.0（MIT），在同一许可下使用；
 - 译文由 DSH 当前默认模型生成，**模型输出的使用还受对应模型服务方条款约束**，与本插件的 MIT 无关。
+
+## 11. 更新日志
+
+### 0.2.1 —— 术语噪声、损坏索引与面板配置
+
+* **单字命中的错配概念**：`adjustment` → Adaptation, Psychological、`association` → Association、
+  `compliance` → Compliance 这类「普通英文词撞上 MeSH 入口词」的约束，会把统计学的
+  「校正 / 关联 / 依从」推向心理学或生理学概念。现在单字命中必须**就是该 MeSH 记录的规范名**、
+  且不落在 `concept` 抽象桶里；全大写缩写（HR、GWAS、EGFR）不受此限，多词短语照旧
+  （代价是 `statin` → HMG-CoA 还原酶抑制剂这类纯同义词映射不再注入——这条通道的价值在于准）。
+* **逗号不是边界，n-gram 拼出假短语**：`age, sex, education, income` 里的「sex, education」
+  曾命中 Sex Education（D012736），提示词里出现原文根本没有的术语。逗号已纳入片段边界
+  （MeSH 的倒置词条因此不再匹配，其规范名照旧命中）。
+* **出版物特征被当成术语**：`Overall`（D016424，一种出版物类型）曾被注入提示词。
+  树号 `V*` 的单字命中一律不接受。
+* **头部合法但正文被截断的 MeSH 索引会让翻译整个失败**：`ping` 报「355,232 条」看起来健康，
+  真去翻译却抛 RangeError（工具直接抛栈、面板只显示一句 Node 报错）。现在构造函数与
+  `status()` 都会核对偏移表是否落在文件内：索引不可用时如实报出，翻译按文档承诺照常进行
+  （只是这一次没有术语约束）。
+* **面板无视宿主配置**：`ping` 回传的 `maxChars` / `annotate` / `mesh.enabled` 之前没被使用——
+  配置 `maxChars: 1000` 时面板仍按 1400 切段，每一段都被宿主以「超过单次上限」拒掉，
+  批量翻译在第一段就中断，面板一个字都翻不了。现在切段按宿主上限、两个开关的初值取配置，
+  并按 `meshDisabled` 显示「MeSH 未启用」（与「0 命中」区分开）。
+* **`annotate: false` 与术语块措辞冲突**：纯中文模式的系统提示词写着「专业术语不要附英文原文」，
+  术语块却仍要求「上述英文术语按 MeSH 规范名书写」。现在措辞随 `annotate` 切换。
+* 顺带修掉：人话提示（余额 / 限流）在工具失败信息里出现两遍；面板 500 的原始报错
+  （`Expected property name or '}' …`、RangeError）改为「插件内部错误（已记录到 DSH 日志）」
+  并把原始信息写进日志；`finish` 只给了 `aborted` / `error` 而没带 `failure` 时也按失败处理
+  ——半截译文不再被当成完整结果返回。
+
+### 0.2.0
+
+加入 MeSH 2026 离线术语层（`lib/mesh.js` + `data/mesh_index.bin`）：翻译时把原文命中的英文术语
+收敛到 MeSH 规范名并附释义与编号，工具输出与面板各多一行「本次约束了什么」。
+
+### 0.1.x
+
+从 `dsh-literature-reading` v1.19.0 中把「学术英译中」拆出来独立成插件：
+粘贴 / 导入 txt·md → 自动切段 → 逐段翻译 → 对照阅读 → 导出 Markdown，支持上文参考与断点续翻。

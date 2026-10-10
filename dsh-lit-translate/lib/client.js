@@ -56,8 +56,14 @@ window.__ModuleLoader__.load({
       return (prefix || 's') + Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
     }
 
-    /** 按空行优先、超长按句子切、相邻碎块合并的方式切成可翻译的段（与 host 半同源） */
-    function splitSegments(text) {
+    /**
+     * 按空行优先、超长按句子切、相邻碎块合并的方式切成可翻译的段（与 host 半同源）。
+     *
+     * `maxChars` 用宿主 ping 回来的值（插件配置），不写死 1400：配置把上限调小时
+     * （例如 maxChars: 1000），面板若仍按 1400 切段，每一段都会被宿主以「超过单次上限」
+     * 拒掉，批量翻译还会在第一段就中断——面板一个字都翻不了，用户也看不出原因。
+     */
+    function splitSegments(text, maxChars) {
       const norm = String(text === null || text === undefined ? '' : text).replace(/\r\n?/g, '\n')
       const blocks = norm.split(/\n\s*\n/)
       const raw = []
@@ -66,8 +72,8 @@ window.__ModuleLoader__.load({
         if (trimmed.length > 0) raw.push(trimmed)
       }
       if (raw.length === 0) return []
-      const MAX = 1400
-      const MIN = 220
+      const MAX = Number(maxChars) > 0 ? Math.max(1, Math.floor(Number(maxChars))) : 1400
+      const MIN = Math.min(220, MAX)
       const out = []
       for (const block of raw) {
         if (block.length <= MAX) {
@@ -102,7 +108,7 @@ window.__ModuleLoader__.load({
      * 重新切段（改了原文、或换了一次切法）时，原文完全一致的段直接沿用旧译文，
      * 免得用户改一个字就丢掉整篇的翻译成果。
      */
-    function makeSegments(text, old) {
+    function makeSegments(text, old, maxChars) {
       const keep = new Map()
       const oldList = Array.isArray(old) ? old : []
       for (const seg of oldList) {
@@ -110,7 +116,7 @@ window.__ModuleLoader__.load({
           keep.set(seg.en.trim(), seg)
         }
       }
-      return splitSegments(text).map((en) => {
+      return splitSegments(text, maxChars).map((en) => {
         const prev = keep.get(en)
         if (!prev) return { id: uid(), en, zh: '' }
         // 沿用旧译文时连 MeSH 命中一起带走：否则重新切段后「MeSH 12」这种标记会莫名消失
@@ -120,6 +126,7 @@ window.__ModuleLoader__.load({
           zh: prev.zh,
           meshCount: prev.meshCount || 0,
           meshNames: Array.isArray(prev.meshNames) ? prev.meshNames : [],
+          meshDisabled: prev.meshDisabled === true,
         }
       })
     }
@@ -377,18 +384,24 @@ window.__ModuleLoader__.load({
           h('span', { className: 'lt-idx' }, '第 ' + (index + 1) + ' 段'),
           h('span', { className: chipClass }, status),
           seg.warn === true ? h('span', { className: 'lt-chip is-warn', title: '译文在模型输出上限处被截断' }, '可能被截断') : null,
-          seg.meshCount > 0
+          seg.meshDisabled === true
             ? h(
                 'span',
-                {
-                  className: 'lt-chip is-mesh',
-                  title:
-                    '本次翻译注入了 ' + seg.meshCount + ' 个 MeSH 2026 术语约束（只统一英文规范名与消歧，MeSH 没有中文名）：\n' +
-                    meshNames.join('\n'),
-                },
-                'MeSH ' + seg.meshCount,
+                { className: 'lt-chip', title: '这一段翻译时按设置关掉了 MeSH 术语约束——不是「没有命中术语」' },
+                'MeSH 未启用',
               )
-            : null,
+            : seg.meshCount > 0
+              ? h(
+                  'span',
+                  {
+                    className: 'lt-chip is-mesh',
+                    title:
+                      '本次翻译注入了 ' + seg.meshCount + ' 个 MeSH 2026 术语约束（只统一英文规范名与消歧，MeSH 没有中文名）：\n' +
+                      meshNames.join('\n'),
+                  },
+                  'MeSH ' + seg.meshCount,
+                )
+              : null,
           h('span', { className: 'lt-small' }, bits.join(' · ')),
           h('span', { className: 'lt-spacer' }),
           zh.length > 0
@@ -454,6 +467,8 @@ window.__ModuleLoader__.load({
       const [err, setErr] = React.useState('')
       const [info, setInfo] = React.useState(null)
       const [loaded, setLoaded] = React.useState(false)
+      // 宿主配置里的单次上限：切段必须按它来，否则调小配置后面板会全部翻不动
+      const [hostMax, setHostMax] = React.useState(0)
 
       const stale = snapshot.length > 0 && src !== snapshot
 
@@ -470,6 +485,9 @@ window.__ModuleLoader__.load({
           if (!alive) return
           hostOk = !!(ping && ping.ok === true)
           setInfo(ping && ping.ok === true ? ping : null)
+          if (hostOk) {
+            setHostMax(Number(ping.maxChars) > 0 ? Number(ping.maxChars) : 0)
+          }
           if (!hostOk) {
             setErr('连不上插件后端（' + ((ping && ping.error) || 'unknown') + '）：翻译不可用，界面与导出仍可用。')
           } else if (ping.model === null) {
@@ -509,6 +527,11 @@ window.__ModuleLoader__.load({
             setUseContext(doc.useContext !== false)
             setUseMesh(doc.mesh !== false)
             setMsg('已恢复上次的工作稿（' + from + '）')
+          } else if (hostOk) {
+            // 没有工作稿可恢复时，两个开关的初值取宿主配置，而不是写死的 true：
+            // 配置 annotate: false 的部署里，面板默认勾着「附英文原文」等于当场违背配置。
+            setAnnotate(ping.annotate !== false)
+            setUseMesh(!(ping.mesh && ping.mesh.enabled === false))
           }
           setLoaded(true)
         }
@@ -536,6 +559,7 @@ window.__ModuleLoader__.load({
             warn: s.warn === true,
             meshCount: s.meshCount || 0,
             meshNames: Array.isArray(s.meshNames) ? s.meshNames : [],
+            meshDisabled: s.meshDisabled === true,
           })),
         }
         const timer = setTimeout(async () => {
@@ -562,7 +586,7 @@ window.__ModuleLoader__.load({
       }
 
       function doSplit(text) {
-        const next = makeSegments(text, segs)
+        const next = makeSegments(text, segs, hostMax)
         const kept = next.filter((s) => s.zh && s.zh.length > 0).length
         setSnapshot(text)
         patchSegs(
@@ -613,6 +637,7 @@ window.__ModuleLoader__.load({
                   model: (res.provider || '?') + '/' + (res.model || '?'),
                   meshCount: typeof res.meshCount === 'number' ? res.meshCount : 0,
                   meshNames: res.mesh && Array.isArray(res.mesh.names) ? res.mesh.names : [],
+                  meshDisabled: res.meshDisabled === true,
                 })
               : s,
           ),
@@ -689,6 +714,7 @@ window.__ModuleLoader__.load({
                   model: (res.provider || '?') + '/' + (res.model || '?'),
                   meshCount: typeof res.meshCount === 'number' ? res.meshCount : 0,
                   meshNames: res.mesh && Array.isArray(res.mesh.names) ? res.mesh.names : [],
+                  meshDisabled: res.meshDisabled === true,
                 })
               : s,
           )
@@ -742,7 +768,7 @@ window.__ModuleLoader__.load({
         reader.onload = () => {
           const text = String(reader.result === null || reader.result === undefined ? '' : reader.result)
           setSrc(text)
-          const next = makeSegments(text, segs)
+          const next = makeSegments(text, segs, hostMax)
           setSnapshot(text)
           patchSegs(next, '已导入 ' + (file.name || '文件') + '，切成 ' + next.length + ' 段')
         }

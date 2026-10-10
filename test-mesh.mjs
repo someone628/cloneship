@@ -12,7 +12,8 @@
  *   mesh_out/mesh_fixtures.json    Python 侧查询夹具
  *   mesh_out/mesh_index.json       清单（计数与 sha256）
  */
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -280,6 +281,74 @@ if (!existsSync(INDEX_FILE)) {
       threw2 = String(error.message || error)
     }
     check(threw2.includes('不完整'), '过短文件被长度检查挡住')
+
+    // 头部合法、正文被截断（74 MiB 文件复制/构建中断是最现实的成因）。
+    // 旧实现只查 magic 与条数，于是 status() 报 ok:true、面板显示「355,232 条」，
+    // 真去翻译时才在偏移表上抛 RangeError——翻译整段失败，面板只看到一句 Node 报错。
+    const full = readFileSync(INDEX_FILE)
+    const truncated = full.subarray(0, 1_000_000)
+    let threw3 = ''
+    try {
+      new mesh.MeshIndex(truncated)
+    } catch (error) {
+      threw3 = String(error.message || error)
+    }
+    check(threw3.includes('不完整'), `头部合法但正文截断时应当场报「不完整」，实际：${threw3 || '(没有报错)'}`)
+
+    // status() 只读 68 字节头部，但配合文件大小也能识破截断——
+    // 否则 ping 报一份「健康」的索引，翻译时才发现不可用。
+    const truncFile = path.join(tmpdir(), 'dsh-mesh-truncated-' + process.pid + '.bin')
+    writeFileSync(truncFile, full.subarray(0, 1_000_000))
+    const truncStatus = mesh.createMeshSource(truncFile).status()
+    check(
+      truncStatus.ok === false && String(truncStatus.error).includes('不完整'),
+      `截断索引的 status 必须报不可用，实际：${JSON.stringify(truncStatus.error || truncStatus.ok)}`,
+    )
+    rmSync(truncFile, { force: true })
+  }
+
+  console.log('\n[7] 回归：单字噪声、逗号边界、纯中文模式的术语块措辞')
+
+  {
+    // 单字命中必须是「名副其实」的 MeSH 规范名，且不落在 concept 抽象桶里。
+    // adjustment → Adaptation, Psychological、association → Association 这类错配
+    // 会把统计学的「校正 / 关联」写进术语约束，把模型带偏。
+    const stats = 'Estimates were adjusted for age and sex, and the association was similar after adjustment for body mass index.'
+    const sm = mesh.findMeshTerms(index, stats)
+    const sids = new Set(sm.matches.map((m) => m.id))
+    check(!sids.has('mesh:D000223'), 'adjustment 不该命中 Adaptation, Psychological（D000223）')
+    check(!sids.has('mesh:D001244'), 'association 不该命中 Association（D001244）')
+    check(sids.has('mesh:D015992'), '多词短语 body mass index 仍应命中（D015992）')
+
+    const immunotherapy = mesh.findMeshTerms(index, 'Immunotherapy was continued.')
+    check(
+      immunotherapy.matches.some((m) => m.id === 'mesh:D007167'),
+      '免疫治疗这类「写法就是 MeSH 规范名」的单字仍应命中',
+    )
+    const norandom = mesh.findMeshTerms(index, 'Overall survival was measured.')
+    check(
+      norandom.matches.every((m) => m.id !== 'mesh:D016424'),
+      'Overall（出版物类型）不该被当成术语约束',
+    )
+
+    // 逗号是边界：并列清单不能被拼成 MeSH 词
+    const list = mesh.findMeshTerms(index, 'Variables were age, sex, education, income, and marital status.')
+    check(
+      list.matches.every((m) => m.id !== 'mesh:D012736'),
+      '「sex, education」不该被拼成 Sex Education（D012736）',
+    )
+    const commaPhrase = mesh.findMeshTerms(index, 'Adverse effects were reported, and drug therapy was recorded.')
+    check(
+      commaPhrase.matches.some((m) => m.id === 'mesh:Q000009'),
+      '逗号是边界之后，adverse effects 这类多词短语仍应命中',
+    )
+
+    // annotate=false 时术语块不能反过来要求「按英文规范名书写」
+    const plain = mesh.renderMeshBlock(res, { annotate: false })
+    check(!plain.includes('上述英文术语按 MeSH 规范名书写'), 'annotate=false 时不再要求写英文规范名')
+    check(plain.includes('一律用中文表达'), 'annotate=false 时明确要求译文中只用中文')
+    const annotated = mesh.renderMeshBlock(res, { annotate: true })
+    check(annotated.includes('按 MeSH 规范名书写'), 'annotate=true 时保留原有措辞')
   }
 }
 

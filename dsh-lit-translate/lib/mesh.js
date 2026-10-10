@@ -61,6 +61,9 @@ export const STOPWORDS = new Set(
     'increase', 'decrease', 'high', 'low', 'normal', 'clinical', 'primary', 'secondary', 'severe', 'mild',
     'chronic', 'acute', 'total', 'mean', 'median', 'rate', 'rates', 'ratio', 'value', 'values', 'score',
     'scores', 'test', 'tests', 'sample', 'samples', 'measure', 'measures', 'significant', 'significance',
+    // 通用英文词，且 MeSH 里的同形条目是出版物类型（Overall, D016424）——见
+    // isPublicationCharacteristic，这里再加一道，防的是「多词短语里也夹着它」的情形
+    'overall',
   ].map((w) => w),
 )
 
@@ -96,11 +99,20 @@ export function tokenize(text) {
   return out
 }
 
-/** 按句读切成互不跨界的片段，避免 n-gram 拼出「跨句子」的假短语 */
+/**
+ * 按句读切成互不跨界的片段，避免 n-gram 拼出「跨句子」的假短语。
+ *
+ * 逗号必须在边界里：英文文献的并列清单写成 "age, sex, education, income"，
+ * 逗号不作边界时 n-gram 会把相邻两项拼成一个 MeSH 词——实测
+ * "sex, education" 命中 Sex Education（D012736）、"insulin, resistance" 命中
+ * Insulin Resistance（D007333），于是提示词里出现原文根本没有的术语。
+ * 代价是 MeSH 的倒置词条（"Anemia, Sickle Cell" 这类写法）不再匹配，
+ * 但它们的规范名（Sickle Cell Anemia）照旧能命中。
+ */
 export function splitMatchSegments(text) {
   const s = text === null || text === undefined ? '' : String(text)
   const out = []
-  const re = /[^.;:!?()[\]{}"“”\n\r\t]+/g
+  const re = /[^.;:!?()[\]{}"“”,，\n\r\t]+/g
   let m
   while ((m = re.exec(s)) !== null) {
     if (m[0].trim().length === 0) continue
@@ -128,6 +140,34 @@ export const KIND_LABEL = {
   unknown: '未知',
 }
 
+/**
+ * 索引各段是否都落在文件内。
+ *
+ * 头部合法、正文却被截断时（74 MiB 的文件复制 / 构建中断），偏移表本身就越界了，
+ * 直到真正读某个术语才抛 RangeError——那时翻译已经走到一半，面板只能显示一句
+ * Node 的报错。构造函数与 `status()` 共用这一份判定，免得出现
+ * 「status 说健康、一翻译就 500」这种自相矛盾。
+ *
+ * `f.len` 是文件长度：构造函数传 Buffer 长度，status() 传 statSync 的大小（不整份读入）。
+ */
+export function indexBoundsError(f) {
+  const within = (start, bytes, what) => {
+    if (!Number.isInteger(start) || start < HEADER_BYTES || start + bytes > f.len) {
+      return `MeSH 索引文件不完整（${what}越界：需 ${start + bytes} 字节，实为 ${f.len}）`
+    }
+    return null
+  }
+  return (
+    within(f.termOffStart, 4 * (f.termCount + 1), '术语偏移表') ||
+    within(f.refOffStart, 4 * (f.termCount + 1), '引用偏移表') ||
+    within(f.refArrStart, 4 * f.refCount, '引用数组') ||
+    within(f.recOffStart, 4 * (f.recordCount + 1), '记录偏移表') ||
+    within(f.recBlobStart, 0, '记录块') ||
+    within(f.metaStart, f.metaLen, '元数据') ||
+    null
+  )
+}
+
 export class MeshIndex {
   constructor(buf) {
     if (!Buffer.isBuffer(buf) || buf.length < HEADER_BYTES) throw new Error('MeSH 索引文件不完整')
@@ -148,6 +188,41 @@ export class MeshIndex {
     this.metaStart = buf.readUInt32LE(56)
     this.metaLen = buf.readUInt32LE(60)
     if (this.termCount === 0 || this.recordCount === 0) throw new Error('MeSH 索引是空的')
+    const bounds = indexBoundsError({
+      len: buf.length,
+      termCount: this.termCount,
+      recordCount: this.recordCount,
+      refCount: this.refCount,
+      termOffStart: this.termOffStart,
+      refOffStart: this.refOffStart,
+      refArrStart: this.refArrStart,
+      recOffStart: this.recOffStart,
+      recBlobStart: this.recBlobStart,
+      metaStart: this.metaStart,
+      metaLen: this.metaLen,
+    })
+    if (bounds !== null) throw new Error(bounds)
+    const within = (start, bytes, what) => {
+      if (!Number.isInteger(start) || start < HEADER_BYTES || start + bytes > buf.length) {
+        throw new Error(`MeSH 索引文件不完整（${what}越界：需 ${start + bytes} 字节，实为 ${buf.length}）`)
+      }
+    }
+    within(this.termOffStart, 4 * (this.termCount + 1), '术语偏移表')
+    within(this.refOffStart, 4 * (this.termCount + 1), '引用偏移表')
+    within(this.refArrStart, 4 * this.refCount, '引用数组')
+    within(this.recOffStart, 4 * (this.recordCount + 1), '记录偏移表')
+    within(this.recBlobStart, 0, '记录块')
+    within(this.metaStart, this.metaLen, '元数据')
+    const lastOffset = (offStart, i) => buf.readUInt32LE(offStart + 4 * i)
+    if (this.termsStart + lastOffset(this.termOffStart, this.termCount) > buf.length) {
+      throw new Error('MeSH 索引文件不完整（术语块被截断）')
+    }
+    if (this.refArrStart + lastOffset(this.refOffStart, this.termCount) > buf.length) {
+      throw new Error('MeSH 索引文件不完整（引用数组被截断）')
+    }
+    if (this.recBlobStart + lastOffset(this.recOffStart, this.recordCount) > buf.length) {
+      throw new Error('MeSH 索引文件不完整（记录块被截断）')
+    }
   }
 
   static load(file) {
@@ -241,6 +316,22 @@ export function createMeshSource(file) {
           const n = fs.readSync(fd, head, 0, HEADER_BYTES, 0)
           if (n < HEADER_BYTES) return { ok: false, file: target, bytes, error: 'MeSH 索引头部不完整' }
           if (head.toString('latin1', 0, 8) !== MAGIC) return { ok: false, file: target, bytes, error: 'MeSH 索引格式不符' }
+          // 只用头部 68 字节 + 文件大小就能判出「正文被截断」：
+          // 否则 ping 会报一份健康的状态，真正翻译时才炸（见 indexBoundsError 的说明）。
+          const bounds = indexBoundsError({
+            len: bytes,
+            termCount: head.readUInt32LE(12),
+            recordCount: head.readUInt32LE(16),
+            refCount: head.readUInt32LE(20),
+            termOffStart: head.readUInt32LE(36),
+            refOffStart: head.readUInt32LE(40),
+            refArrStart: head.readUInt32LE(44),
+            recOffStart: head.readUInt32LE(48),
+            recBlobStart: head.readUInt32LE(52),
+            metaStart: head.readUInt32LE(56),
+            metaLen: head.readUInt32LE(60),
+          })
+          if (bounds !== null) return { ok: false, file: target, bytes, error: bounds }
           return {
             ok: true,
             file: target,
@@ -286,6 +377,56 @@ export const DEFAULT_MESH_OPTIONS = {
   maxSingleRefs: 3,
   /** 单字命中要求的最短归一化长度 */
   minSingleLength: 5,
+}
+
+/**
+ * 记录是否属于 MeSH 的**出版物特征**（Publication Characteristics，树号 V*）。
+ *
+ * V 树里装的是「文献是什么体裁」而不是医学概念：Overall（D016424）的定义是
+ * 「会议摘要汇编」，Comment / Editorial / Letter / News / Review / Map 同理。
+ * 它们的名字恰好都是普通英文词，单词命中时几乎必然是正文里的普通词——实测
+ * "Median overall survival was 38.6 months" 会把 Overall 当成术语约束注入提示词。
+ * 多词短语不受此限（Randomized Controlled Trial 这类研究设计名照旧可用）。
+ */
+export function isPublicationCharacteristic(tree) {
+  const parts = String(tree ?? '')
+    .split(',')
+    .map((t) => t.trim())
+    .filter((t) => t.length > 0)
+  if (parts.length === 0) return false
+  return parts.every((t) => t.startsWith('V'))
+}
+
+/**
+ * 单字命中是否「名副其实」。
+ *
+ * `acceptSingleToken` 只看词长与候选数，挡不住这类错配（都在真实语料里实测过）：
+ *
+ *   `adjustment` → Adaptation, Psychological（D000223，心理适应）
+ *   `association` → Association（D001244，讲的是心理现象之间的功能联系）
+ *   `compliance` → Compliance（D003187，讲的是肺这类腔隙的可扩张性）
+ *   `sensitivity` → Sensitivity and Specificity；`supervision` → Organization and Administration
+ *
+ * 这些词在正文里就是普通英文词。它们一旦被当成术语约束注入提示词，就等于让模型把
+ * 统计学的「校正 / 关联 / 依从性」往心理学、生理学概念上靠——而术语约束这条通道的
+ * 全部价值在于**准**，宁可少给。
+ *
+ * 判据两条，都来自数据本身：
+ *   1. 该写法必须**就是** MeSH 的规范名（同义词到概念的映射交给多词短语去认——
+ *      「drug therapy」「body mass index」这类短语照旧命中）；
+ *   2. 记录不能落在 `concept` 这个抽象桶里：单字的抽象概念名（Overall、Association、
+ *      Compliance）几乎全是普通英文词。
+ * 全大写缩写（HR、GWAS、EGFR）不受这两条限制——缩写的信息量恰恰在于缩写本身。
+ */
+export function singleTokenIsFaithful(token, refs, index) {
+  const raw = String((token && token.raw) || '')
+  if (raw.length >= 2 && raw.length <= 12 && /^[A-Z][A-Z0-9-]*$/.test(raw)) return true
+  if (!index || typeof index.recordAt !== 'function') return true
+  const rec = index.recordAt(refs[0])
+  if (rec === null) return false
+  if (normalizeText(rec.name) !== String((token && token.norm) || '')) return false
+  if (rec.cat === 'concept') return false
+  return true
 }
 
 /** 单字是否值得作为术语约束（多词短语一律接受） */
@@ -341,7 +482,10 @@ export function findMeshTerms(index, text, options = {}) {
           // 所以单字命中一律不接受限定词；多词短语（如 adverse effects）仍然放行。
           const rec0 = index.recordAt(refs[0])
           if (rec0 !== null && rec0.kind === 'qualifier') continue
+          // 出版物特征（树号 V*）的单词名几乎全是普通英文词，见 isPublicationCharacteristic
+          if (rec0 !== null && isPublicationCharacteristic(rec0.tree)) continue
           if (!acceptSingleToken(tokens[i], refs, opts)) continue
+          if (!singleTokenIsFaithful(tokens[i], refs, index)) continue
         }
         hit = { n, refs, phrase }
         break
@@ -426,7 +570,13 @@ export function renderMeshBlock(result, options = {}) {
     used += line.length + 1
   }
   lines.push(
-    '约束：① 上述英文术语按 MeSH 规范名书写（原文若有不同写法，中文译文对应同一概念）；' +
+    '约束：' +
+      // annotate=false 时系统提示词里写着「全文只用中文表达，专业术语不要附英文原文」。
+      // 这一条若还要求「按 MeSH 规范名书写」，等于把两条相反的指令塞给模型，
+      // 结果就是纯中文模式里仍然漏出英文括号。所以措辞随 annotate 走。
+      (opts.annotate === false
+        ? '① 上述术语只用来说明概念口径：译文中一律用中文表达，不要把英文原名或缩写写进译文；'
+        : '① 上述英文术语按 MeSH 规范名书写（原文若有不同写法，中文译文对应同一概念）；') +
       '② 中文译名由你按医学文献翻译规范给出——MeSH 只有英文，没有中文名，不要声称存在「官方中文名」；' +
       '③ 同一术语在本段、上文参考与后续段落之间必须保持同一译法；' +
       '④ 这一段只是术语提示，不要翻译它，也不要出现在译文里。',

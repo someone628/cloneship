@@ -1,6 +1,6 @@
 {
   "name": "dsh-lit-translate",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "DSH 文献翻译插件：从文献阅读里把「学术英译中」单独抠出来做成配套插件。粘贴或导入 txt/md 即可逐段翻译，术语首次出现附英文原文，支持上文参考、进度续翻与导出；内置 MeSH 2026 离线术语索引，翻译时自动收敛英文术语口径；并给模型提供 lit_translate 工具。",
   "keywords": [
     "dsh",

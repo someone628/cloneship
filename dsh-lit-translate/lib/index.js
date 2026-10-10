@@ -289,15 +289,26 @@ export function apply(ctx, config = {}) {
   /**
    * 给一段原文找出 MeSH 术语并组装成提示词块。
    * 返回 { block, brief, matchCount, truncated } 或 { error }；**任何失败都不阻断翻译**。
+   *
+   * 「不阻断」不是靠自觉：索引被截断、释义超长、正则异常都会在这里抛，所以整段包在
+   * try/catch 里，失败只降级为「本次没有术语约束」，翻译照常进行。
    */
-  function meshFor(text, disabled) {
+  function meshFor(text, disabled, annotate) {
     if (!meshEnabled || disabled === true) return null
     const got = meshSource.get()
     if (got.ok !== true) return { error: got.error }
-    const found = findMeshTerms(got.index, text, { maxTerms: meshMaxTerms })
-    if (found.matches.length === 0) return { block: '', brief: meshBrief(found.matches), matchCount: 0, truncated: false }
-    const block = renderMeshBlock(found, { defChars: meshDefChars, maxChars: meshMaxBlockChars })
-    return { block, brief: meshBrief(found.matches), matchCount: found.matches.length, truncated: found.truncated === true }
+    try {
+      const found = findMeshTerms(got.index, text, { maxTerms: meshMaxTerms })
+      if (found.matches.length === 0) return { block: '', brief: meshBrief(found.matches), matchCount: 0, truncated: false }
+      const block = renderMeshBlock(found, {
+        defChars: meshDefChars,
+        maxChars: meshMaxBlockChars,
+        annotate: annotate !== false,
+      })
+      return { block, brief: meshBrief(found.matches), matchCount: found.matches.length, truncated: found.truncated === true }
+    } catch (error) {
+      return { error: 'MeSH 术语层本次未生效（不影响翻译）：' + errText(error) }
+    }
   }
 
   /**
@@ -345,6 +356,7 @@ export function apply(ctx, config = {}) {
     const blockTexts = []
     let failure = null
     let truncated = false
+    let finishKind = null
     try {
       for await (const chunk of llm.stream({ provider, model, messages, system })) {
         if (chunk === null || chunk === undefined) continue
@@ -354,26 +366,33 @@ export function apply(ctx, config = {}) {
           blockTexts.push(chunk.block.text)
         } else if (chunk.type === 'finish' && chunk.reason) {
           const kind = chunk.reason.kind
-          if (kind === 'error' || kind === 'aborted') failure = chunk.reason.failure
-          else if (kind === 'max-tokens') truncated = true
+          finishKind = kind
+          // 以 kind 为准，而不是「failure 在不在」：万一上游只给了 kind 没给 failure，
+          // 半截译文会被当成完整结果返回（ok:true、truncated:false），那是最坏的一种错。
+          if (kind === 'error' || kind === 'aborted') {
+            failure = chunk.reason.failure || { message: kind === 'aborted' ? '模型调用被中断' : '模型返回错误', kind }
+          } else if (kind === 'max-tokens') truncated = true
         }
       }
     } catch (error) {
-      return { ok: false, error: errText(error) + llmTrouble(errText(error), error && error.code), provider, model }
+      const hint = llmTrouble(errText(error), error && error.code)
+      return { ok: false, error: errText(error) + hint, hinted: hint.length > 0, provider, model }
     }
     if (out.trim().length === 0 && blockTexts.length > 0) out = blockTexts.join('\n')
     if (out.trim().length === 0) {
       if (failure !== null && failure !== undefined) {
         const detail = String(failure.message || '')
-        return { ok: false, error: '模型调用失败：' + detail + llmTrouble(detail, failure.code), code: failure.code, provider, model }
+        const hint = llmTrouble(detail, failure.code)
+        return { ok: false, error: '模型调用失败：' + detail + hint, hinted: hint.length > 0, code: failure.code, provider, model }
       }
-      return { ok: false, error: '模型没有返回内容', provider, model }
+      return { ok: false, error: '模型没有返回内容', provider, model, finishKind }
     }
     if (failure !== null && failure !== undefined) {
       const detail = String(failure.message || '')
-      return { ok: false, error: '模型调用中断：' + detail + llmTrouble(detail, failure.code), code: failure.code, provider, model }
+      const hint = llmTrouble(detail, failure.code)
+      return { ok: false, error: '模型调用中断：' + detail + hint, hinted: hint.length > 0, code: failure.code, provider, model }
     }
-    return { ok: true, text: out, truncated, provider, model }
+    return { ok: true, text: out, truncated, provider, model, finishKind }
   }
 
   /**
@@ -389,7 +408,7 @@ export function apply(ctx, config = {}) {
     }
     const annotate = args && args.annotate === false ? false : args && args.annotate === true ? true : defaultAnnotate
     const hasContext = context.trim().length > 0
-    const mesh = meshFor(text, args && args.mesh === false)
+    const mesh = meshFor(text, args && args.mesh === false, annotate)
     const system = buildPrompt(annotate, hasContext, mesh && typeof mesh.block === 'string' ? mesh.block : '')
     const userText = buildUserText(text, context)
     const res = await llmRun(system, userText, 'littr')
@@ -467,17 +486,26 @@ export function apply(ctx, config = {}) {
         async execute(args) {
           const text = args && typeof args.text === 'string' ? args.text : ''
           const context = args && typeof args.context === 'string' ? args.context : ''
-          const res = await doTranslate(args)
-          if (res.ok !== true) {
-            const hint = res.error && /服务不可用|默认模型/.test(res.error) ? '' : llmTrouble(res.error, res.code)
-            return `文献翻译失败：${res.error}${hint}\n（lit-translate 插件：译文由 DSH 默认模型产出；失败时可以先把原文交给模型自行翻译，并向用户说明是模型翻译而非插件产出。）`
+          try {
+            const res = await doTranslate(args)
+            if (res.ok !== true) {
+              // llmRun 已经把「余额不足 / Key 无效」这类人话提示拼进 error 了（hinted=true），
+              // 这里不能再拼一次，否则同一句提示会出现两遍。
+              const hint = res.hinted === true ? '' : llmTrouble(res.error, res.code)
+              return `文献翻译失败：${res.error}${hint}\n（lit-translate 插件：译文由 DSH 默认模型产出；失败时可以先把原文交给模型自行翻译，并向用户说明是模型翻译而非插件产出。）`
+            }
+            return renderTranslationResult(res, {
+              text,
+              annotate: res.annotate !== false,
+              hasContext: context.trim().length > 0,
+              meshLine: meshSummaryLine(res),
+            })
+          } catch (error) {
+            // 兜底：任何没预料到的异常（例如损坏的 MeSH 索引）都不能让工具调用直接抛栈——
+            // 那样模型只看到一句技术报错，用户则什么都拿不到。
+            logInfo(ctx, `lit_translate 工具异常：${errText(error)}`)
+            return `文献翻译失败：插件内部错误（${errText(error)}）。可以先把原文交给模型自行翻译，并向用户说明这是模型翻译、不是插件产出。`
           }
-          return renderTranslationResult(res, {
-            text,
-            annotate: res.annotate !== false,
-            hasContext: context.trim().length > 0,
-            meshLine: meshSummaryLine(res),
-          })
         },
       }),
     )
@@ -553,8 +581,11 @@ export function apply(ctx, config = {}) {
               try {
                 await inner(req, res)
               } catch (error) {
+                // 面板只该看到人话。原始报错（JSON 解析失败、RangeError、栈信息……）
+                // 写进日志供排查，不直接丢给浏览器。
+                logInfo(ctx, `面板 RPC 处理失败：${errText(error)}`)
                 try {
-                  sendJson(res, { ok: false, error: errText(error) }, 500)
+                  sendJson(res, { ok: false, error: '插件内部错误（已记录到 DSH 日志），请重试或查看日志' }, 500)
                 } catch {
                   /* 响应已经发出去或连接断了 */
                 }
