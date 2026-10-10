@@ -108,6 +108,24 @@ export function normKey(text) {
     .trim()
 }
 
+/**
+ * 缓存键：用**实际发起查询的那串文本**，只做 NFKC / 大小写 / 空白归一。
+ *
+ * 这里**不能**用 normKey()。它把非 `[a-z0-9]` 一律抹成空格，于是
+ *   - 所有纯中文查询都塌成同一个空键：「高血压」与「糖尿病」共用 `term||5`，
+ *     第二次查询会拿到第一次的结果，输出里还回显着上一个词（缓存命中了别人的答案，
+ *     比不缓存危险得多）；
+ *   - `ER+` 与 `ER` 撞键：雌激素受体与 ER 阳性是两个不同检索口径。
+ * normKey 仍然用于「查询词 vs 概念名」的语义比较，只是不该拿来当缓存键。
+ */
+export function cacheKeyOf(text) {
+  return String(text ?? '')
+    .normalize('NFKC')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 // ---------------------------------------------------------------------------
 // 带 TTL 的小缓存
 // ---------------------------------------------------------------------------
@@ -525,7 +543,7 @@ export async function onlineLookup(query, options = {}) {
     return result
   }
 
-  const cacheKey = `${kind}|${normKey(q)}|${topK}`
+  const cacheKey = `${kind}|${cacheKeyOf(q)}|${topK}`
   if (cache) {
     const hit = cache.get(cacheKey)
     if (hit) return { ...hit, cached: true, ms: Date.now() - started }

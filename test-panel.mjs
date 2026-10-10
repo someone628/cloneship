@@ -509,6 +509,43 @@ const dictMiB = Buffer.byteLength(rawDict) / 2 ** 20
 console.log(`  词典体积: ${dictMiB.toFixed(1)} MiB`)
 check(dictMiB < 80, `词典体积应小于 80 MiB（精简后约 71.7），实际 ${dictMiB.toFixed(1)}`)
 
+console.log('[11] 回归：中文噪声命中、缩写义项与前缀、英译中功能词')
+{
+  // 中文查询只共享一个汉字时不算命中：「磨玻璃结节」曾靠一个「结」字拿到 13% 覆盖率、
+  // 51.9 分越过阈值，把「结直肠癌」「前哨淋巴结」当成结果返回——真正的「未收录」
+  // 提示（以及本地零命中才触发的联网兜底）都被这些噪声挡住了。
+  const glass = await call({ op: 'search', args: { q: '磨玻璃结节', limit: 5, online: false } })
+  check(
+    (glass.body.hits || []).length === 0,
+    `「磨玻璃结节」不该召回无关条目，实际 ${(glass.body.hits || []).map((h) => h.en).join(' / ')}`,
+  )
+  const legitWeak = await call({ op: 'search', args: { q: '肝转移', limit: 3, online: false } })
+  check((legitWeak.body.hits || []).length > 0, '共享二元组的合法弱匹配（肝转移）仍应命中')
+
+  // 缩写：义项数必须是真的总数，同前缀的其它缩写不得混进义项列表
+  const mmOut = String(await abbrTool.execute({ abbr: 'MM' }))
+  const mmHdr = mmOut.match(/共有 (\d+) 个义项/)
+  check(!!mmHdr && Number(mmHdr[1]) >= 4, `MM 的义项数应如实报出，实际 ${mmHdr && mmHdr[1]}`)
+  check(/不是\*{0,2}「MM」的义项/.test(mmOut), '同前缀的其它缩写必须单独标注，不能当义项')
+  const sensesPart = mmOut.split('【以下是')[0]
+  check(!/MM-151|MMP-2/.test(sensesPart), 'MM-151 / MMP-2 这类别的缩写不能出现在义项列表里')
+  const prOut = String(await abbrTool.execute({ abbr: 'PR' }))
+  const prHdr = prOut.match(/共有 (\d+) 个义项/)
+  check(!!prHdr && Number(prHdr[1]) > 10, `PR 的义项不能被截成 10，实际 ${prHdr && prHdr[1]}`)
+  check(prOut.includes('提高显示上限'), '义项超出显示上限时要说明只列了前 N 个')
+  check(prOut.includes('【以下是同前缀的其它缩写'), '前缀命中要单独成段')
+
+  // 英译中的逐词对照：功能词与纯数字不能当成术语（was → WAS 基因、50 → Fifty）
+  const trTool = tools.find((t) => t.name === 'onco_translate')
+  const enOut = String(
+    await trTool.execute({ text: 'The patient received osimertinib; PD-L1 expression was 50%.' }),
+  )
+  check(enOut.includes('奥希替尼'), '英译中仍应给出真实术语的中文名')
+  check(!/WAS Gene/.test(enOut), 'was（动词）不该被当成 WAS 基因')
+  check(!/Fifty/.test(enOut), '50 这样的纯数字不该被当成术语')
+  check(!/Receive\b/.test(enOut), 'received 这类功能词不该被当成术语')
+}
+
 console.log()
 console.log('='.repeat(58))
 console.log(`checks: ${checks}  failures: ${failures.length}`)

@@ -15,6 +15,7 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { Lexicon, apply, normalize, tokenize } from './dsh-onco-lexicon/lib/index.js'
+import * as online from './dsh-onco-lexicon/lib/online.js'
 
 let checks = 0
 const failures = []
@@ -177,6 +178,51 @@ try {
   badDirThrew = (e && e.code) === 'INVALID_ARGS'
 }
 check(badDirThrew, '非法翻译方向未被 schema 拦下')
+
+console.log('[11] 回归：缓存键、义项与前缀命中、Windows 绝对路径 dictPath')
+{
+  // 缓存键曾经用 normKey（把非 [a-z0-9] 全部抹成空格），于是所有纯中文查询都塌成同一个
+  // 空键：「高血压」查过之后查「糖尿病」，会拿到上一问的结果（连 query 都回显成上一个词）。
+  check(online.cacheKeyOf('高血压') !== online.cacheKeyOf('糖尿病'), '缓存键必须区分不同中文查询')
+  check(online.cacheKeyOf('ER+') !== online.cacheKeyOf('ER'), '缓存键必须区分 ER+ 与 ER')
+  check(online.cacheKeyOf('  High   BP ') === 'high bp', '缓存键只做大小写与空白归一')
+
+  // 缩写：义项（缩写字段真的写着它）与前缀命中（别的缩写）必须分开
+  const detail = lex.lookupAbbrDetailed('MM', {})
+  check(
+    detail.exact.every((h) => (h.entry.abbr ?? []).some((a) => normalize(a) === 'mm')),
+    '义项必须真的带该缩写',
+  )
+  check(
+    detail.prefix.every((h) => !detail.exact.some((e) => e.entry.id === h.entry.id)),
+    '前缀命中里不能混入已在义项里的条目',
+  )
+  check(
+    lex.lookupAbbr('MM', 10).length === [...detail.exact, ...detail.prefix].slice(0, 10).length,
+    'lookupAbbr 与 lookupAbbrDetailed 的结果集一致（旧调用方不受影响）',
+  )
+
+  // Windows 盘符路径（C:\…）不是「以 / 开头」，旧实现会把它交给 new URL，
+  // 于是 `c:` 被当成协议名，fileURLToPath 抛错，整个插件变成「词典不可用」。
+  const seedFile = fileURLToPath(new URL('./dsh-onco-lexicon/data/onco.seed.jsonl', import.meta.url))
+  const tools2 = []
+  const logs2 = []
+  apply(
+    {
+      logger: { info: (msg) => logs2.push(String(msg)) },
+      tools: { register: (t) => tools2.push(t) },
+      systemPrompt: { section: () => {} },
+      webServer: { register: () => () => {} },
+      get: () => undefined,
+      effect: (fn) => fn(),
+    },
+    { dictPath: seedFile },
+  )
+  const term2 = tools2.find((t) => t.name === 'onco_term')
+  const out2 = String(await term2.execute({ term: '非小细胞肺癌' }))
+  check(!out2.includes('词典不可用'), `绝对路径 dictPath 应能正常加载（日志：${logs2.join(' | ')}）`)
+  check(out2.includes('非小细胞肺癌'), '用绝对路径加载的词典应能正常检索')
+}
 
 console.log()
 console.log('='.repeat(58))

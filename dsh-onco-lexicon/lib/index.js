@@ -14,7 +14,7 @@
  * 逻辑与原始 TS 设计一致。包内不引入任何第三方依赖。
  */
 import { readFileSync, existsSync, statSync, writeFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import os from 'node:os'
 import path from 'node:path'
 import { defineTool } from '@deepseek-ai/dsh-tools'
@@ -159,6 +159,48 @@ function detectDirection(text) {
   const total = cjk + latin
   const ratio = total ? cjk / total : 0
   return { direction: ratio >= 0.2 ? 'zh2en' : 'en2zh', ratio, cjk, latin }
+}
+
+/**
+ * 逐词对照（`onco_translate` 英译中）里**不参与匹配**的英文写法。
+ *
+ * 词典是全量 NCIt 本体，里面什么都有：`was` 是 WAS 基因的缩写、`50` 是 Fifty 的缩写、
+ * `received` 对应 NCIt 的 Receive（Action）。术语查询里这没问题（用户查的就是它），
+ * 但**自由文本的逐词对照**里，这些词是普通英文词——实测一句
+ * "The patient received osimertinib; PD-L1 expression was 50%." 被标注成 6 个术语、
+ * 覆盖率 79.7%，其中 4 个是 was / received / 50 这类噪声，对照表直接被灌满。
+ *
+ * 因此这里只收两类：**功能词**（虚词、代词、介词、助动词、连接词）和**通用非术语词**
+ * （patient、received 这类放进对照表没有任何信息量的词）。
+ *
+ * 刻意**不**收 MET / SET / CAT / MAX / ATM / WAS 这类「英文词与基因符号同形」的实词——
+ * 它们本身就是正经肿瘤学术语（MET、ATM 都是关键驱动基因），一律屏蔽会把真术语一起杀掉。
+ */
+export const TRANSLATE_STOPWORDS = new Set([
+  'a', 'an', 'the', 'and', 'or', 'but', 'if', 'then', 'than', 'so', 'as', 'at', 'by', 'for', 'from',
+  'in', 'into', 'of', 'on', 'onto', 'to', 'with', 'within', 'without', 'via', 'per', 'upon', 'over',
+  'under', 'between', 'during', 'after', 'before', 'above', 'below', 'up', 'down', 'out', 'off',
+  'that', 'this', 'these', 'those', 'it', 'its', 'we', 'our', 'us', 'they', 'their', 'them',
+  'he', 'she', 'his', 'her', 'him', 'you', 'your', 'who', 'whom', 'which', 'when', 'where', 'while',
+  'how', 'why', 'there', 'here', 'not', 'no', 'nor', 'all', 'any', 'both', 'each', 'few', 'more',
+  'most', 'other', 'some', 'such', 'only', 'also', 'very', 'too', 'just', 'even', 'still',
+  'is', 'are', 'was', 'were', 'be', 'been', 'being', 'am', 'do', 'does', 'did', 'done', 'doing',
+  'have', 'has', 'had', 'having', 'can', 'could', 'may', 'might', 'must', 'shall', 'should', 'will',
+  'would', 'however', 'therefore', 'thus', 'hence', 'moreover', 'meanwhile', 'versus', 'vs',
+  'et', 'al', 'eg', 'ie', 'etc', 'received', 'receive', 'receiving', 'patient', 'patients',
+])
+
+/**
+ * 这个词在「逐词对照」里是否属于噪声。
+ *
+ * 纯数字一律算噪声：数字在正文里是数字，而词典里 `50` 会命中 Fifty、
+ * `1` 会命中某个基因——把它标成术语只会让覆盖率虚高。
+ */
+export function isNonTermSpan(key) {
+  const k = String(key ?? '')
+  if (!k) return true
+  if (/^[0-9]+$/.test(k)) return true
+  return TRANSLATE_STOPWORDS.has(k)
 }
 
 let segmenter = null
@@ -426,8 +468,23 @@ export class Lexicon {
       }
     }
     if (qIdfSum > 0) {
+      // 中文查询里，**只共享一个汉字不算命中**。
+      //
+      // 一元汉字在 IDF 上权重很高，于是「磨玻璃结节」会靠一个「结」字拿到 13% 覆盖率、
+      // 51.9 分，越过 MIN_SCORE 把「结直肠癌」「前哨淋巴结」当成结果返回——用户问的是
+      // 磨玻璃结节，拿到的却是两个毫不相干的疾病，而真正的「未收录」提示（以及本地零命中
+      // 才会触发的联网兜底）被这些噪声命中挡住了。
+      //
+      // 判据不是覆盖率而是**重叠物的粒度**：查询里有 ≥2 个汉字时，命中的汉字 token 至少
+      // 要有 2 个字（二元组或分词结果）才算数。合法的弱匹配（「抗肿瘤药物」命中「肿瘤」、
+      // 「肝转移」命中「转移」）都是二元组，不受影响。
+      const strictCjk = [...q].filter((ch) => CJK_RE.test(ch)).length >= 2
       let hitIdf = 0
-      for (const t of qTokens) if (doc.tf.has(t)) hitIdf += this.idf(t)
+      for (const t of qTokens) {
+        if (!doc.tf.has(t)) continue
+        if (strictCjk && t.length === 1 && CJK_RE.test(t)) continue
+        hitIdf += this.idf(t)
+      }
       const coverage = hitIdf / qIdfSum
       if (coverage > 0) {
         const s = W_TOKEN * coverage + 60 * coverage * coverage
@@ -504,25 +561,49 @@ export class Lexicon {
       .slice(0, topK)
   }
 
-  /** 缩写专用查询：返回该缩写的全部义项，供模型消歧 */
-  lookupAbbr(abbr, topK = 10, filter = null) {
+  /**
+   * 缩写专用查询，**分两桶**返回，供模型消歧。
+   *
+   *   - `exact`  —— 缩写字段里**真的写着**这个缩写的条目。这些才是「义项」。
+   *   - `prefix` —— 别的缩写以它开头（MM → MMP-2、MM-151；OS → OSCS、OSE-279）。
+   *     那不是「MM 的义项」，混进义项列表里会被模型转述成「MM 也可能指 MMP-2」。
+   *
+   * 分开还有一个更硬的理由：`exact` 的条数决定了「是否歧义」的判断，
+   * 而这个数字必须是真的总数——旧实现对结果切了 10 条，然后把 10 当成总数报出去。
+   */
+  lookupAbbrDetailed(abbr, options = {}) {
     const q = normalize(abbr)
-    if (!q) return []
+    const label = String(abbr ?? '')
+    if (!q) return { abbr: label, exact: [], prefix: [] }
+    const filter = options.filter ?? null
     const keep = (entry) => !filter || filter(entry)
-    const hits = []
+    const exact = []
     for (const i of this.abbrIndex.get(q) ?? []) {
       if (keep(this.docs[i].entry)) {
-        hits.push({ entry: this.docs[i].entry, score: W_EXACT, via: '缩写完全匹配' })
+        exact.push({ entry: this.docs[i].entry, score: W_EXACT, via: '缩写完全匹配' })
       }
     }
+    const prefix = []
     for (const [key, list] of this.abbrIndex) {
       if (key === q || !key.startsWith(q) || q.length < 2) continue
       for (const i of list) {
         if (!keep(this.docs[i].entry)) continue
-        hits.push({ entry: this.docs[i].entry, score: W_PREFIX - 200, via: `缩写前缀匹配「${key}」` })
+        prefix.push({ entry: this.docs[i].entry, score: W_PREFIX - 200, via: `缩写前缀匹配「${key}」` })
       }
     }
-    return dedupe(hits).slice(0, topK)
+    const exactHits = dedupe(exact)
+    const exactIds = new Set(exactHits.map((h) => h.entry.id))
+    return {
+      abbr: label,
+      exact: exactHits,
+      prefix: dedupe(prefix).filter((h) => !exactIds.has(h.entry.id)),
+    }
+  }
+
+  /** 缩写专用查询（扁平结果，义项在前、前缀命中在后）：面板等旧调用方用 */
+  lookupAbbr(abbr, topK = 10, filter = null) {
+    const { exact, prefix } = this.lookupAbbrDetailed(abbr, { filter })
+    return [...exact, ...prefix].slice(0, topK)
   }
 
   browse(category, keyword, limit = 30, filter = null) {
@@ -703,7 +784,11 @@ export class Lexicon {
     const want = options.direction
     const direction = want === 'zh2en' || want === 'en2zh' ? want : det.direction
     const maxSpans = Math.min(Math.max(Number(options.limit) || 400, 1), 2000)
-    const raw = this.matchTerms(src, { limit: maxSpans })
+    // 英译中时先把功能词与纯数字摘掉：它们虽然真在 NCIt 里（was→WAS 基因、50→Fifty），
+    // 但在自由文本里是噪声，留着会把对照表和覆盖率一起灌满。见 TRANSLATE_STOPWORDS。
+    const raw = this.matchTerms(src, { limit: maxSpans }).filter(
+      (span) => !(direction === 'en2zh' && isNonTermSpan(span.key)),
+    )
     const truncated = raw.length >= maxSpans
 
     const segments = []
@@ -899,11 +984,76 @@ export function renderAbbr(hits, abbr, dictLabel) {
   return `${head}\n\n${body}\n\n${DISCLAIMER}`
 }
 
-export function renderBrowse(entries, category, dictLabel) {
-  if (!entries.length) {
-    return `离线词典中该类目下没有匹配词条（类别：${category ?? '全部'}，词典：${dictLabel}）。`
+/**
+ * 缩写消歧的工具文本输出：**义项**与「同前缀的其它缩写」分栏渲染。
+ *
+ * 两件事必须做对：
+ *   1. 头部的义项数是真的总数。旧实现先把结果切到 10 条，再写「共有 10 个义项」——
+ *      实测 PR 有 21 个义项却报 10 个，而系统提示词正是让模型把这个数字当权威。
+ *   2. 前缀命中不能混进义项列表。`MM` 的真实义项只有 4 个，前缀命中却是 MMP-2、
+ *      MMDD、MM-151 这些**别的缩写**；混在一起模型会答「MM 也可能是 MMP-2」。
+ */
+export function renderAbbrDetailed(detail, dictLabel, options = {}) {
+  const maxExact = Math.max(1, Number(options.maxExact) || 20)
+  const maxPrefix = Math.max(0, Number(options.maxPrefix) || 6)
+  const exact = Array.isArray(detail?.exact) ? detail.exact : []
+  const prefix = Array.isArray(detail?.prefix) ? detail.prefix : []
+  const abbr = detail?.abbr ?? ''
+  const shown = exact.slice(0, maxExact)
+  const parts = []
+
+  if (!exact.length) {
+    parts.push(
+      `离线词典中未收录缩写「${abbr}」的义项（词典：${dictLabel}）。` +
+        '请勿臆测其含义，可提示用户给出上下文或全称。',
+    )
+  } else if (exact.length === 1 && !prefix.length) {
+    return renderHits(exact, abbr, dictLabel)
+  } else {
+    const head =
+      exact.length === 1
+        ? `缩写「${abbr}」在离线词典中有 1 个义项（词典：${dictLabel}）：`
+        : `缩写「${abbr}」在离线词典中共有 ${exact.length} 个义项` +
+          (shown.length < exact.length ? `，下面列出前 ${shown.length} 个` : '') +
+          `（词典：${dictLabel}）：\n该缩写存在歧义，请结合上下文向用户确认所指，不要默认取第一条。`
+    parts.push(head)
+    parts.push(shown.map((h, i) => formatEntry(h.entry, i + 1, h.via)).join('\n\n'))
+    if (shown.length < exact.length) {
+      parts.push(`（义项共 ${exact.length} 个，此处只显示前 ${shown.length} 个；可用 topK 提高显示上限。）`)
+    }
   }
-  const head = `词典类目「${category ?? '全部'}」下的词条（显示 ${entries.length} 条，词典：${dictLabel}）`
+
+  if (prefix.length) {
+    const list = prefix.slice(0, maxPrefix)
+    parts.push(
+      `【以下是同前缀的其它缩写，**不是**「${abbr}」的义项，不要当义项转述】\n` +
+        list
+          .map((h, i) => {
+            const nm = h.entry.zh ? `${h.entry.zh} / ${h.entry.en}` : h.entry.en
+            const ab = h.entry.abbr?.length ? `（缩写：${h.entry.abbr.join('、')}）` : ''
+            return `${i + 1}. ${nm}${ab}`
+          })
+          .join('\n') +
+        (prefix.length > list.length ? `\n…另有 ${prefix.length - list.length} 条同前缀缩写未列出` : ''),
+    )
+  }
+
+  return `${parts.join('\n\n')}\n\n${DISCLAIMER}`
+}
+
+export function renderBrowse(entries, category, dictLabel, constraints = '') {
+  if (!entries.length) {
+    // 空结果必须说清是**哪个条件**筛空的。旧版一律写成「类别：全部」，
+    // 于是 {keyword:'zzzz'} 或 {ncitType:'不存在的类型'} 的空结果也被归咎于类别，
+    // 而这个工具恰恰是用来「确认词典覆盖范围」的——归错因会让模型误判词表。
+    const own = category ? `类别：${CATEGORY_LABEL[category] ?? category}` : ''
+    const all = constraints ? (own ? `${own}，${constraints}` : constraints) : own
+    return (
+      `离线词典中没有符合条件的词条${all ? `（${all}）` : ''}（词典：${dictLabel}）。` +
+      '本工具只浏览本地词表：空结果表示当前这些条件在词表里没有交集，不代表词表收录范围之外另有内容。'
+    )
+  }
+  const head = `词典类目「${category ? (CATEGORY_LABEL[category] ?? category) : '全部'}」下的词条（显示 ${entries.length} 条，词典：${dictLabel}）`
   const body = entries
     .map((e, i) => {
       const nm = e.zh ? `${e.zh} / ${e.en}` : e.en
@@ -1011,9 +1161,13 @@ function logInfo(ctx, message) {
 function resolveDict(ctx, config) {
   const pluginRoot = fileURLToPath(new URL('..', import.meta.url))
   if (config.dictPath) {
-    const file = config.dictPath.startsWith('/')
+    // Windows 盘符路径（C:\…）不是「以 / 开头」，走 URL 相对路径拼接会被当成协议名
+    // （`c:` 被解析成 scheme），fileURLToPath 直接抛 "The URL must be of scheme file"，
+    // 整个插件随之不可用。这里用 path.isAbsolute 判绝对路径，相对路径也用
+    // pathToFileURL 拼基址，避免盘符与空格把 URL 拼坏。
+    const file = path.isAbsolute(config.dictPath)
       ? config.dictPath
-      : fileURLToPath(new URL(config.dictPath, `file://${pluginRoot}/`))
+      : fileURLToPath(new URL(config.dictPath, pathToFileURL(pluginRoot + path.sep)))
     if (!existsSync(file)) throw new Error(`指定的词典文件不存在：${file}`)
     return { file, label: file }
   }
@@ -1211,6 +1365,23 @@ export function apply(ctx, config = {}) {
     return bits.length ? `【已按 ${bits.join('，')} 筛查】` : ''
   }
 
+  /**
+   * 空结果时用来交代「谁把结果筛空了」——与 describeScope 不同，
+   * 这里把 keyword 也算上，且不带方括号横幅。
+   */
+  function describeConstraints(args) {
+    const bits = []
+    if (CATEGORIES.includes(args && args.category)) {
+      bits.push(`类别：${CATEGORY_LABEL[args.category] ?? args.category}`)
+    }
+    if (SOURCE_VALUES.includes(args && args.source)) bits.push(`出处：${args.source}`)
+    const typ = args && typeof args.ncitType === 'string' ? args.ncitType.trim() : ''
+    if (typ) bits.push(`类型：${typ}`)
+    const kw = args && typeof args.keyword === 'string' ? args.keyword.trim() : ''
+    if (kw) bits.push(`关键词：${kw}`)
+    return bits.join('，')
+  }
+
   ctx.tools.register(
     defineTool({
       name: 'onco_term',
@@ -1283,7 +1454,12 @@ export function apply(ctx, config = {}) {
         }
 
         const fallback = await onlineFallback(args.term, 'term', { topK: k, signal: exec && exec.signal })
-        return [scope, localMiss, fallback.text].filter(Boolean).join('\n\n')
+        // 联网结果没有本地那套 category / source / ncitType 字段，筛查对它**不生效**。
+        // 这时候还挂着「已按…筛查」的横幅，等于让模型把未筛查的联网概念当成筛查过的结果。
+        const onlineScope = filter
+          ? '【注意】本地筛查条件对下面这段联网结果不生效：联网侧的 NCIt / MeSH 记录没有类别、出处与语义类型字段。'
+          : scope
+        return [onlineScope, localMiss, fallback.text].filter(Boolean).join('\n\n')
       },
     }),
   )
@@ -1297,6 +1473,10 @@ export function apply(ctx, config = {}) {
         '会联网在 NCIt 中补查（召回不保证完整，结果只作线索）。',
       parameters: {
         abbr: { type: 'string', required: true, description: '缩写本身，例如 OS、PFS、PD-L1、MM' },
+        topK: {
+          type: 'number',
+          description: '可选：最多列出多少个义项，默认 20，上限 50。默认值已够覆盖常见缩写。',
+        },
         category: {
           type: 'string',
           enum: CATEGORIES,
@@ -1313,24 +1493,32 @@ export function apply(ctx, config = {}) {
       async execute(args, exec) {
         if (!lex) return `肿瘤学词典不可用${dictNote}，无法查询，请勿据记忆作答。`
         const filter = toolFilter(args)
-        const hits = lex.lookupAbbr(args.abbr, 10, filter)
+        const limit = args.topK && args.topK > 0 ? Math.min(args.topK, 50) : 20
+        const detail = lex.lookupAbbrDetailed(args.abbr, { filter })
         const scope = describeScope(args)
-        const localMiss = renderAbbr(hits, args.abbr, dictLabel)
-        if (hits.length) return scope ? `${scope}\n\n${localMiss}` : localMiss
+        const localMiss = renderAbbrDetailed(detail, dictLabel, { maxExact: limit })
+        // 义项（缩写字段真的写着它）才算命中；同前缀的其它缩写只作为附带线索列出
+        if (detail.exact.length) return scope ? `${scope}\n\n${localMiss}` : localMiss
 
         // 同样先排除「被筛查条件挡掉」的情形
         if (filter) {
-          const unfiltered = lex.lookupAbbr(args.abbr, 10, null)
-          if (unfiltered.length) {
+          const unfiltered = lex.lookupAbbrDetailed(args.abbr, {})
+          if (unfiltered.exact.length) {
             const note =
-              `注意：本地词典中确有缩写「${args.abbr}」的义项（不加筛查条件时 ${unfiltered.length} 条），` +
+              `注意：本地词典中确有缩写「${args.abbr}」的义项（不加筛查条件时 ${unfiltered.exact.length} 条），` +
               '只是被当前筛查条件排除了，因此本次不进行联网兜底。请放宽或清除筛查条件后重试。'
             return [scope, localMiss, note].filter(Boolean).join('\n\n')
           }
         }
 
-        const fallback = await onlineFallback(args.abbr, 'abbr', { topK: 5, signal: exec && exec.signal })
-        return [scope, localMiss, fallback.text].filter(Boolean).join('\n\n')
+        const fallback = await onlineFallback(args.abbr, 'abbr', {
+          topK: Math.min(limit, 10),
+          signal: exec && exec.signal,
+        })
+        const onlineScope = filter
+          ? '【注意】本地筛查条件对下面这段联网结果不生效：联网侧的 NCIt / MeSH 记录没有类别、出处与语义类型字段。'
+          : scope
+        return [onlineScope, localMiss, fallback.text].filter(Boolean).join('\n\n')
       },
     }),
   )
@@ -1375,7 +1563,7 @@ export function apply(ctx, config = {}) {
         const stats = lex.stats()
         const head =
           `当前词典共 ${stats.total} 条词条${dictNote}。${describeScope(args)}\n\n` +
-          renderBrowse(entries, category, dictLabel)
+          renderBrowse(entries, category, dictLabel, describeConstraints(args))
         return head
       },
     }),
@@ -1691,6 +1879,18 @@ export function apply(ctx, config = {}) {
         if (result.hits && result.hits.length) return result
         const q = String((args && args.q) || '').trim()
         if (!q) return result
+        // 与工具层同一口径：本地「其实有命中、只是被筛查条件挡掉」时不联网。
+        // 联网结果没有 category / source / ncitType 字段，过滤不了——既白白把查询发给
+        // NCI / NLM，又会把一份与面板上生效中的筛查条件相矛盾的结果摆到用户面前。
+        const filter = makeFilter(args || {})
+        if (filter) {
+          const unfiltered = op === 'abbr' ? lex.lookupAbbr(q, 50, null) : lex.search(q, 20, null)
+          if (unfiltered.length) {
+            result.onlineSkipped =
+              '本地词典中有命中，只是被当前筛查条件排除了；联网兜底对筛查条件不生效，故本次不联网。'
+            return result
+          }
+        }
         const { result: fb } = await onlineFallback(q, op === 'abbr' ? 'abbr' : 'term', { topK: 3 })
         if (fb) {
           result.online = { ...fb, summary: summarizeOnline(fb) }
